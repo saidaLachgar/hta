@@ -1,0 +1,58 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+###> symfony/framework-bundle ###
+/server/.env.local
+/server/.env.local.php
+/server/.env.*.local
+/server/config/secrets/prod/prod.decrypt.private.php
+/server/public/bundles/
+/server/var/
+/server/vendor/
+###< symfony/framework-bundle ###
+
+###> lexik/jwt-authentication-bundle ###
+/server/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+
+# Compiled output
+/admin/dist
+/admin/tmp
+/admin/out-tsc
+/admin/bazel-out
+
+# Node
+/admin/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.vscode/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/admin/.angular/cache
+.sass-cache/
+/admin/connect.lock
+/admin/coverage
+/admin/libpeerconnection.log
+testem.log
+/admin/typings
+
+# System files
+.DS_Store
+Thumbs.db
