@@ -21,7 +21,7 @@ export class DefaultComponent implements OnInit {
      const attribute = document.body.getAttribute('data-layout');
      const vertical = document.getElementById('layout-vertical');
      this.isVisible = attribute;
-     vertical.setAttribute('checked', 'true');
+     vertical && vertical.setAttribute('checked', 'true');
      
   }
 

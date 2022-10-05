@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { AlertsComponent } from './alerts/alerts.component';
 import { ButtonsComponent } from './buttons/buttons.component';
 import { CardsComponent } from './cards/cards.component';
-import { CarouselComponent } from './carousel/carousel.component';
 import { DropdownsComponent } from './dropdowns/dropdowns.component';
 import { GridComponent } from './grid/grid.component';
 import { ImagesComponent } from './images/images.component';
@@ -33,10 +32,6 @@ const routes: Routes = [
     {
         path: 'cards',
         component: CardsComponent
-    },
-    {
-        path: 'carousel',
-        component: CarouselComponent
     },
     {
         path: 'dropdowns',

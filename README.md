@@ -80,3 +80,4 @@ Swagger API Docs http://127.0.0.1:8000/api/
     ng set --global packageManager=yarn   // swatch to yarn instead of npm
     ng g m shared --routing               // create a A Shared Module is used to organize a set of commonly used pieces into one module and export them to any module that imports the Share Module 
     ng g c shared/components/compoName --module shared // create a shared compos
+    source-map-explorer dist/skote/main.3d439155b7914070.js

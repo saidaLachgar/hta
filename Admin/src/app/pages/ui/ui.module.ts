@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { UIModule } from '../../shared/ui/ui.module';
 import {
-  NgbAlertModule, NgbCarouselModule, NgbDropdownModule, NgbModalModule, NgbProgressbarModule,
+  NgbAlertModule, NgbDropdownModule, NgbModalModule, NgbProgressbarModule,
   NgbTooltipModule, NgbPopoverModule, NgbPaginationModule, NgbNavModule, NgbAccordionModule,
   NgbCollapseModule
 } from '@ng-bootstrap/ng-bootstrap';
@@ -15,7 +15,6 @@ import { UiRoutingModule } from './ui-routing.module';
 import { AlertsComponent } from './alerts/alerts.component';
 import { ButtonsComponent } from './buttons/buttons.component';
 import { CardsComponent } from './cards/cards.component';
-import { CarouselComponent } from './carousel/carousel.component';
 import { DropdownsComponent } from './dropdowns/dropdowns.component';
 import { GridComponent } from './grid/grid.component';
 import { ImagesComponent } from './images/images.component';
@@ -36,7 +35,7 @@ import { PlaceholderComponent } from './placeholder/placeholder.component';
 
 @NgModule({
   // tslint:disable-next-line: max-line-length
-  declarations: [AlertsComponent, ButtonsComponent, CardsComponent, CarouselComponent, DropdownsComponent, GridComponent, ImagesComponent, ModalsComponent, ProgressbarComponent, TypographyComponent, GeneralComponent, ColorsComponent, VideoComponent, TabsComponent, SweetalertComponent, RangesliderComponent, ImagecropperComponent, LightboxComponent, PlaceholderComponent],
+  declarations: [AlertsComponent, ButtonsComponent, CardsComponent, DropdownsComponent, GridComponent, ImagesComponent, ModalsComponent, ProgressbarComponent, TypographyComponent, GeneralComponent, ColorsComponent, VideoComponent, TabsComponent, SweetalertComponent, RangesliderComponent, ImagecropperComponent, LightboxComponent, PlaceholderComponent],
   imports: [
     CommonModule,
     UiRoutingModule,
@@ -44,7 +43,6 @@ import { PlaceholderComponent } from './placeholder/placeholder.component';
     FormsModule,
     Ng5SliderModule,
     NgbAlertModule,
-    NgbCarouselModule,
     NgbDropdownModule,
     NgbModalModule,
     NgbProgressbarModule,

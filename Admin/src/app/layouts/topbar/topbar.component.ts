@@ -2,8 +2,6 @@ import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { AuthenticationService } from '../../core/services/auth.service';
-import { AuthfakeauthenticationService } from '../../core/services/authfake.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-topbar',
@@ -18,8 +16,7 @@ export class TopbarComponent implements OnInit {
 
   element;
 
-  constructor(@Inject(DOCUMENT) private document: any, private router: Router, private authService: AuthenticationService,
-              private authFackservice: AuthfakeauthenticationService) {
+  constructor(@Inject(DOCUMENT) private document: any, private router: Router, private authService: AuthenticationService,) {
   }
 
   openMobileMenu: boolean;
@@ -43,11 +40,8 @@ export class TopbarComponent implements OnInit {
    * Logout the user
    */
   logout() {
-    if (environment.defaultauth === 'firebase') {
-      this.authService.logout();
-    } else {
-      this.authFackservice.logout();
-    }
+   
+    this.authService.logout();
     this.router.navigate(['/account/login']);
   }
 

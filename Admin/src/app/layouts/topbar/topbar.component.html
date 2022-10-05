@@ -2,26 +2,11 @@
   <div class="navbar-header">
     <div class="d-flex">
       <!-- LOGO -->
-      <div class="navbar-brand-box">
-        <a routerLink="/" class="logo logo-dark">
-          <span class="logo-sm">
-            <img src="assets/images/logo.svg" alt="" height="22">
-          </span>
-          <span class="logo-lg">
-            <img src="assets/images/logo-dark.png" alt="" height="17">
-          </span>
-        </a>
-
-        <a routerLink="/" class="logo logo-light">
-          <span class="logo-sm">
-            <img src="assets/images/logo-light.svg" alt="" height="22">
-          </span>
-          <span class="logo-lg">
-            <img src="assets/images/logo-light.png" alt="" height="19">
-          </span>
+      <div class="navbar-brand-box d-flex justify-content-center align-items-center">
+        <a routerLink="/">
+          <div class="fw-bold text-white fs-2">RTE CRM</div>
         </a>
       </div>
-
       <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn"
         (click)="toggleMobileMenu($event)">
         <i class="fa fa-fw fa-bars"></i>
@@ -47,10 +32,10 @@
           <div class="p-3">
             <div class="row align-items-center">
               <div class="col">
-                <h6 class="m-0">{{ 'HEADER.NOTIFICATIONS.TITLE' | translate}} </h6>
+                <h6 class="m-0">{{ 'HEADER.NOTIFICATIONS.TITLE' }} </h6>
               </div>
               <div class="col-auto">
-                <a href="javascript: void(0);" class="small">{{ 'HEADER.NOTIFICATIONS.VIEW_ALL' | translate}}</a>
+                <a href="javascript: void(0);" class="small">{{ 'HEADER.NOTIFICATIONS.VIEW_ALL' }}</a>
               </div>
             </div>
           </div>
@@ -63,11 +48,11 @@
                   </span>
                 </div>
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TITLE' | translate}}</h6>
+                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TEXT' | translate}}</p>
+                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TEXT' }}</p>
                     <p class="mb-0"><i class="mdi mdi-clock-outline"></i>
-                      {{ 'HEADER.NOTIFICATIONS.FIRST.TIME' | translate}}</p>
+                      {{ 'HEADER.NOTIFICATIONS.FIRST.TIME' }}</p>
                   </div>
                 </div>
               </div>
@@ -76,11 +61,10 @@
               <div class="media">
                 <img src="assets/images/users/avatar-3.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TITLE' | translate}}</h6>
+                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TEXT' | translate}}</p>
-                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.SECOND.TIME' |
-                      translate}}</p>
+                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TEXT' }}</p>
+                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.SECOND.TIME' }}</p>
                   </div>
                 </div>
               </div>
@@ -93,11 +77,10 @@
                   </span>
                 </div>
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TITLE' | translate}}</h6>
+                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TEXT' | translate}}</p>
-                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.THIRD.TIME' |
-                      translate}}</p>
+                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TEXT' }}</p>
+                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.THIRD.TIME' }}</p>
                   </div>
                 </div>
               </div>
@@ -106,11 +89,10 @@
               <div class="media">
                 <img src="assets/images/users/avatar-4.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TITLE' | translate}}</h6>
+                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TEXT' | translate}}</p>
-                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.FOUR.TIME' |
-                      translate}}</p>
+                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TEXT' }}</p>
+                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.FOUR.TIME' }}</p>
                   </div>
                 </div>
               </div>
@@ -119,7 +101,7 @@
           <div class="p-2 border-top d-grid">
             <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">
               <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">{{
-                'HEADER.NOTIFICATIONS.LOAD_MORE' | translate}}</span>
+                'HEADER.NOTIFICATIONS.LOAD_MORE' }}</span>
             </a>
           </div>
         </div>

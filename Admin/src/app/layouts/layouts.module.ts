@@ -12,8 +12,6 @@ import { SidebarComponent } from "./sidebar/sidebar.component";
 import { TopbarComponent } from "./topbar/topbar.component";
 import { FooterComponent } from "./footer/footer.component";
 import { VerticalComponent } from "./vertical/vertical.component";
-import { LanguageService } from "../core/services/language.service";
-import { TranslateModule } from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
@@ -25,13 +23,12 @@ import { TranslateModule } from "@ngx-translate/core";
   ],
   imports: [
     CommonModule,
-    TranslateModule,
     RouterModule,
     NgbDropdownModule,
     ClickOutsideModule,
     UIModule,
     SimplebarAngularModule,
   ],
-  providers: [LanguageService],
+  providers: [],
 })
 export class LayoutsModule {}

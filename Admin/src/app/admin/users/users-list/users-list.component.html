@@ -1,0 +1,27 @@
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <!-- <app-page-title title="Task List" [breadcrumbItems]="breadCrumbItems"></app-page-title> -->
+    <!-- end page title -->
+  
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users$ | async">
+                    <td>{{user.id}}</td>
+                    <td>{{user.username}}</td>
+                    <td>{{user.firstname}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- end row -->
+  
+  </div> <!-- container-fluid -->

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { CarouselModule } from 'ngx-owl-carousel-o';
 import { NgOtpInputModule } from  'ng-otp-input';
 
 import { ExtrapagesRoutingModule } from './extrapages-routing.module';
@@ -17,7 +16,6 @@ import { ComingsoonComponent } from './comingsoon/comingsoon.component';
   declarations: [MaintenanceComponent, Page404Component, Page500Component, LockscreenComponent,ComingsoonComponent ],
   imports: [
     CommonModule,
-    CarouselModule,
     ExtrapagesRoutingModule,
     NgOtpInputModule
   ]
