@@ -7,7 +7,7 @@ import { AuthenticationService } from '../services/auth.service';
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
     constructor(private authenticationService: AuthenticationService) { }
-
+    
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         
             // add authorization header with jwt token if available
@@ -18,6 +18,11 @@ export class JwtInterceptor implements HttpInterceptor {
                         Authorization: `Bearer ${currentUser.token}`
                     }
                 });
+            }
+            // removes trailing slashes
+            if (request.url.includes("/api/") && request.url.endsWith("/")) {
+                const dupReq = request.clone({ url: request.url.replace(/\/$/, "") });
+                return next.handle(dupReq);
             }
         return next.handle(request);
     }

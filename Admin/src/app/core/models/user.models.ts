@@ -1,8 +1,14 @@
 export class User {
     id?: number;
-    username: string;
+    username?: string;
     password?: string;
-    firstname?: string;
-    lastname?: string;
-    token: string;
+    fullName?: string;
+    roles? : string[];
+    token?: string;
+    // team? : string;
+}
+export class Group{
+    id?: number;
+    title: string;
+    roles: string[];
 }

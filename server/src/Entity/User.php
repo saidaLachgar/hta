@@ -29,12 +29,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $firstname;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $lastname;
+    private $fullName;
 
     /**
      * @var string The hashed password
@@ -64,29 +59,18 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getFirstname(): ?string
+    public function getFullName(): ?string
     {
-        return $this->firstname;
+        return $this->fullName;
     }
 
-    public function setFirstname(?string $firstname): self
+    public function setFullName(?string $fullName): self
     {
-        $this->firstname = $firstname;
+        $this->fullName = $fullName;
 
         return $this;
     }
 
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(?string $lastname): self
-    {
-        $this->lastname = $lastname;
-
-        return $this;
-    }
 
     public function getPassword(): ?string
     {
@@ -105,10 +89,11 @@ class User implements UserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        // $roles = $this->roles;
         // guarantee every User at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-        return array_unique($roles);
+        // $roles[] = 'ROLE_USER';
+        // return array_unique($roles);
+        return $this->roles;
     }
 
     public function setRoles(array $roles): self

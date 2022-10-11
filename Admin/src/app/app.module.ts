@@ -4,11 +4,11 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { NgbNavModule, NgbAccordionModule, NgbTooltipModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HotToastModule } from '@ngneat/hot-toast';
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
 
 import { ExtrapagesModule } from './extrapages/extrapages.module';
-
 
 import { LayoutsModule } from './layouts/layouts.module';
 import { AppRoutingModule } from './app-routing.module';
@@ -17,10 +17,7 @@ import { AppComponent } from './app.component';
 import { ErrorInterceptor } from './core/helpers/error.interceptor';
 import { JwtInterceptor } from './core/helpers/jwt.interceptor';
 
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { EntityDataModule, EntityDataService } from '@ngrx/data';
-import { userModule } from './admin/users/user.module';
+// import { userModule } from './admin/users/user.module';
 import { AppStoreModule } from './entity-store.module';
 
 @NgModule({
@@ -28,23 +25,21 @@ import { AppStoreModule } from './entity-store.module';
     AppComponent,
   ],
   imports: [
+    NgbModule,
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
     LayoutsModule,
     AppRoutingModule,
     ExtrapagesModule,
+
     NgbAccordionModule,
     NgbNavModule,
     NgbTooltipModule,
     ScrollToModule.forRoot(),
-    NgbModule,
-
-    StoreModule.forRoot({}, {}),
-    EffectsModule.forRoot([]),
+    HotToastModule.forRoot({ theme:'snackbar',position: 'bottom-center',dismissible: true }),
+    
     AppStoreModule,
-    userModule
-
   ],
   bootstrap: [AppComponent],
   providers: [

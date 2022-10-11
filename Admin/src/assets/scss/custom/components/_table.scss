@@ -4,10 +4,10 @@
 
 .table {
   th {
-      font-weight: $font-weight-bold;
+    font-weight: $font-weight-bold;
   }
 
-  .table-light{
+  .table-light {
     color: $body-color;
     border-color: $table-border-color;
     background-color: $table-head-bg;
@@ -24,14 +24,46 @@
 }
 
 
-.table-dark>:not(:last-child)>:last-child>*{
-  border-bottom-color:  $table-dark-border-color;
+.table-dark>:not(:last-child)>:last-child>* {
+  border-bottom-color: $table-dark-border-color;
 }
 
 .table-nowrap {
-  th, td {
+
+  th,
+  td {
     white-space: nowrap;
   }
 }
 
+.table.datatables thead tr th {
+  &:not([sortable]) {
 
+    &::before,
+    &::after {
+      content: unset;
+    }
+  }
+
+  &[sortable] {
+
+    &::before,
+    &::after {
+      font-size: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &::before {
+      content: "\2191" !important;
+      right: 5px;
+    }
+
+    &::after {
+
+      content: "\2193" !important;
+      right: 11px;
+
+    }
+  }
+}

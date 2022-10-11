@@ -1,27 +1,210 @@
 <div class="container-fluid">
-
-    <!-- start page title -->
-    <!-- <app-page-title title="Task List" [breadcrumbItems]="breadCrumbItems"></app-page-title> -->
-    <!-- end page title -->
-  
-    <div class="row">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of users$ | async">
-                    <td>{{user.id}}</td>
-                    <td>{{user.username}}</td>
-                    <td>{{user.firstname}}</td>
-                </tr>
-            </tbody>
-        </table>
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Utilisateurs"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
     </div>
-    <!-- end row -->
-  
-  </div> <!-- container-fluid -->
+    <div class="col-auto">
+      <button
+        class="btn bg-light text-primary ms-2"
+        title="Recherche"
+        data-toggle="collapse"
+        (click)="hideSearch = !hideSearch"
+      >
+        <i class="fas fa-filter"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Exporter">
+        <i class="fas fa-upload"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Importer">
+        <i class="fas fa-download"></i>
+      </button>
+      <a routerLink="/users/add" class="btn btn-primary ms-2"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="collapse" id="collapseExample" [ngbCollapse]="hideSearch">
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-body">
+          <form class="row gy-2 gx-3 align-items-end">
+            <div class="col-auto col-lg-5">
+              <label for="filterSelect">Propriétés</label>
+              <select class="form-select w-100" id="filterSelect" required>
+                <option selected>Choisir une option...</option>
+                <option value="username">Matricule</option>
+                <option value="name">Nom</option>
+                <option value="role">Role</option>
+                <option value="team">Equipe</option>
+              </select>
+            </div>
+            <div class="col-sm-auto col-lg-5">
+              <label for="filterInput">Valeurs</label>
+              <input
+                type="text"
+                class="form-control"
+                id="filterInput"
+                placeholder="Recherche..."
+                required
+              />
+            </div>
+            <div class="col-sm-auto col-lg">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-filter"></i> Filtrer
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- <div class="row mb-md-2">
+              <div class="col-sm-12 col-md-6">
+                <div class="dataTables_length" id="tickets-table_length"><label
+                    class="d-inline-flex align-items-center">Show
+                    <select name="tickets-table_length" aria-controls="tickets-table" name="pageSize"
+                      [(ngModel)]="userService.pageSize" class="form-control form-control-sm mx-2">
+                      <option [ngValue]="10">10</option>
+                      <option [ngValue]="25">25</option>
+                      <option [ngValue]="50">50</option>
+                      <option [ngValue]="100">100</option>
+                    </select> entries</label></div> 
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_filter" class="dataTables_filter text-md-end"><label
+                    class="d-inline-flex align-items-center">Search:
+                     <input type="text" name="searchTerm" class="form-control form-control-sm ms-2"
+                      aria-controls="tickets-table" [(ngModel)]="userService.searchTerm"> </label></div>
+              </div>
+            </div> -->
+          <!-- Table -->
+          <div class="table-responsive">
+            <table
+              id="basic-datatable"
+              class="table table-bordered dt-responsive nowrap datatables no-footer dtr-inline"
+            >
+              <thead>
+                <tr>
+                  <th sortable="username">Matricule</th>
+                  <th sortable="name">Nom</th>
+                  <th sortable="role">Rôle</th>
+                  <th sortable="team">Équipe</th>
+                  <th style="width: 40px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(users$ | async) && loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                </tr>
+                <tr *ngFor="let table of users$ | async; let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="table.username"
+                      [term]="userService.searchTerm"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="table.fullName"
+                      [term]="userService.searchTerm"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="table.roles | replace : '_' : ' '"
+                      [term]="userService.searchTerm"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="table.team"
+                      [term]="userService.searchTerm"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <div ngbDropdown placement="bottom-left">
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item" href="javascript: void(0);">
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          [routerLink]="['edit', table.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          (click)="deleteItem(table.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- End table -->
+          <div
+            class="row justify-content-md-between align-items-md-center mt-2"
+          >
+            <div class="col-sm-12 col-md-5">
+              <div
+                class="dataTables_info mb-2"
+                id="tickets-table_info"
+                role="status"
+                aria-live="polite"
+              >
+                Showing
+                <!-- {{service.startIndex}} to
+                  {{service.endIndex}} of {{service.totalRecords}} -->
+                entries
+              </div>
+            </div>
+            <!-- Pagination -->
+            <div class="col-sm-12 col-md-5">
+              <div class="text-md-right float-md-end pagination-rounded">
+                <ngb-pagination
+                  [collectionSize]="total$ | async"
+                  [(page)]="userService.page"
+                  [pageSize]="userService.pageSize"
+                >
+                </ngb-pagination>
+              </div>
+            </div>
+            <!-- End Pagination -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

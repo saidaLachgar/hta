@@ -10,7 +10,7 @@ const routes: Routes = [
   // tslint:disable-next-line: max-line-length
   { path: '', component: LayoutComponent, loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule), canActivate: [AuthGuard] },
   { path: 'pages', loadChildren: () => import('./extrapages/extrapages.module').then(m => m.ExtrapagesModule), canActivate: [AuthGuard] },
-  { path: 'users', loadChildren: () => import('./admin/users/user.module').then(m => m.userModule), canActivate: [AuthGuard] },
+  { path: 'users', component: LayoutComponent, loadChildren: () => import('./admin/users/user.module').then(m => m.userModule), canActivate: [AuthGuard] },
   { path: '**', component: Page404Component },
 ];
 
