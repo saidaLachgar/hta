@@ -16,9 +16,9 @@ import { AppComponent } from './app.component';
 
 import { ErrorInterceptor } from './core/helpers/error.interceptor';
 import { JwtInterceptor } from './core/helpers/jwt.interceptor';
+import { AppStoreModule } from './store/entity-store.module';
 
 // import { userModule } from './admin/users/user.module';
-import { AppStoreModule } from './entity-store.module';
 
 @NgModule({
   declarations: [

@@ -4,6 +4,9 @@ api_platform:
     patch_formats:
         json: ['application/json']
     formats:
+        html: ['text/html']
+        jsonld: ['application/ld+json']
+        jsonapi: ['application/vnd.api+json']
         json: ['application/json']
     swagger:
         versions: [3]

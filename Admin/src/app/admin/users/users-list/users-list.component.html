@@ -7,15 +7,10 @@
       ></app-page-title>
     </div>
     <div class="col-auto">
-      <button
-        class="btn bg-light text-primary ms-2"
-        title="Recherche"
+      <button class="btn bg-light text-primary ms-2" 
         data-toggle="collapse"
-        (click)="hideSearch = !hideSearch"
-      >
-        <i class="fas fa-filter"></i>
-      </button>
-      <button class="btn bg-light text-primary ms-2" title="Exporter">
+        (click)="hideExport = !hideExport"
+        title="Exporter">
         <i class="fas fa-upload"></i>
       </button>
       <button class="btn bg-light text-primary ms-2" title="Importer">
@@ -27,14 +22,17 @@
     </div>
   </div>
 
-  <div class="collapse" id="collapseExample" [ngbCollapse]="hideSearch">
+  <!-- <div class="collapse" id="collapseExample" [ngbCollapse]="hideExport">
     <div class="row">
       <div class="col-12">
         <div class="card card-body">
           <form class="row gy-2 gx-3 align-items-end">
             <div class="col-auto col-lg-5">
-              <label for="filterSelect">Propriétés</label>
-              <select class="form-select w-100" id="filterSelect" required>
+              <label for="filterSelect">Propriété</label>
+              <select class="form-select w-100"
+                id="filterSelect"
+                formControlName="property"
+                required>
                 <option selected>Choisir une option...</option>
                 <option value="username">Matricule</option>
                 <option value="name">Nom</option>
@@ -43,12 +41,13 @@
               </select>
             </div>
             <div class="col-sm-auto col-lg-5">
-              <label for="filterInput">Valeurs</label>
+              <label for="filterInput">Valeur</label>
               <input
                 type="text"
                 class="form-control"
                 id="filterInput"
                 placeholder="Recherche..."
+                formControlName="value"
                 required
               />
             </div>
@@ -61,7 +60,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="row">
     <div class="col-12">
@@ -87,56 +86,86 @@
               </div>
             </div> -->
           <!-- Table -->
-          <div class="table-responsive">
-            <table
-              id="basic-datatable"
-              class="table table-bordered dt-responsive nowrap datatables no-footer dtr-inline"
-            >
+          <form [formGroup]="userService.searchForm" (ngSubmit)="userService.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th sortable="username">Matricule</th>
-                  <th sortable="name">Nom</th>
-                  <th sortable="role">Rôle</th>
-                  <th sortable="team">Équipe</th>
-                  <th style="width: 40px"></th>
+                  <th>Matricule</th>
+                  <th>Nom</th>
+                  <th>Rôle</th>
+                  <th>Équipe</th>
+                  <th width="123px"></th>
                 </tr>
               </thead>
               <tbody>
+                <tr valign="middle">
+                  <td><input type="text" placeholder="Matricule..." formControlName="username" #searchUsername class="form-control"></td>
+                  <td><input type="text" placeholder="Nom..." formControlName="fullName" #searchFullName class="form-control"></td>
+                  <td>
+                    <select class="form-select"
+                      formControlName="roles" #searchRoles>
+                      <option value="" selected>Rôle...</option>
+                      <option value="ROLE_USER">USER</option>
+                      <option value="ROLE_ADMIN">ADMIN</option>
+                      <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select">
+                      <!-- formControlName="role"> -->
+                      <option selected>Équipe...</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
                 <tr>
                   <td
                     class="text-center"
                     colspan="5"
-                    *ngIf="!(users$ | async) && loading$ | async"
+                    *ngIf="!(userService.users$ | async) && userService.loading$ | async"
                   >
                     Chargement...
                   </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(userService.users$ | async) && (userService.users$ | async).length === 0 && userService.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
                 </tr>
-                <tr *ngFor="let table of users$ | async; let i = index">
+                <tr *ngFor="let user of (userService.users$ | async); let i = index">
                   <td>
                     <ngb-highlight
-                      [result]="table.username"
-                      [term]="userService.searchTerm"
+                      [result]="user.username"
+                      [term]="searchUsername"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
-                      [result]="table.fullName"
-                      [term]="userService.searchTerm"
+                      [result]="user.fullName"
+                      [term]="searchFullName"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
-                      [result]="table.roles | replace : '_' : ' '"
-                      [term]="userService.searchTerm"
+                      [result]="user.roles | replace : '_' : ' '"
+                      [term]="searchRoles"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
-                      [result]="table.team"
-                      [term]="userService.searchTerm"
+                      [result]="user.team"
                     ></ngb-highlight>
                   </td>
-                  <td>
+                  <td align="center">
                     <div ngbDropdown placement="bottom-left">
                       <i
                         class="fas fa-ellipsis-h dropdown-toggle"
@@ -148,13 +177,15 @@
                         class="dropdown-menu dropdown-menu-end"
                         ngbDropdownMenu
                       >
-                        <a class="dropdown-item" href="javascript: void(0);">
+                        <a class="dropdown-item"
+                          [routerLink]="['details', user.id]"
+                          href="javascript: void(0);">
                           <i class="fas fa-eye me-2"></i> Voir
                         </a>
                         <a
                           class="dropdown-item"
                           href="javascript: void(0);"
-                          [routerLink]="['edit', table.id]"
+                          [routerLink]="['edit', user.id]"
                           >
                           <!-- skipLocationChange -->
                           <i class="fas fa-edit me-2"></i> Modifier
@@ -162,7 +193,7 @@
                         <a
                           class="dropdown-item text-danger"
                           href="javascript: void(0);"
-                          (click)="deleteItem(table.id, $event.target)"
+                          (click)="userService.deleteItem(user.id, $event.target)"
                         >
                           <i class="fas fa-trash me-2"></i> Supprimer
                         </a>
@@ -172,39 +203,44 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+          </form>
           <!-- End table -->
-          <div
-            class="row justify-content-md-between align-items-md-center mt-2"
-          >
-            <div class="col-sm-12 col-md-5">
-              <div
-                class="dataTables_info mb-2"
-                id="tickets-table_info"
-                role="status"
-                aria-live="polite"
-              >
-                Showing
-                <!-- {{service.startIndex}} to
-                  {{service.endIndex}} of {{service.totalRecords}} -->
-                entries
-              </div>
-            </div>
-            <!-- Pagination -->
-            <div class="col-sm-12 col-md-5">
-              <div class="text-md-right float-md-end pagination-rounded">
-                <ngb-pagination
-                  [collectionSize]="total$ | async"
-                  [(page)]="userService.page"
-                  [pageSize]="userService.pageSize"
+          <!-- Pagination -->
+          <ng-container *ngIf="(userService.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > pagination.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
                 >
-                </ngb-pagination>
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="userService.page$"
+                    [pageSize]="pagination.pageSize"
+                    (pageChange)="userService.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
               </div>
             </div>
-            <!-- End Pagination -->
-          </div>
+          </ng-container>
+          <!-- End Pagination -->
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- <app-confirm-dialog></app-confirm-dialog> -->

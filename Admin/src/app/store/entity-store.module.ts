@@ -5,12 +5,18 @@ import { EffectsModule } from "@ngrx/effects";
 import {
   EntityDataModule,
   DefaultDataServiceConfig,
+  DefaultDataServiceFactory,
+  PersistenceResultHandler,
+  EntityCollectionReducerMethodsFactory,
   // EntityDataService,
 } from "@ngrx/data";
 import { environment } from "src/environments/environment";
 import { entityConfig } from "./entity-metadata";
-import { UserDataService } from "./admin/users/user-data.service";
+// import { UserDataService } from "./admin/users/user-data.service";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { CustomDataServiceFactory } from "./paginated-data.service";
+import { AdditionalPersistenceResultHandler } from "./additional-persistence-result-handler.service";
+import { AdditionalEntityCollectionReducerMethodsFactory } from "./additional-entity-collection-reducer-methods";
 
 const server = environment.serverURL;
 
@@ -40,7 +46,19 @@ const REGISTERED_EFFECTS = [];
       provide: DefaultDataServiceConfig,
       useValue: NGRX_DATA_SERVICE_CONFIGURATION,
     },
-    UserDataService,
+    // {
+    //   provide: DefaultDataServiceFactory,
+    //   useClass: CustomDataServiceFactory,
+    // },
+    {
+      provide: PersistenceResultHandler,
+      useClass: AdditionalPersistenceResultHandler,
+    },
+    {
+      provide: EntityCollectionReducerMethodsFactory,
+      useClass: AdditionalEntityCollectionReducerMethodsFactory
+    }
+    // UserDataService,
   ],
 })
 export class AppStoreModule {

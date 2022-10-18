@@ -5,11 +5,26 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+
 /**
- * @ApiResource()
+ * @ApiResource(
+ *   order= {"id" = "DESC"}
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "username"=SearchFilter::STRATEGY_PARTIAL,
+ *          "fullName"=SearchFilter::STRATEGY_PARTIAL,
+ *          "roles"=SearchFilter::STRATEGY_PARTIAL
+ *      }
+ * )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
 class User implements UserInterface
