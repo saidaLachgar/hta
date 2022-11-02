@@ -86,7 +86,7 @@
               </div>
             </div> -->
           <!-- Table -->
-          <form [formGroup]="userService.searchForm" (ngSubmit)="userService.onSearch()" class="table-responsive">
+          <form [formGroup]="userService.userForm" (ngSubmit)="userService.onSearch()" class="table-responsive">
             <table class="table table-bordered">
               <thead>
                 <tr>
@@ -98,7 +98,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr valign="middle">
+                <tr valign="middle" 
+                >
                   <td><input type="text" placeholder="Matricule..." formControlName="username" #searchUsername class="form-control"></td>
                   <td><input type="text" placeholder="Nom..." formControlName="fullName" #searchFullName class="form-control"></td>
                   <td>
@@ -117,12 +118,14 @@
                     </select>
                   </td>
                   <td>
-                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
-                      <i class="bx bx-search me-1"></i>Rechercher
-                    </button>
-                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
-                      <i class="bx bx-x me-1"></i>Réinitialiser
-                    </button>
+                    <div *ngIf="(userService.users$ | async) && (userService.users$ | async).length > userService.pageSize && userService.loaded$ | async">
+                      <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                        <i class="bx bx-search me-1"></i>Rechercher
+                      </button>
+                      <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
+                        <i class="bx bx-x me-1"></i>Réinitialiser
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -145,19 +148,19 @@
                   <td>
                     <ngb-highlight
                       [result]="user.username"
-                      [term]="searchUsername"
+                      [term]="searchUsername.value"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
                       [result]="user.fullName"
-                      [term]="searchFullName"
+                      [term]="searchFullName.value"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
                       [result]="user.roles | replace : '_' : ' '"
-                      [term]="searchRoles"
+                      [term]="searchRoles.options[searchRoles.options.selectedIndex].text"
                     ></ngb-highlight>
                   </td>
                   <td>
@@ -168,7 +171,7 @@
                   <td align="center">
                     <div ngbDropdown placement="bottom-left">
                       <i
-                        class="fas fa-ellipsis-h dropdown-toggle"
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
                         ngbDropdownToggle
                         data-toggle="dropdown"
                         aria-expanded="true"
@@ -208,7 +211,7 @@
           <!-- Pagination -->
           <ng-container *ngIf="(userService.pagination$ | async) as pagination">
             <div
-              *ngIf="pagination.totalRecords > pagination.pageSize"
+              *ngIf="pagination.totalRecords > userService.pageSize"
               class="row justify-content-md-between align-items-md-center mt-2"
             >
               <div class="col-sm-12 col-md-5">
@@ -228,7 +231,7 @@
                   <ngb-pagination
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="userService.page$"
-                    [pageSize]="pagination.pageSize"
+                    [pageSize]="userService.pageSize"
                     (pageChange)="userService.onPaginate($event)"
                   >
                   </ngb-pagination>
@@ -242,5 +245,3 @@
     </div>
   </div>
 </div>
-
-<!-- <app-confirm-dialog></app-confirm-dialog> -->

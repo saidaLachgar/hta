@@ -4,31 +4,31 @@ import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory,
-
 } from "@ngrx/data";
 import { Observable, of } from "rxjs";
-import { map, tap } from "rxjs/operators";
-import { User } from "src/app/core/models";
-import { Pagination } from "src/app/store/additional-persistence-result-handler.service";
+import { map } from "rxjs/operators";
+import { Pagination, User } from "src/app/core/models";
+import { environment } from "src/environments/environment";
 import { ConfirmDialogService } from "../components/confirm-dialog/confirm-dialog.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class UserService extends EntityCollectionServiceBase<User> {
+  readonly pageSize = environment.pageSize;
   users$: Observable<User[]>;
   pagination$: Observable<Pagination>;
   page$: Observable<number>;
-  public searchForm: FormGroup;
+  submitted: boolean = false;
+  public userForm: FormGroup;
 
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    private toast: HotToastService,
+    private toast: HotToastService
   ) {
     super("users", serviceElementsFactory);
   }
-
 
   /**
    * Get records
@@ -36,18 +36,20 @@ export class UserService extends EntityCollectionServiceBase<User> {
   findAll(): void {
     // this.users$ = this.getAll();
     // this.getPagination();
-    this.findByCriteria({page : this.page$ || 1});
+    this.findByCriteria({ page: this.page$ || 1 });
   }
-  
+
   /**
    * Get pagination
    */
-  getPagination():void{
-    this.pagination$ = this.selectors$.entityActions$.pipe(map(action => {
-      let pagination = (action as any).payload.pagination;
-      pagination && (this.page$ = pagination.page);
-      return pagination;
-    }));
+  getPagination(): void {
+    this.pagination$ = this.selectors$.entityActions$.pipe(
+      map((action) => {
+        let pagination = (action as any).payload.pagination;
+        pagination && (this.page$ = pagination.page);
+        return pagination;
+      })
+    );
   }
 
   /**
@@ -76,7 +78,59 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * Search
    */
   onSearch(): void {
-    this.findByCriteria(this.searchForm.value);
+    this.findByCriteria(this.userForm.value);
+  }
+
+  /**
+   * Persist : Create
+   */
+  onCreate(): void {
+    let userForm = this.userForm;
+    this.submitted = true;
+    if (userForm.invalid) return;
+    this.submitted = false;
+    let toast = this.toast;
+    let user = userForm.value as User;
+    user.roles = [user.roles.toString()];
+    this.add(user).subscribe({
+      error: () => toast.error("un problème est survenu, veuillez réessayer"),
+      complete() {
+        userForm.reset();
+        toast.success("Utilisateur ajouté avec succès");
+      },
+    });
+  }
+  /**
+   * Persist : update
+   */
+  onUpdate(id:number): void {
+    let userForm = this.userForm;
+    this.submitted = true;
+    if (userForm.invalid) return;
+    this.submitted = false;
+
+    let toast = this.toast;
+    let user = userForm.value as User;
+    user.id = id;
+    user.roles = [user.roles.toString()];
+      this.update(user).subscribe({
+        error: () => toast.error("un problème est survenu, veuillez réessayer"),
+        complete() {
+          toast.success("L'utilisateur a été mis à jour avec succès");
+        },
+      });
+  }
+  get fullName() {
+    return this.userForm.get("fullName");
+  }
+  get username() {
+    return this.userForm.get("username");
+  }
+  get password() {
+    return this.userForm.get("password");
+  }
+  get roles() {
+    return this.userForm.get("roles");
   }
 
   /**
@@ -97,8 +151,7 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * on Paginate
    * @param page page to search for
    */
-  onPaginate(page : number){
-    this.findByCriteria({page : page, ...this.searchForm.value});
+  onPaginate(page: number) {
+    this.findByCriteria({ page: page, ...this.userForm.value });
   }
-
 }

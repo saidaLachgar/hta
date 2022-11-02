@@ -1,8 +1,10 @@
-
 // dropdown
 .dropdown-toggle {
     &:after {
-        display: none;        
+        display: none;
     }
 }
 
+.c-pointer {
+    cursor: pointer;
+}

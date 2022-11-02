@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UIModule } from 'src/app/shared/ui/ui.module';
-import { NgbPaginationModule, NgbTypeaheadModule, NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPaginationModule, NgbTypeaheadModule, NgbDropdownModule, NgbCollapseModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserRoutingModule } from './user-routing.module';
 import { ConfirmDialogModule } from '../components/confirm-dialog/confirm-dialog.module';
@@ -11,8 +11,8 @@ import { UsersListComponent } from './users-list/users-list.component';
 import { UserCreateComponent } from './user-create/user-create.component';
 import { UserUpdateComponent } from './user-update/user-update.component';
 import { UserDetailsComponent } from './user-details/user-details.component';
-
-import { ReplacePipe } from 'src/app/core/pipes/replace.pipe';
+import { TypeofPipe, ReplacePipe } from 'src/app/core/pipes';
+import { UserPermissionsComponent } from './UserPermissions/UserPermissions.component';
 
 @NgModule({
   imports: [
@@ -27,13 +27,17 @@ import { ReplacePipe } from 'src/app/core/pipes/replace.pipe';
     NgbPaginationModule,
     NgbTypeaheadModule,
     NgbDropdownModule,
+    NgbNavModule,
   ],
   declarations: [
     UsersListComponent,
     UserCreateComponent,
     UserUpdateComponent,
     UserDetailsComponent,
-    ReplacePipe
+    UserPermissionsComponent,
+
+    ReplacePipe,
+    TypeofPipe,
   ],
 })
 export class userModule { }

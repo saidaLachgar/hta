@@ -17,8 +17,9 @@ export interface User {
     token?: string;
     // team? : string;
 }
-export interface Group {
+export interface UserPermissions {
     id?: number;
-    title: string;
-    roles: string[];
+    role: string;
+    label: string;
+    permissions: string[];
 }

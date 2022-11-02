@@ -1,20 +1,10 @@
 import { DefaultPersistenceResultHandler, EntityAction } from "@ngrx/data";
 import { Action } from "@ngrx/store";
-
-export interface Pagination {
-    pageSize: number;
-    page: number;
-    first: number;
-    last: number;
-    next: number;
-    previous: number;
-    totalRecords: number;
-    startIndex: number;
-    endIndex: number;
-}
+import { environment } from "src/environments/environment";
+import { Pagination } from "../core/models";
 
 export class AdditionalPersistenceResultHandler extends DefaultPersistenceResultHandler {
-    private readonly pageSize = 30;
+    private readonly pageSize = environment.pageSize;
     private serializeHydra(response): Pagination {
         let getHydra = (key: string) => {
             let val = response["hydra:view"][key];
@@ -27,7 +17,6 @@ export class AdditionalPersistenceResultHandler extends DefaultPersistenceResult
             previous = getHydra("hydra:previous"),
             totalRecords = response["hydra:totalItems"];
         return {
-            pageSize: this.pageSize,
             page: page,
             first: first,
             last: last,
@@ -46,7 +35,7 @@ export class AdditionalPersistenceResultHandler extends DefaultPersistenceResult
         // parse data from DataService and save to action.payload
         return function (data: any) {
             const action = actionHandler.call(this, data);
-            if (action && data) {
+            if (action && data && typeof data !== "number"  && "hydra:member" in data) {
                 "hydra:view" in data && ((action as any).payload.pagination = that.serializeHydra(data));
                 (action as any).payload.data = data["hydra:member"];
             }

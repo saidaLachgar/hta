@@ -6,9 +6,8 @@
     ></app-page-title>
     <!-- end page title -->
   
-    <form class="row mt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <fieldset [disabled]="loading$ | async">
-      <div class="col-12">
+    <form class="row mt-4" [formGroup]="userService.userForm" (ngSubmit)="userService.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="userService.loading$ | async">
         <div class="card">
           <div class="card-body">
             <div class="mb-3 row">
@@ -16,15 +15,15 @@
               <div class="col-md-10">
                 <input
                   formControlName="fullName"
-                  [ngClass]="{'is-invalid':f.fullName.invalid && (form.dirty || form.touched)}"
+                  [ngClass]="{'is-invalid':userService.fullName.invalid && userService.submitted}"
                   class="form-control"
                   type="text"
                   id="name-input"
                 />
                 <div
-                  *ngIf="(form.dirty || form.touched) && f.fullName.errors"
+                  *ngIf="userService.submitted && userService.fullName.errors"
                   class="invalid-feedback">
-                  <span *ngIf="f.fullName.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="userService.fullName.errors.required">Ce champ est obligatoire.</span>
                 </div>
               </div>
             </div>
@@ -34,16 +33,16 @@
               >
               <div class="col-md-10">
                 <input
-                  [ngClass]="{'is-invalid':f.username.invalid && (form.dirty || form.touched)}"
+                  [ngClass]="{'is-invalid':userService.username.invalid && userService.submitted}"
                   formControlName="username"
                   class="form-control"
                   type="text"
                   id="text-input"
                 />
                 <div
-                  *ngIf="(form.dirty || form.touched) && f.username.errors"
+                  *ngIf="userService.submitted && userService.username.errors"
                   class="invalid-feedback">
-                  <span *ngIf="f.username.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="userService.username.errors.required">Ce champ est obligatoire.</span>
                 </div>
               </div>
             </div>
@@ -55,16 +54,16 @@
               <div class="col-md-10">
                 <input
                   class="form-control"
-                  [ngClass]="{'is-invalid':f.password.invalid && (form.dirty || form.touched)}"
+                  [ngClass]="{'is-invalid':userService.password.invalid && userService.submitted}"
                   type="password"
                   formControlName="password"
                   id="password-input"
                 />
                 <div
-                  *ngIf="(form.dirty || form.touched) && f.password.errors"
+                  *ngIf="userService.submitted && userService.password.errors"
                   class="invalid-feedback">
-                  <span *ngIf="f.password.errors.required">Ce champ est obligatoire.</span>
-                  <span *ngIf="f.password.errors.minlength">Le mot de passe doit comporter au moins 6 caractères.</span>
+                  <span *ngIf="userService.password.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="userService.password.errors.minlength">Le mot de passe doit comporter au moins 6 caractères.</span>
                 </div>
               </div>
             </div>
@@ -73,7 +72,7 @@
               <div class="col-12">
                 <h5 
                   class="font-size-14"
-                  [ngClass]="{ 'text-danger': f.roles.invalid && (form.dirty || form.touched) }">Rôle</h5>
+                  [ngClass]="{ 'is-invalid': userService.roles.invalid && userService.submitted }">Rôle</h5>
                 <div class="form-check">
                   <input
                     class="form-check-input"
@@ -106,18 +105,22 @@
                   />
                   <label class="form-check-label" for="role3">User</label>
                 </div>
+                <div
+                  *ngIf="userService.roles.invalid && userService.submitted"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.roles.errors.required">Ce champ est obligatoire.</span>
+                </div>
               </div>
             </div>
   
             <div class="row justify-content-end">
               <div class="col-auto">
                 <button class="btn btn-light me-2" routerLink="/users">Annuler</button>
-                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="(form.dirty || form.touched) && (loading$ | async)"></i> Sauvegarder</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="userService.submitted && (userService.loading$ | async)"></i> Sauvegarder</button>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </fieldset>
       <!-- end col -->
     </form>

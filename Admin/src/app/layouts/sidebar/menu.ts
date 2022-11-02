@@ -76,7 +76,7 @@ export const MENU: MenuItem[] = [
             {
                 id: 13,
                 label: 'Équipes',
-                link: '/user/team',
+                link: '/users/team',
                 parentId: 12
             },
             {
@@ -87,6 +87,12 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 15,
+                label: 'Autorisation',
+                link: 'users/UserPermissions',
+                parentId: 12
+            },
+            {
+                id: 16,
                 label: 'Historique',
                 link: '/user/history',
                 parentId: 12
@@ -94,7 +100,7 @@ export const MENU: MenuItem[] = [
         ]
     },
     {
-        id: 16,
+        id: 17,
         label: 'Source des données',
         icon: 'bx bx-cog',
     },
