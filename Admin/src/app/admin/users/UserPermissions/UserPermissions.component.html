@@ -6,8 +6,10 @@
         <fieldset class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row" *ngIf="(UserPermissions$ | async) as UserPermissions">
-                        <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs">
+                    <i class="bx bx-loader-alt fa-spin text-center fs-1 text-primary d-block m-5" *ngIf="!submitted && (service.loading$ | async)"></i>
+                    <ng-container *ngIf="(UserPermissions$ | async) as UserPermissions">
+                    <div class="row">
+                        <ul ngbNav #nav="ngbNav" [activeId]="0" class="nav-tabs">
                             <li *ngFor="let r of UserPermissions; let j=index"
                                 [ngbNavItem]="j"
                                 >
@@ -20,20 +22,20 @@
                                         <div class="col-6 mt-4" *ngFor="let access of access; let i=index">
                                             <h5 class="mb-3">{{access.name}}</h5>
                                             <div class="ms-3">
-                                                
-                                                <!-- <ng-container *ngVar="(
+<!--                                                 
+                                                <ng-container *ngVar="(
                                                         access.name + '_' +
                                                         (access.permissions === -1 ? permission : 
                                                         ((access.permissions | typeof) === 'number' ? 
                                                         permissions[access.permissions] : permissions[key])) 
                                                     ) as value">
                                                     <div *ngFor="let permission of permissions; let i=index">
-                                                        <label>
-                                                            <input type="checkbox" 
-                                                                [formArrayName]="r.role"
-                                                                [value]="value"
-                                                                (change)="onChange($event, r.role)"
-                                                                [checked]="r.permissions.includes(value)"
+                                                            <label>
+                                                                <input type="checkbox" 
+                                                                    [formArrayName]="r.role"
+                                                                    [value]="value"
+                                                                    (change)="onChange($event, r.role)"
+                                                                    [checked]="isChecked(value, r.role)"
                                                             >
                                                             {{permission}}
                                                         </label>
@@ -45,11 +47,11 @@
                                                         <label>
                                                             <input type="checkbox" 
                                                                 [formArrayName]="r.role"
-                                                                [value]="access.name+'_'+permission"
+                                                                [value]="access.value+'_'+permission.value"
                                                                 (change)="onChange($event, r.role)"
-                                                                [checked]="isChecked(access.name+'_'+permission, r.role)"
+                                                                [checked]="isChecked(access.value+'_'+permission.value, r.role)"
                                                             >
-                                                            {{permission}}
+                                                            {{permission.name}}
                                                         </label>
                                                     </div>
                                                 </ng-container>
@@ -59,11 +61,11 @@
                                                         <label>
                                                             <input type="checkbox"
                                                                 [formArrayName]="r.role"
-                                                                [value]="access.name+'_'+permissions[access.permissions]"
+                                                                [value]="access.value+'_'+permissions[access.permissions].value"
                                                                 (change)="onChange($event, r.role)"
-                                                                [checked]="isChecked(access.name+'_'+permissions[access.permissions], r.role)"
+                                                                [checked]="isChecked(access.value+'_'+permissions[access.permissions].value, r.role)"
                                                             >
-                                                            {{permissions[access.permissions]}}
+                                                            {{permissions[access.permissions].name}}
                                                         </label>
                                                     </ng-container>
                                                 </ng-template>
@@ -73,10 +75,10 @@
                                                             <input type="checkbox"
                                                                 [formArrayName]="r.role"
                                                                 (change)="onChange($event, r.role)"
-                                                                [value]="access.name+'_'+permissions[key]"
-                                                                [checked]="isChecked(access.name+'_'+permissions[key], r.role)"
+                                                                [value]="access.value+'_'+permissions[key].name"
+                                                                [checked]="isChecked(access.value+'_'+permissions[key].name, r.role)"
                                                             >
-                                                            {{permissions[key]}}
+                                                            {{permissions[key].value}}
                                                         </label>
                                                     </div>
                                                 </ng-template>
@@ -91,12 +93,13 @@
                     </div>
                     <div class="row justify-content-end">
                         <div class="col-auto">
-                            <button class="btn btn-light me-2" routerLink="/users">Annuler</button>
                             <button class="btn btn-primary">
-                                <!-- <i class="bx bx-loader-alt fa-spin"></i> -->
-                                Sauvegarder</button>
+                                <i class="bx bx-loader-alt fa-spin" *ngIf="submitted && (service.loading$ | async)"></i>
+                                Sauvegarder
+                            </button>
                         </div>
                     </div>
+                    </ng-container>
                 </div>
             </div>
         </fieldset>

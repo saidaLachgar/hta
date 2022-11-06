@@ -3,15 +3,22 @@
 namespace App\Entity;
 
 use App\Repository\UserPermissionsRepository;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 /**
  * @ApiResource()      
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "role"=SearchFilter::STRATEGY_EXACT
+ *      }
+ * )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=UserPermissionsRepository::class)
  */
 class UserPermissions

@@ -6,7 +6,6 @@ import { AuthenticationService } from '../../../core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -20,6 +19,7 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
   submitted = false;
+  loading = false;
   error = '';
   returnUrl: string;
 
@@ -50,20 +50,21 @@ export class LoginComponent implements OnInit {
    */
   onSubmit() {
     this.submitted = true;
+    this.loading = true;
 
     // stop here if form is invalid
     if (this.loginForm.invalid) {
       return;
     } else {
-        this.authenticationService.login(this.f.username.value, this.f.password.value)
-          .pipe(first())
-          .subscribe(
-            data => {
-              this.router.navigate(['/dashboard']);
-            },
-            error => {
-              this.error = error ? error : '';
-            });
+      let that = this;
+      this.authenticationService.login(this.f.username.value, this.f.password.value)
+        .subscribe({
+          error: (error) => this.error = error ? error : '',
+          complete() {
+            that.router.navigate(['/dashboard']);
+            this.loading = false;
+          },
+        })
     }
   }
 }

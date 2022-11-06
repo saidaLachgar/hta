@@ -88,7 +88,7 @@ export const MENU: MenuItem[] = [
             {
                 id: 15,
                 label: 'Autorisation',
-                link: 'users/UserPermissions',
+                link: '/users/autorisation',
                 parentId: 12
             },
             {
