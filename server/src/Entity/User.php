@@ -14,7 +14,16 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 /**
  * @ApiResource(
- *   order= {"id" = "DESC"}
+ *   order= {"id" = "DESC"},
+ *   itemOperations={
+ *      "patch"= {"access_control"="is_granted('hasPermission', 'users_update')"},
+ *      "get"= {"access_control"="is_granted('hasPermission', 'users_details')"},
+ *      "delete"= {"access_control"="is_granted('hasPermission', 'users_delete')"},
+ *      "post"= {"access_control"="is_granted('hasPermission', 'users_add')"},
+ *   },
+ *   collectionOperations={
+ *      "get"= { "access_control"="is_granted('hasPermission', 'users_show')"},
+ *   },
  * )
  * @ApiFilter(
  *      SearchFilter::class,

@@ -8,15 +8,17 @@
     </div>
     <div class="col-auto">
       <button class="btn bg-light text-primary ms-2" 
-        data-toggle="collapse"
+        data-toggle="collapse" *ngIf="authService.isAuthorized('users_export')"
         (click)="hideExport = !hideExport"
         title="Exporter">
         <i class="fas fa-upload"></i>
       </button>
-      <button class="btn bg-light text-primary ms-2" title="Importer">
+      <button class="btn bg-light text-primary ms-2" title="Importer" 
+        *ngIf="authService.isAuthorized('users_import')">
         <i class="fas fa-download"></i>
       </button>
       <a routerLink="/users/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('users_add')"
         ><i class="fas fa-plus-circle"></i> Ajouter</a
       >
     </div>
@@ -169,7 +171,10 @@
                     ></ngb-highlight>
                   </td>
                   <td align="center">
-                    <div ngbDropdown placement="bottom-left">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('users_details') || authService.isAuthorized('users_update') || authService.isAuthorized('users_delete')"
+                      >
                       <i
                         class="fas fa-ellipsis-h dropdown-toggle c-pointer"
                         ngbDropdownToggle
@@ -182,12 +187,15 @@
                       >
                         <a class="dropdown-item"
                           [routerLink]="['details', user.id]"
-                          href="javascript: void(0);">
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_details')"
+                          >
                           <i class="fas fa-eye me-2"></i> Voir
                         </a>
                         <a
                           class="dropdown-item"
                           href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_update')"
                           [routerLink]="['edit', user.id]"
                           >
                           <!-- skipLocationChange -->
@@ -196,6 +204,7 @@
                         <a
                           class="dropdown-item text-danger"
                           href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_delete')"
                           (click)="userService.deleteItem(user.id, $event.target)"
                         >
                           <i class="fas fa-trash me-2"></i> Supprimer

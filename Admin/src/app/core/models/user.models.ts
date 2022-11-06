@@ -14,7 +14,7 @@ export interface User {
     password?: string;
     fullName?: string;
     roles? : string[];
-    token?: string;
+    jwt?: any;
     // team? : string;
 }
 export interface UserPermissions {

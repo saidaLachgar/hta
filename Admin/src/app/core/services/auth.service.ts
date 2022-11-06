@@ -33,7 +33,7 @@ export class AuthenticationService {
         },
         {
             name: 'Objectifs de l\'année',
-            value: 'bbjectifs',
+            value: 'objectifs',
             permissions: 4
         },
         {
@@ -59,7 +59,7 @@ export class AuthenticationService {
         {
             name: 'Autorisation',
             value: 'autorisation',
-            permissions: 0
+            permissions: 4
         },
         {
             name: 'Historique',
@@ -80,43 +80,48 @@ export class AuthenticationService {
     get currentUserValue(): User {
         return this.currentUserSubject.value;
     }
-    getToken(): string | undefined {
-        return this.currentUserValue.token;
-    }
-    notAuthenticated(): boolean {
-        const token = this.getToken(); // get the token
-        if (token === undefined) return true;
-        // return a boolean reflecting  whether or not the token is expired
-        const expiry = this.decodeToken(token).exp;
-        return (Math.floor((new Date).getTime() / 1000)) >= expiry; // check if JWT token is expired
+    getToken(): any {
+        return this.currentUserValue.jwt;
     }
     decodeToken(token: string) {
         return JSON.parse(atob(token.split('.')[1]));
     }
-
-    login(username: string, password: string) {
+    refreshToken() {
         let roles: string[];
-        return this.http.post<any>(`${this.server}/api/login`, { username, password })
+        return this.http.post<any>(`${this.server}/api/token/refresh`, { refresh_token: this.getToken().refresh_token })
             .pipe(
-                tap(token => {
-                    // login successful if there's a jwt token in the response
-                    // get user role
-                    roles = this.decodeToken(token.token).roles;
+                tap(result => {
+                    roles = this.decodeToken(result.token).roles;
                     let user: User = {
-                        username: username,
-                        token: token,
+                        username: this.currentUserValue.username,
+                        jwt: result,
                         roles: roles,
                     };
                     // store user details and jwt token in local storage to keep user logged in between page refreshes
                     localStorage.setItem('currentUser', JSON.stringify(user));
                     this.currentUserSubject.next(user);
                 }),
-                switchMap(() => {
-                    return this.UserPermissionsService.getWithQuery({ role: roles[0] })
-                        .pipe(
-                            tap((data) => localStorage.setItem('permissions', JSON.stringify(data[0])))
-                        );
+                switchMap(() => this.setPermissions(roles[0])),
+            );
+    }
+    login(username: string, password: string) {
+        let roles: string[];
+        return this.http.post<any>(`${this.server}/api/login`, { username, password })
+            .pipe(
+                tap(result => {
+                    // login successful if there's a jwt token in the response
+                    // get user role
+                    roles = this.decodeToken(result.token).roles;
+                    let user: User = {
+                        username: username,
+                        jwt: result,
+                        roles: roles,
+                    };
+                    // store user details and jwt token in local storage to keep user logged in between page refreshes
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    this.currentUserSubject.next(user);
                 }),
+                switchMap(() => this.setPermissions(roles[0])),
             );
     }
 
@@ -127,11 +132,17 @@ export class AuthenticationService {
         this.router.navigate(['account/login']);
     }
 
-    getPermissions(): string[]{
+    setPermissions(role:string) {
+        return this.UserPermissionsService.getWithQuery({ role: role })
+            .pipe(
+                tap((data) => localStorage.setItem('permissions', JSON.stringify(data[0])))
+            );
+    }
+    getPermissions(): string[] {
         return JSON.parse(localStorage.getItem("permissions")).permissions;
     }
 
-    isAuthorized(access:string):boolean{
+    isAuthorized(access: string): boolean {
         return this.getPermissions().includes(access);
     }
 }
