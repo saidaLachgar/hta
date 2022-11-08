@@ -13,18 +13,22 @@ export class ErrorInterceptor implements HttpInterceptor {
             let error = err.error.message || err.statusText;
             if (err.status === 401 || err.status === 403) {
                 // auto logout if 401 response returned from api
-                // if(error == "JWT Token not found") {
-                //     this.authenticationService.logout();
-                //     location.reload();
-                // }
-                // // auto refresh user token when unauthorized ( Expired JWT Token (24h) )
-                // else {
-                //     this.authenticationService.refreshToken()
-                //       .subscribe({
-                //         error: (error) => error = error ? error : '',
-                //         complete: () => location.reload(),
-                //       })
-                // }
+                if(error == "JWT Token not found") {
+                    this.authenticationService.logout();
+                    location.reload();
+                }
+                // auto refresh user token when unauthorized ( Expired JWT Token (24h) )
+                else {
+                    this.authenticationService.refreshToken()
+                      .subscribe({
+                          error: (error) => {
+                            error = error;
+                            this.authenticationService.logout();
+                            location.reload();
+                        },
+                        complete: () => location.reload(),
+                      })
+                }
             }
             console.error(error);
             return throwError(error);

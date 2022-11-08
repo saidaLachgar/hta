@@ -14,64 +14,7 @@ export class AuthenticationService {
     private currentUserSubject: BehaviorSubject<User>;
     private server = environment.serverURL;
     public currentUser: Observable<User>;
-    public readonly access = [
-        {
-            name: "Anomalies",
-            value: "anomalies",
-            permissions: -1
-        },
-        {
-            name: 'Travaux',
-            value: 'travaux',
-            permissions: -1
-        },
-
-        {
-            name: 'Calendrier',
-            value: 'calendrier',
-            permissions: 4
-        },
-        {
-            name: 'Objectifs de l\'année',
-            value: 'objectifs',
-            permissions: 4
-        },
-        {
-            name: 'Postes',
-            value: 'postes',
-            permissions: -1
-        },
-        {
-            name: 'Statistiques',
-            value: 'statistiques',
-            permissions: 4
-        },
-        {
-            name: 'Équipes',
-            value: 'equipes',
-            permissions: [0, 1, 2, 3, 4]
-        },
-        {
-            name: 'Members',
-            value: 'users',
-            permissions: [0, 1, 2, 3, 4]
-        },
-        {
-            name: 'Autorisation',
-            value: 'autorisation',
-            permissions: 4
-        },
-        {
-            name: 'Historique',
-            value: 'historique',
-            permissions: 4
-        },
-        {
-            name: 'Source des données',
-            value: 'data',
-            permissions: 4
-        },
-    ];
+    
 
     constructor(private http: HttpClient, private router: Router, private UserPermissionsService: UserPermissionsService) {
         this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
@@ -142,7 +85,7 @@ export class AuthenticationService {
         return JSON.parse(localStorage.getItem("permissions")).permissions;
     }
 
-    isAuthorized(access: string): boolean {
+   isAuthorized(access: string): boolean {
         return this.getPermissions().includes(access);
     }
 }

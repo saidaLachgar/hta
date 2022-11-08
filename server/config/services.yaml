@@ -22,10 +22,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    # security.access.role_voter:
-    #     class:      App\Security\Voter\RoleVoter
-    #     arguments: [ "@doctrine.orm.entity_manager" ]
-    #     public:     false
-    #     tags:
-    #         - { name: security.voter }
+    
+    monolog.dbHandler:
+        class: App\Utility\DbHandler
+
+    monolog.dbProcessor:
+        class: App\Utility\DbProcessor
+        tags:
+            - {name: monolog.processor, handler: dbHandler}
+
+    doctrine.doctrineSuscriber:
+        class: App\EventListener\DoctrineSuscriber
+        tags:
+            - {name: doctrine.event_subscriber}
     

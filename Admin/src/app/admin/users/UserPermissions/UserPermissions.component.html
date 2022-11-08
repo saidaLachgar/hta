@@ -25,7 +25,7 @@
                                 </a>
                                 <ng-template ngbNavContent>
                                     <div class="row">
-                                        <div class="col-6 mt-4" *ngFor="let access of access; let i=index">
+                                        <div class="col-6 mt-4" *ngFor="let access of EntitiesAccess; let i=index">
                                             <h5 class="mb-3">{{access.name}}</h5>
                                             <div class="ms-3">
 <!--                                                 
@@ -49,7 +49,7 @@
                                                 </ng-container> -->
 
                                                 <ng-container *ngIf="access.permissions === -1;else second">
-                                                    <div *ngFor="let permission of permissions; let i=index">
+                                                    <div *ngFor="let permission of PermissionsIndex; let i=index">
                                                         <label>
                                                             <input type="checkbox" 
                                                                 [formArrayName]="r.role"
@@ -68,10 +68,10 @@
                                                             <input type="checkbox"
                                                                 [formArrayName]="r.role"
                                                                 (change)="onChange($event, r.role)"
-                                                                [value]="access.value+'_'+permissions[access.permissions].value"
-                                                                [checked]="isChecked(access.value+'_'+permissions[access.permissions].value, r.role)"
+                                                                [value]="access.value+'_'+PermissionsIndex[access.permissions].value"
+                                                                [checked]="isChecked(access.value+'_'+PermissionsIndex[access.permissions].value, r.role)"
                                                             >
-                                                            {{permissions[access.permissions].name}}
+                                                            {{PermissionsIndex[access.permissions].name}}
                                                         </label>
                                                     </ng-container>
                                                 </ng-template>
@@ -81,10 +81,10 @@
                                                             <input type="checkbox"
                                                                 [formArrayName]="r.role"
                                                                 (change)="onChange($event, r.role)"
-                                                                [value]="access.value+'_'+permissions[key].value"
-                                                                [checked]="isChecked(access.value+'_'+permissions[key].value, r.role)"
+                                                                [value]="access.value+'_'+PermissionsIndex[key].value"
+                                                                [checked]="isChecked(access.value+'_'+PermissionsIndex[key].value, r.role)"
                                                             >
-                                                            {{permissions[key].name}}
+                                                            {{PermissionsIndex[key].name}}
                                                         </label>
                                                     </div>
                                                 </ng-template>

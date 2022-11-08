@@ -1,2 +1,4 @@
-export * from './user.models';
-export * from './pagination.models';
+export * from './user.model';
+export * from './access.model';
+export * from './pagination.model';
+export * from './menu.model';

@@ -1,5 +1,4 @@
-import { MenuItem } from './menu.model';
-
+import { MenuItem } from '../models/menu.model';
 export const MENU: MenuItem[] = [
     {
         id: 1,
@@ -77,18 +76,21 @@ export const MENU: MenuItem[] = [
                 id: 13,
                 label: 'Équipes',
                 link: '/users/team',
+                checkPermissions: 'teams',
                 parentId: 12
             },
             {
                 id: 14,
                 label: 'Members',
                 link: '/users',
+                checkPermissions: 'users',
                 parentId: 12
             },
             {
                 id: 15,
                 label: 'Autorisation',
                 link: '/users/autorisation',
+                checkPermissions: 'autorisation',
                 parentId: 12
             },
             {
@@ -104,6 +106,6 @@ export const MENU: MenuItem[] = [
         label: 'Source des données',
         icon: 'bx bx-cog',
     },
-    
+
 ];
 

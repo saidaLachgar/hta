@@ -1,13 +1,3 @@
-// interface HydraEntity {
-//     '@id'?: string;
-//     '@type'?: string;
-//     '@context'?: string;
-//     "hydra:member"?: any;
-//     "hydra:totalItems"?:number;
-//     "hydra:view"?:HydraView;
-//     "hydra:search"?: any;
-// }
-
 export interface User {
     id?: number;
     username?: string;

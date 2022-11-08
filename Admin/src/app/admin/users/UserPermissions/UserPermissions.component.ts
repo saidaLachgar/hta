@@ -2,7 +2,8 @@ import { Component } from "@angular/core";
 import { FormArray, FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
 import { forkJoin, Observable } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { tap } from "rxjs/operators";
+import { EntitiesAccess, PermissionsIndex } from "src/app/core/const/access";
 import { UserPermissions } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { UserPermissionsService } from "./UserPermissions.service";
@@ -22,24 +23,14 @@ export class UserPermissionsComponent {
     OldPermissions: UserPermissions[];
     form: FormGroup;
     submitted = false;
-    access;
-    permissions = [ // has all checkboxes -> -1
-        {name:'Modifier', value: 'update'}, // -> 0
-        {name:'Supprimer', value: 'delete'}, // -> 1
-        {name:'Ajouter', value: 'add'}, // -> 2
-        {name:'Details', value: 'details'}, // -> 3
-        {name:'Afficher', value: 'show'}, // -> 4
-        {name:'Exporter', value: 'export'}, // -> 5
-        {name:'Importer', value: 'import'}, // -> 6
-    ]
+    readonly EntitiesAccess= EntitiesAccess;
+    readonly PermissionsIndex = PermissionsIndex;
 
     constructor(
         public service: UserPermissionsService,
         private fb: FormBuilder,
         private toast: HotToastService,
-        private auth: AuthenticationService
     ) {
-        this.access = auth.access;
         this.form = fb.group({});
         this.UserPermissions$ = service.getAll()
             .pipe(tap(data => {
