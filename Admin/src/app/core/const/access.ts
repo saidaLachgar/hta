@@ -49,7 +49,7 @@ export const EntitiesAccess:EntityAccess[] = [
     },
     {
         name: 'Historique',
-        value: 'historique',
+        value: 'logs',
         permissions: 4
     },
     {

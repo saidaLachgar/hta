@@ -23,6 +23,9 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  */
 class UserPermissions
 {
+    public static $ROUTE_NAME = "autorisation";
+    public static $TRANSLATED_NAME = "autorisation";
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -46,7 +49,10 @@ class UserPermissions
      */
     private $permissions = [];
 
-   
+    public function __toString()
+    {
+        return $this->label;
+    }
     public function getId(): ?int
     {
         return $this->id;

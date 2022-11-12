@@ -5,7 +5,7 @@ import { switchMap, tap } from 'rxjs/operators';
 import { User } from '../models';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
-import { UserPermissionsService } from 'src/app/admin/users/UserPermissions/UserPermissions.service';
+import { UserPermissionsService } from 'src/app/pages/UserPermissions/user-permissions.service';
 
 @Injectable({ providedIn: 'root' })
 

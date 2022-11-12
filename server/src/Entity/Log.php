@@ -5,10 +5,39 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+
 /**
+ * @ApiResource(
+ *   order= {"id" = "DESC"},
+ *   collectionOperations={
+ *      "get"= { "access_control"="is_granted('hasPermission', 'logs_show')"},
+ *   },
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "id"=SearchFilter::STRATEGY_EXACT,
+ *          "message"=SearchFilter::STRATEGY_PARTIAL,
+ *          "extra"=SearchFilter::STRATEGY_PARTIAL,
+ *          "user.id"=SearchFilter::STRATEGY_EXACT
+ *      }
+ * )
+ * @ApiFilter(
+ *      DateFilter::class,
+ *      properties={
+ *          "createdAt"
+ *      }
+ * )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass="App\Repository\LogRepository")
  * @ORM\HasLifecycleCallbacks
  */
+
 class Log
 {
     /**

@@ -1,0 +1,147 @@
+<div class="container-fluid">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Utilisateurs"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="LogsService.LogsForm" (ngSubmit)="LogsService.onSearch()" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th width="100px">ID</th>
+                  <th  width="200px">Date</th>
+                  <th  width="200px">Utilisateur</th>
+                  <th width="200px">IP</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="ID..." formControlName="id" #searchId class="form-control"></td>
+                  <td>
+                    <ng-template #t let-date let-focused="focused">
+                      <span
+                        class="custom-day"
+                        [class.focused]="focused"
+                        [class.range]="isRange(date)"
+                        [class.faded]="isHovered(date) || isInside(date)"
+                        (mouseenter)="hoveredDate = date"
+                        (mouseleave)="hoveredDate = null"
+                      >
+                        {{ date.day }}
+                      </span>
+                    </ng-template>
+      
+                    <input #searchDate type="text" class="form-control date" (focus)="dpHidden=false" (blur)="dpHidden=true" name="daterange" autocomplete="off"
+                      formControlName="createdAt"/>
+      
+                    <ngb-datepicker  (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t"
+                      outsideDays="hidden" [hidden]="dpHidden">
+                    </ngb-datepicker>
+                  </td>
+                  <td>
+                    <select class="form-select"
+                      formControlName="user" #searchUser>
+                      <option value="" selected>Utilisateur...</option>
+                      <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                    </select>
+                  </td>
+                  <td><input type="text" placeholder="IP..." formControlName="extra" #searchExtra class="form-control"></td>
+                  <td><input type="text" placeholder="Description..." formControlName="message" class="form-control"></td>
+                </tr>
+                
+                <tr *ngFor="let item of (LogsService.Logs$ | async); let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="item.id"
+                      [term]="searchId.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.createdAt | date:'long'"
+                      [term]="searchDate.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.user.fullName"
+                      [term]="searchUser.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.extra.clientIp"
+                      [term]="searchExtra.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td [innerHTML]="item.message"></td>
+                </tr>
+
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(LogsService.Logs$ | async) && LogsService.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(LogsService.Logs$ | async) && (LogsService.Logs$ | async).length === 0 && LogsService.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(LogsService.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > LogsService.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="LogsService.page$"
+                    [pageSize]="LogsService.pageSize"
+                    (pageChange)="LogsService.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

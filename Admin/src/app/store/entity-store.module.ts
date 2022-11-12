@@ -1,22 +1,15 @@
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { StoreModule } from "@ngrx/store";
-import { EffectsModule } from "@ngrx/effects";
+import { NgModule } from "@angular/core";
 import {
-  EntityDataModule,
-  DefaultDataServiceConfig,
-  DefaultDataServiceFactory,
-  PersistenceResultHandler,
-  EntityCollectionReducerMethodsFactory,
-  // EntityDataService,
+  DefaultDataServiceConfig, EntityCollectionReducerMethodsFactory, EntityDataModule, PersistenceResultHandler
 } from "@ngrx/data";
-import { environment } from "src/environments/environment";
-import { entityConfig } from "./entity-metadata";
-// import { UserDataService } from "./admin/users/user-data.service";
+import { EffectsModule } from "@ngrx/effects";
+import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
-import { CustomDataServiceFactory } from "./paginated-data.service";
-import { AdditionalPersistenceResultHandler } from "./additional-persistence-result-handler.service";
+import { environment } from "src/environments/environment";
 import { AdditionalEntityCollectionReducerMethodsFactory } from "./additional-entity-collection-reducer-methods";
+import { AdditionalPersistenceResultHandler } from "./additional-persistence-result-handler.service";
+import { entityConfig } from "./entity-metadata";
 
 const server = environment.serverURL;
 

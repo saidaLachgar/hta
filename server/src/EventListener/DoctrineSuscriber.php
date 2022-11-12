@@ -3,14 +3,17 @@
 namespace App\EventListener;
 
 use App\Entity\Log;
+use App\Entity\RefreshToken;
 use Doctrine\ORM\Events;
 use Psr\Log\LoggerInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-
 class DoctrineSuscriber implements EventSubscriber
 {
     private $logger;
+    public const CREATE = "Ajouté";
+    public const UPDATE = "Modifé";
+    public const DELETE = "Supprimé";
 
     public function __construct(LoggerInterface $dbLogger)
     {
@@ -28,24 +31,65 @@ class DoctrineSuscriber implements EventSubscriber
 
     public function postPersist(LifecycleEventArgs $args)
     {
-        $this->log('Ajouté', $args);
+        $this->log($args,self::CREATE);
     }
 
     public function postUpdate(LifecycleEventArgs $args)
     {
-        $this->log('Modifé', $args);
-    }
+        $this->log($args,self::UPDATE);
+        // prevent token updates from logging
+        // if (($args->getObject() instanceof User)) {
+            // $changeArray = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($args->getObject());
+            // if (!isset($changeArray["password"])){
+                // dd($changeArray);
+            // }
 
+        // }
+    }
+    
     public function postRemove(LifecycleEventArgs $args)
     {
-        $this->log('Supprimé', $args);
+        $this->log($args,self::DELETE);
     }
 
-    public function log($message, $args)
+    public function log($args, $eventType)
     {
-        $entity = $args->getEntity();
-        if (!($entity instanceof Log)) {
-            $this->logger->info($entity->getId() . $message);
+        $object = $args->getObject();
+        if (!($object instanceof Log || $object instanceof RefreshToken)) {
+            $objectString = (string)$object; // ex : fullName
+            $className = get_class($object); // returns fully-qualified class name
+            $instance = new $className(); // Creating class instance
+            $translatedName = $instance::$TRANSLATED_NAME; // ex: utilisateur
+            if( $eventType !== self::DELETE ){
+                $routeName = $instance::$ROUTE_NAME; // ex : users
+                if(strpos($routeName, ":id") !== false){
+                    $objectId = $object->getId(); // ex : 190
+                    $routeName = str_replace(":id",$objectId,$routeName);
+                }
+                $url =  $_ENV['FRONTEND_URL'].$routeName; // ex : /users/details/:id
+                $urlHtml =  '<p class="mb-1">URL : <b><a href="'.$url.'">'.$url.'</a></b></p>';
+            } else  $urlHtml="";
+
+            switch ($eventType) {
+                case self::CREATE:
+                    $badge = "success";
+                    $title = "Création";
+                    break;
+                case self::UPDATE:
+                    $badge = "warning";
+                    $title = "modification";
+                    break;
+                case self::DELETE:
+                    $badge = "danger";
+                    $title = "Suppression";
+                    break;
+            }
+
+            $message = '<p class="mb-0">Event Type : <span class="badge rounded-pill badge-soft-'.$badge.'">'.$title.'</span></p>'.
+                '<p class="mb-1">'.$eventType.' '.$translatedName. ' : <b>'.$objectString.'</b></p>'.$urlHtml;
+            $this->logger->info($message);
+
+            
         }
     }
 }

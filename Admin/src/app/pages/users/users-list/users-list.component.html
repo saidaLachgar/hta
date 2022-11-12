@@ -1,0 +1,256 @@
+<div class="container-fluid">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Utilisateurs"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <button class="btn bg-light text-primary ms-2" 
+        data-toggle="collapse" *ngIf="authService.isAuthorized('users_export')"
+        (click)="hideExport = !hideExport"
+        title="Exporter">
+        <i class="fas fa-upload"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Importer" 
+        *ngIf="authService.isAuthorized('users_import')">
+        <i class="fas fa-download"></i>
+      </button>
+      <a routerLink="/users/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('users_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <!-- <div class="collapse" id="collapseExample" [ngbCollapse]="hideExport">
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-body">
+          <form class="row gy-2 gx-3 align-items-end">
+            <div class="col-auto col-lg-5">
+              <label for="filterSelect">Propriété</label>
+              <select class="form-select w-100"
+                id="filterSelect"
+                formControlName="property"
+                required>
+                <option selected>Choisir une option...</option>
+                <option value="username">Matricule</option>
+                <option value="name">Nom</option>
+                <option value="role">Role</option>
+                <option value="team">Equipe</option>
+              </select>
+            </div>
+            <div class="col-sm-auto col-lg-5">
+              <label for="filterInput">Valeur</label>
+              <input
+                type="text"
+                class="form-control"
+                id="filterInput"
+                placeholder="Recherche..."
+                formControlName="value"
+                required
+              />
+            </div>
+            <div class="col-sm-auto col-lg">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-filter"></i> Filtrer
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- <div class="row mb-md-2">
+              <div class="col-sm-12 col-md-6">
+                <div class="dataTables_length" id="tickets-table_length"><label
+                    class="d-inline-flex align-items-center">Show
+                    <select name="tickets-table_length" aria-controls="tickets-table" name="pageSize"
+                      [(ngModel)]="userService.pageSize" class="form-control form-control-sm mx-2">
+                      <option [ngValue]="10">10</option>
+                      <option [ngValue]="25">25</option>
+                      <option [ngValue]="50">50</option>
+                      <option [ngValue]="100">100</option>
+                    </select> entries</label></div> 
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_filter" class="dataTables_filter text-md-end"><label
+                    class="d-inline-flex align-items-center">Search:
+                     <input type="text" name="searchTerm" class="form-control form-control-sm ms-2"
+                      aria-controls="tickets-table" [(ngModel)]="userService.searchTerm"> </label></div>
+              </div>
+            </div> -->
+          <!-- Table -->
+          <form [formGroup]="userService.userForm" (ngSubmit)="userService.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Matricule</th>
+                  <th>Nom</th>
+                  <th>Rôle</th>
+                  <th>Équipe</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="Matricule..." formControlName="username" #searchUsername class="form-control"></td>
+                  <td><input type="text" placeholder="Nom..." formControlName="fullName" #searchFullName class="form-control"></td>
+                  <td>
+                    <select class="form-select"
+                      formControlName="roles" #searchRoles>
+                      <option value="" selected>Rôle...</option>
+                      <option value="ROLE_USER">USER</option>
+                      <option value="ROLE_ADMIN">ADMIN</option>
+                      <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select">
+                      <!-- formControlName="role"> -->
+                      <option selected>Équipe...</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div *ngIf="(userService.users$ | async) && (userService.users$ | async).length > userService.pageSize && userService.loaded$ | async">
+                      <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                        <i class="bx bx-search me-1"></i>Rechercher
+                      </button>
+                      <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
+                        <i class="bx bx-x me-1"></i>Réinitialiser
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(userService.users$ | async) && userService.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(userService.users$ | async) && (userService.users$ | async).length === 0 && userService.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let user of (userService.users$ | async); let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="user.username"
+                      [term]="searchUsername.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="user.fullName"
+                      [term]="searchFullName.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="user.roles | replace : '_' : ' '"
+                      [term]="searchRoles.options[searchRoles.options.selectedIndex].text"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="user.team"
+                    ></ngb-highlight>
+                  </td>
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('users_details') || authService.isAuthorized('users_update') || authService.isAuthorized('users_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', user.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_update')"
+                          [routerLink]="['update', user.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('users_delete')"
+                          (click)="userService.deleteItem(user.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(userService.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > userService.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="userService.page$"
+                    [pageSize]="userService.pageSize"
+                    (pageChange)="userService.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

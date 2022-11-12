@@ -18,12 +18,12 @@ use Doctrine\Common\Collections\Collection;
  * @ApiResource(
  *   order= {"id" = "DESC"},
  *   itemOperations={
- *      "patch"= {"access_control"="is_granted('hasPermission', 'users_update')"},
+ *      "put"= {"access_control"="is_granted('hasPermission', 'users_update')"},
  *      "get"= {"access_control"="is_granted('hasPermission', 'users_details')"},
  *      "delete"= {"access_control"="is_granted('hasPermission', 'users_delete')"},
- *      "post"= {"access_control"="is_granted('hasPermission', 'users_add')"},
  *   },
  *   collectionOperations={
+ *      "post"= {"access_control"="is_granted('hasPermission', 'users_add')"},
  *      "get"= { "access_control"="is_granted('hasPermission', 'users_show')"},
  *   },
  * )
@@ -40,6 +40,8 @@ use Doctrine\Common\Collections\Collection;
  */
 class User implements UserInterface
 {
+    public static $ROUTE_NAME = "users/details/:id";
+    public static $TRANSLATED_NAME = "utilisateur";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -76,6 +78,10 @@ class User implements UserInterface
     public function __construct()
     {
         $this->logs = new ArrayCollection();
+    }
+    public function __toString()
+    {
+        return $this->fullName;
     }
 
     public function getId(): ?int

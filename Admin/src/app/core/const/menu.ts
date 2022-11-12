@@ -89,14 +89,14 @@ export const MENU: MenuItem[] = [
             {
                 id: 15,
                 label: 'Autorisation',
-                link: '/users/autorisation',
+                link: '/autorisation',
                 checkPermissions: 'autorisation',
                 parentId: 12
             },
             {
                 id: 16,
                 label: 'Historique',
-                link: '/user/history',
+                link: '/historique',
                 parentId: 12
             }
         ]
