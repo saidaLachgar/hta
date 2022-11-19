@@ -26,6 +26,9 @@ export class AuthenticationService {
     getToken(): any {
         return this.currentUserValue.jwt;
     }
+    getUserName(): string {
+        return this.currentUserValue.username;
+    }
     decodeToken(token: string) {
         return JSON.parse(atob(token.split('.')[1]));
     }

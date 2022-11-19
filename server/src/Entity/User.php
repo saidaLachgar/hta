@@ -6,13 +6,15 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+// PropertyFilter => ?properties[]=title&properties[]=shortDescription
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter; 
 
 /**
  * @ApiResource(
@@ -46,6 +48,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"logs_list"})
      */
     private $id;
 
@@ -55,6 +58,7 @@ class User implements UserInterface
     private $username;
 
     /**
+     * @Groups({"logs_list"})
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $fullName;
@@ -74,6 +78,11 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="Log", mappedBy="user")
      */
     private $logs;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="membres")
+     */
+    private $team;
 
     public function __construct()
     {
@@ -188,6 +197,18 @@ class User implements UserInterface
                 $log->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Team $team): self
+    {
+        $this->team = $team;
 
         return $this;
     }

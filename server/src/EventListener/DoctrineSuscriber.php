@@ -85,8 +85,8 @@ class DoctrineSuscriber implements EventSubscriber
                     break;
             }
 
-            $message = '<p class="mb-0">Event Type : <span class="badge rounded-pill badge-soft-'.$badge.'">'.$title.'</span></p>'.
-                '<p class="mb-1">'.$eventType.' '.$translatedName. ' : <b>'.$objectString.'</b></p>'.$urlHtml;
+            $message = '<p class="mb-1">'.$eventType.' '.$translatedName. ' : <b>'.$objectString.'</b></p>'.$urlHtml.
+                '<p class="mb-0 d-block mt-3">Type d\'événement : <span class="badge rounded-pill badge-soft-'.$badge.'">'.$title.'</span></p>';
             $this->logger->info($message);
 
             

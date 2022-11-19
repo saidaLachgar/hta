@@ -120,14 +120,12 @@
                     </select>
                   </td>
                   <td>
-                    <div *ngIf="(userService.users$ | async) && (userService.users$ | async).length > userService.pageSize && userService.loaded$ | async">
-                      <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
-                        <i class="bx bx-search me-1"></i>Rechercher
-                      </button>
-                      <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
-                        <i class="bx bx-x me-1"></i>Réinitialiser
-                      </button>
-                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
                   </td>
                 </tr>
                 <tr>

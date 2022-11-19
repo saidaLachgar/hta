@@ -7,8 +7,12 @@ export class AdditionalPersistenceResultHandler extends DefaultPersistenceResult
     private readonly pageSize = environment.pageSize;
     private serializeHydra(response): Pagination {
         let getHydra = (key: string) => {
-            let val = response["hydra:view"][key];
-            return val ? parseInt(val.replace(/^\D+/g, "")) : null;
+            let urlString = response["hydra:view"][key];
+            if(urlString){
+                var url = new URL("http://localhost"+urlString);
+                return parseInt(url.searchParams.get("page"));
+            }
+            return null;
         };
         let page = getHydra("@id"),
             first = getHydra("hydra:first"),

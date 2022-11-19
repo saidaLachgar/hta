@@ -10,11 +10,14 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+// use ApiPlatform\Core\Annotation\ApiProperty;
 
 /**
  * @ApiResource(
- *   order= {"id" = "DESC"},
- *   collectionOperations={
+ *     order= {"id" = "DESC"},
+ *     normalizationContext={"groups"={"logs_list"}},
+ *     collectionOperations={
  *      "get"= { "access_control"="is_granted('hasPermission', 'logs_show')"},
  *   },
  * )
@@ -27,12 +30,7 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
  *          "user.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
- * @ApiFilter(
- *      DateFilter::class,
- *      properties={
- *          "createdAt"
- *      }
- * )
+ * @ApiFilter(DateFilter::class, properties={"createdAt"})
  * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass="App\Repository\LogRepository")
  * @ORM\HasLifecycleCallbacks
@@ -44,10 +42,12 @@ class Log
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"logs_list"})
      */
     private $id;
 
     /**
+     * @Groups({"logs_list"})
      * @ORM\Column(type="text")
      */
     private $message;
@@ -63,22 +63,30 @@ class Log
     private $level;
 
     /**
+     * @Groups({"logs_list"})
      * @ORM\Column(type="string", length=50)
      */
     private $levelName;
 
     /**
+     * @Groups({"logs_list"})
      * @ORM\Column(type="array", nullable=true)
      */
     private $extra = [];
 
     /**
+     * @Groups({"logs_list"})
      * @ORM\Column(type="datetime")
+     * @var \DateTime
      */
     private $createdAt;
-
+    
+    // * @ApiProperty(
+    // *    readableLink=true
+    // *  )
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="logs")
+     * @Groups({"logs_list"})
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="logs", fetch="EAGER")
      */
     private $user;
 

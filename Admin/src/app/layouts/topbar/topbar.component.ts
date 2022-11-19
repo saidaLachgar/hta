@@ -1,6 +1,5 @@
-import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
+import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { AuthenticationService } from '../../core/services/auth.service';
 
 @Component({
@@ -13,10 +12,11 @@ import { AuthenticationService } from '../../core/services/auth.service';
  * Topbar component
  */
 export class TopbarComponent implements OnInit {
-
+  username:string;
   element;
 
-  constructor(@Inject(DOCUMENT) private document: any, private router: Router, private authService: AuthenticationService,) {
+  constructor(@Inject(DOCUMENT) private document: any, private authService: AuthenticationService,) {
+    this.username = authService.getUserName();
   }
 
   openMobileMenu: boolean;

@@ -14,10 +14,11 @@ import { environment } from "src/environments/environment";
 })
 export class LogsService extends EntityCollectionServiceBase<Log> {
   readonly pageSize = environment.pageSize;
+  public page:number = 1;
   Logs$: Observable<Log[]>;
   pagination$: Observable<Pagination>;
-  page$: Observable<number>;
   submitted: boolean = false;
+  lastSearchedParams;
   public LogsForm: FormGroup;
 
   constructor(
@@ -25,24 +26,23 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
   ) {
     super("logs", serviceElementsFactory);
   }
-
+  
   /**
    * Get records
    */
   findAll(): void {
-    this.findByCriteria({ page: this.page$ || 1 });
+    // console.log("findAll")
+    this.findByCriteria({ page: 1 });
   }
 
   /**
    * Get pagination
    */
   getPagination(): void {
+    this.pagination$ = of(); // reset pagination
+    // console.log("getPagination")
     this.pagination$ = this.selectors$.entityActions$.pipe(
-      map((action) => {
-        let pagination = (action as any).payload.pagination;
-        pagination && (this.page$ = pagination.page);
-        return pagination;
-      })
+      map(action => (action as any).payload.pagination)
     );
   }
 
@@ -51,26 +51,10 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
    * Search
    */
   onSearch(): void {
-    this.findByCriteria(this.LogsForm.value);
-  }
-
-  get id() {
-    return this.LogsForm.get("id");
-  }
-  get message() {
-    return this.LogsForm.get("message");
-  }
-  get levelName() {
-    return this.LogsForm.get("levelName");
-  }
-  get extra() {
-    return this.LogsForm.get("extra");
-  }
-  get createdAt() {
-    return this.LogsForm.get("createdAt");
-  }
-  get user() {
-    return this.LogsForm.get("user");
+    // console.log("onSearch")
+    this.page = 1;
+    this.lastSearchedParams = this.LogsForm.value;
+    this.findByCriteria({ page: 1, ...this.lastSearchedParams });
   }
 
   /**
@@ -79,6 +63,14 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
    */
   findByCriteria(obj): void {
     this.Logs$ = of([]); // clear table
+    // format date
+    if(Object.keys(obj).length > 1){
+      // console.log(obj);
+      const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
+      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: formatDate(obj[key]) })[key];
+      updateObj("before");updateObj("after");
+    }
+
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
@@ -91,7 +83,8 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
    * on Paginate
    * @param page page to search for
    */
-  onPaginate(page: number) {
-    this.findByCriteria({ page: page, ...this.LogsForm.value });
+  onPaginate(page: number):void {
+    // console.log("onPaginate", page);
+    this.findByCriteria({ page: page, ...this.lastSearchedParams });
   }
 }
