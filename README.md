@@ -81,3 +81,93 @@ Swagger API Docs http://127.0.0.1:8000/api/
     ng g m shared --routing               // create a A Shared Module is used to organize a set of commonly used pieces into one module and export them to any module that imports the Share Module 
     ng g c shared/components/compoName --module shared // create a shared compos
     source-map-explorer dist/skote/main.3d439155b7914070.js
+
+
+
+Error : Object of class App\\Entity\\MediaObject could not be converted to string
+Fix : add string or remove from logs
+
+Error : method not found
+Fix : remove last slash from url
+
+
+
+
+How to grant access in front?
+    on login get user role from token which can be only (super_admin,admin,user)
+    send a new request to get the user's groupe ( using find by name )
+    store groupe in local storage
+        use ng guard to tell if a route can be accessed or not
+        you should add a validation foreach item in the menu if it can be accessed or not
+How to grant api by role dynamically?
+    in the api u can do something like (user.groupe.roles as json) contains current entity also current method (add,delete....)
+How to update stored roles for each user :
+    set authz for each REST api in backend
+    if gets an authz error (in front interceptor) 
+        -> refresh the user's token (which will get a new roles to the front)
+        -> refresh page
+        -> show a toast of something went wrong
+
+The changes may tak a while to be effected
+For having the permission changes immediately reflected, the user should logout and re-authenticate, otherwise the changes will be effected when the user is Unauthorized or denied from accessing an interface or when it session end which will take approximately one hour
+
+https://nehalist.io/logging-events-to-database-in-symfony/
+07:58 x download monolog bundel
+09:10 x create monolog.yml file config > package
+12:52 x create Monolog handler php src > utlity
+15:26 x create new entity log
+15:45 : update services.yaml > config
+01:40 : create dbprocessor > utillity
+
+
+<!-- checklist 📃 -->
+Dev. Backend
+    - Create entity
+    - __string + constant vars
+    - grant access of REST methods + api filter
+Inté Frontend
+    - HTML, component, service, routing, model
+    - menu.ts (url)
+    - access.ts (access value ex : logs_show)
+    - pages-routing.module.ts (model)
+    - entity-metadata.ts (entity name)
+
+
+A TESTER
+    - REFRESH TOKEN
+
+
+A fixer
+  Urgent
+    - Departement CRUD should have multiple team to choose
+    
+    - fix api platform -> date filter 
+    - Token session refresh?!
+    - wrong password error
+    - toggle password show -> login
+    - breadcrumbs + form titles
+
+A FAIR
+    x authorized menu items
+    x users
+    x history
+    ~ Departement
+      x crud 
+      - Long aérien / LP ( original ) + total of each post length
+    x teams
+    x Commune
+    - poste de distribution (designation, xDépart, origine, MLE, P KVA, Nb clients, xCommune, Date MST)
+    - Appareil coupeur
+    - visites ou sol
+    - travuex/inteription
+    - anomalies
+    
+
+
+A AMÉLIORER
+  - add update && delete actions in view (details)
+  - password toggle -> user update/add
+
+
+FAST TODOs
+  update depars to a real names chichawa..

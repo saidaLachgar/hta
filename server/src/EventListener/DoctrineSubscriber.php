@@ -3,12 +3,13 @@
 namespace App\EventListener;
 
 use App\Entity\Log;
+use App\Entity\MediaObject;
 use App\Entity\RefreshToken;
 use Doctrine\ORM\Events;
 use Psr\Log\LoggerInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-class DoctrineSuscriber implements EventSubscriber
+class DoctrineSubscriber implements EventSubscriber
 {
     private $logger;
     public const CREATE = "Ajouté";
@@ -55,7 +56,7 @@ class DoctrineSuscriber implements EventSubscriber
     public function log($args, $eventType)
     {
         $object = $args->getObject();
-        if (!($object instanceof Log || $object instanceof RefreshToken)) {
+        if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject)) {
             $objectString = (string)$object; // ex : fullName
             $className = get_class($object); // returns fully-qualified class name
             $instance = new $className(); // Creating class instance

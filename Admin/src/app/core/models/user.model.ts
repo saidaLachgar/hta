@@ -1,3 +1,5 @@
+import { Team } from ".";
+
 export interface User {
     id?: number;
     username?: string;
@@ -5,7 +7,7 @@ export interface User {
     fullName?: string;
     roles? : string[];
     jwt?: any;
-    // team? : string;
+    team? : Team;
 }
 export interface UserPermissions {
     id?: number;

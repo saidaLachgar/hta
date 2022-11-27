@@ -1,0 +1,178 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Les équipes"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <a routerLink="/teams/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('teams_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="teamService.teamForm" (ngSubmit)="teamService.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th width="30%">Départements</th>
+                  <th width="30%">Membres</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
+                  <td>
+                    <ng-select formControlName="departements.id[]" [multiple]="true" placeholder="Départements.." #searchDepar>
+                      <ng-option *ngFor="let depar of (teamService.departements$ | async)" [value]="depar.id">{{depar.titre}}</ng-option>
+                    </ng-select>
+                  </td>
+                  <td>
+                    <ng-select formControlName="membres.id[]" [multiple]="true" placeholder="Membres.." #searchMembres>
+                      <ng-option *ngFor="let user of (teamService.membres$ | async)" [value]="user.id">{{user.fullName}}</ng-option>
+                    </ng-select>
+                  </td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="teamService.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(teamService.teams$ | async) && teamService.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(teamService.teams$ | async) && (teamService.teams$ | async).length === 0 && teamService.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let team of (teamService.teams$ | async); let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="team.titre"
+                      [term]="searchTitre.value"
+                    ></ngb-highlight>
+                  </td>
+                  
+                  
+                  <td>
+                    <div *ngFor="let depar of team.departements">
+                      <a 
+                        [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', depar.id] : null"
+                        target="_blank" rel="noopener noreferrer">- {{depar.titre}}</a>
+                    </div>
+                  </td>
+                  <td>
+                    <div *ngFor="let usr of team.membres">
+                      <a 
+                        [routerLink]="authService.isAuthorized('users_details') ? ['/users/details', usr.id] : null"
+                        target="_blank" rel="noopener noreferrer">- {{usr.fullName}}</a>
+                    </div>
+                  </td>
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('teams_details') || authService.isAuthorized('teams_update') || authService.isAuthorized('teams_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', team.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('teams_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('teams_update')"
+                          [routerLink]="['update', team.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('teams_delete')"
+                          (click)="teamService.deleteItem(team.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(teamService.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > teamService.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="teamService.page"
+                    [pageSize]="teamService.pageSize"
+                    (pageChange)="teamService.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

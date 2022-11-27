@@ -31,8 +31,8 @@ services:
         tags:
             - {name: monolog.processor, handler: dbHandler}
 
-    doctrine.doctrineSuscriber:
-        class: App\EventListener\DoctrineSuscriber
+    doctrine.doctrineSubscriber:
+        class: App\EventListener\DoctrineSubscriber
         tags:
             - {name: doctrine.event_subscriber}
     

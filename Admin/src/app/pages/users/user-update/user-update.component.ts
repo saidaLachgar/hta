@@ -14,12 +14,14 @@ export class UserUpdateComponent {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public userService: UserService) { 
     this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Mettre à jour l\'utilisateur', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
+    userService.loadTeams();
 
     userService.userForm = this.fb.group({
       fullName: ['', Validators.required],
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       roles: ['', Validators.required],
+      team: [""],
     });
     this.userService.getByKey(this.id).subscribe((usr) => {
       userService.userForm.setValue({
@@ -27,6 +29,7 @@ export class UserUpdateComponent {
         username : usr.username,
         password : "",
         roles : usr.roles.join(''),
+        team: usr.team ? usr.team["@id"] : null,
       });
     });
   }

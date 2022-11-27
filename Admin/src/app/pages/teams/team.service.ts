@@ -1,0 +1,166 @@
+import { Injectable } from "@angular/core";
+import { FormGroup } from "@angular/forms";
+import { HotToastService } from "@ngneat/hot-toast";
+import {
+  EntityCollectionServiceBase,
+  EntityCollectionServiceElementsFactory,
+} from "@ngrx/data";
+import { Observable, of } from "rxjs";
+import { map } from "rxjs/operators";
+import { Pagination, Team, Departement, User } from "src/app/core/models";
+import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
+import { environment } from "src/environments/environment";
+import { departementService } from "../departements/departement.service";
+import { UserService } from "../users/user.service";
+
+@Injectable({
+  providedIn: "root",
+})
+export class teamService extends EntityCollectionServiceBase<Team> {
+  readonly pageSize = environment.pageSize;
+  teams$: Observable<Team[]>;
+  membres$: Observable<User[]>;
+  departements$: Observable<Departement[]>;
+
+  pagination$: Observable<Pagination>;
+  submitted: boolean = false;
+  page:number = 1;
+  lastSearchedParams;
+  public teamForm: FormGroup;
+
+  constructor(
+    private serviceElementsFactory: EntityCollectionServiceElementsFactory,
+    private confirmDialogService: ConfirmDialogService,
+    public DepartementService: departementService,
+    public UserService: UserService,
+    private toast: HotToastService
+  ) {
+    super("teams", serviceElementsFactory);
+  }
+
+  /**
+   * Get records
+   */
+  findAll(): void {
+    this.findByCriteria({ page: 1 });
+  }
+  
+  loadMembers() : void{
+    this.membres$ = this.UserService.getWithQuery("properties[]=id&properties[]=fullName");
+  }
+  loadDepartements() : void{
+    this.departements$ = this.DepartementService.getWithQuery("properties[]=id&properties[]=titre");
+  }
+  /**
+   * Get pagination
+   */
+  getPagination(): void {
+    this.pagination$ = of(); // reset pagination
+    // console.log("getPagination")
+    this.pagination$ = this.selectors$.entityActions$.pipe(
+      map(action => (action as any).payload.pagination)
+    );
+  }
+
+  /**
+   * Delete item
+   * @param id team id
+   * @param target html element
+   */
+  deleteItem(id: number, target: HTMLElement) {
+    this.confirmDialogService.setConfirmation("Are you sure to delete?", () => {
+      this.delete(id)
+        .pipe(
+          this.toast.observe({
+            loading: "Suppression...",
+            success: () => {
+              target.closest("tr").remove();
+              return "L'équipe supprimé avec succès";
+            },
+            error: "un problème est survenu, veuillez réessayer",
+          })
+        )
+        .subscribe();
+    });
+  }
+
+  /**
+   * Search
+   */
+  onSearch(): void {
+    this.page = 1;
+    this.lastSearchedParams = this.teamForm.value;
+    this.findByCriteria({ page: 1, ...this.lastSearchedParams });
+  }
+
+  /**
+   * Persist : Create
+   */
+  onCreate(): void {
+    let teamForm = this.teamForm;
+    this.submitted = true;
+    if (teamForm.invalid) return;
+    this.submitted = false;
+    let toast = this.toast;
+    let team = teamForm.value as Team;
+    this.add(team).subscribe({
+      error: () => toast.error("un problème est survenu, veuillez réessayer"),
+      complete() {
+        teamForm.reset();
+        toast.success("L'équipe ajouté avec succès");
+      },
+    });
+  }
+  /**
+   * Persist : update
+   */
+  onUpdate(id:number): void {
+    let teamForm = this.teamForm;
+    this.submitted = true;
+    if (teamForm.invalid) return;
+    this.submitted = false;
+
+    let toast = this.toast;
+    let team:Team = {...teamForm.value};
+    team.id = id;
+      this.update(team).subscribe({
+        error: () => toast.error("un problème est survenu, veuillez réessayer"),
+        complete() {
+          toast.success("L'équipe a été mis à jour avec succès");
+        },
+      });
+  }
+
+  get titre() {
+    return this.teamForm.get("titre");
+  }
+  get membres() {
+    return this.teamForm.get("membres");
+  }
+  get departements() {
+    return this.teamForm.get("departements");
+  }
+
+  /**
+   * find By Criteria
+   * @param obj query parameters
+   */
+  findByCriteria(obj): void {
+    this.teams$ = of([]); // clear table
+    // remove empty values
+    let queryParams = Object.keys(obj)
+      .filter((k) => obj[k] != "" && obj[k] != null)
+      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
+    console.log(queryParams);
+    this.teams$ = this.getWithQuery(queryParams);
+    this.getPagination();
+  }
+
+  /**
+   * on Paginate
+   * @param page page to search for
+   */
+  onPaginate(page: number) {
+    this.findByCriteria({ page: page, ...this.lastSearchedParams });
+  }
+}

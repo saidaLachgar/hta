@@ -1,3 +1,4 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
@@ -7,7 +8,7 @@ import {
 } from "@ngrx/data";
 import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
-import { Pagination, User } from "src/app/core/models";
+import { Pagination, Team, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 
@@ -16,15 +17,19 @@ import { environment } from "src/environments/environment";
 })
 export class UserService extends EntityCollectionServiceBase<User> {
   readonly pageSize = environment.pageSize;
+  private server = environment.serverURL;
+  teams$: Observable<Team[]>;
   users$: Observable<User[]>;
   pagination$: Observable<Pagination>;
-  page$: Observable<number>;
   submitted: boolean = false;
+  page:number = 1;
+  lastSearchedParams;
   public userForm: FormGroup;
 
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
+    private http: HttpClient,
     private toast: HotToastService
   ) {
     super("users", serviceElementsFactory);
@@ -34,21 +39,22 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * Get records
    */
   findAll(): void {
-    // this.users$ = this.getAll();
-    // this.getPagination();
-    this.findByCriteria({ page: this.page$ || 1 });
+    this.findByCriteria({ page: 1 });
+  }
+
+  loadTeams(): void {
+    this.teams$ =  this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre`)
+    .pipe(map(response => response["hydra:member"]));
   }
 
   /**
    * Get pagination
    */
   getPagination(): void {
+    this.pagination$ = of(); // reset pagination
+    // console.log("getPagination")
     this.pagination$ = this.selectors$.entityActions$.pipe(
-      map((action) => {
-        let pagination = (action as any).payload.pagination;
-        pagination && (this.page$ = pagination.page);
-        return pagination;
-      })
+      map(action => (action as any).payload.pagination)
     );
   }
 
@@ -78,7 +84,9 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * Search
    */
   onSearch(): void {
-    this.findByCriteria(this.userForm.value);
+    this.page = 1;
+    this.lastSearchedParams = this.userForm.value;
+    this.findByCriteria({ page: 1, ...this.lastSearchedParams });
   }
 
   /**
@@ -90,7 +98,10 @@ export class UserService extends EntityCollectionServiceBase<User> {
     if (userForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let user = userForm.value as User;
+    let obj = userForm.value;
+    let user = Object.keys(obj)
+      .filter((k) => obj[k] != "" && obj[k] != null)
+      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as User;
     user.roles = [user.roles.toString()];
     this.add(user).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),
@@ -132,6 +143,9 @@ export class UserService extends EntityCollectionServiceBase<User> {
   get roles() {
     return this.userForm.get("roles");
   }
+  get team() {
+    return this.userForm.get("team");
+  }
 
   /**
    * find By Criteria
@@ -152,6 +166,6 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * @param page page to search for
    */
   onPaginate(page: number) {
-    this.findByCriteria({ page: page, ...this.userForm.value });
+    this.findByCriteria({ page: page, ...this.lastSearchedParams });
   }
 }

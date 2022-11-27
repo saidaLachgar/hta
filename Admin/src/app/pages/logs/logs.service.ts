@@ -14,7 +14,7 @@ import { environment } from "src/environments/environment";
 })
 export class LogsService extends EntityCollectionServiceBase<Log> {
   readonly pageSize = environment.pageSize;
-  public page:number = 1;
+  page:number = 1;
   Logs$: Observable<Log[]>;
   pagination$: Observable<Pagination>;
   submitted: boolean = false;

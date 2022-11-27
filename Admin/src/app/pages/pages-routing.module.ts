@@ -11,6 +11,21 @@ const routes: Routes = [
       import("./users/user.module").then((m) => m.userModule),
   },
   {
+    path: "teams",
+    loadChildren: () =>
+      import("./teams/team.module").then((m) => m.teamModule),
+  },
+  {
+    path: "departements",
+    loadChildren: () =>
+      import("./departements/departement.module").then((m) => m.departementModule),
+  },
+  {
+    path: "communes",
+    loadChildren: () =>
+      import("./communes/commune.module").then((m) => m.communeModule),
+  },
+  {
     path: "autorisation",
     loadChildren: () =>
       import("./UserPermissions/user-permissions.module").then((m) => m.UserPermissionsModule),

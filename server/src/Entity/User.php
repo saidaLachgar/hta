@@ -19,6 +19,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 /**
  * @ApiResource(
  *   order= {"id" = "DESC"},
+ *   normalizationContext={"groups"={"users"}},
  *   itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'users_update')"},
  *      "get"= {"access_control"="is_granted('hasPermission', 'users_details')"},
@@ -34,7 +35,8 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      properties={
  *          "username"=SearchFilter::STRATEGY_PARTIAL,
  *          "fullName"=SearchFilter::STRATEGY_PARTIAL,
- *          "roles"=SearchFilter::STRATEGY_PARTIAL
+ *          "roles"=SearchFilter::STRATEGY_PARTIAL,
+ *          "team.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
  * @ApiFilter(PropertyFilter::class)
@@ -48,18 +50,22 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"logs_list"})
+     * 
+     * @Groups({"users","logs","teams"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * 
+     * @Groups({"users"})
      */
     private $username;
 
     /**
-     * @Groups({"logs_list"})
      * @ORM\Column(type="string", length=255, nullable=true)
+     * 
+     * @Groups({"users","logs","teams"})
      */
     private $fullName;
 
@@ -71,16 +77,20 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="json")
+     * 
+     * @Groups({"users"})
      */
     private $roles = [];
 
     /**
-     * @ORM\OneToMany(targetEntity="Log", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="Log", mappedBy="user", orphanRemoval=true)
      */
     private $logs;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="membres")
+     * 
+     * @Groups({"users"})
      */
     private $team;
 

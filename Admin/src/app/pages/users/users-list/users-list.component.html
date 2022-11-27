@@ -92,10 +92,10 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Matricule</th>
-                  <th>Nom</th>
-                  <th>Rôle</th>
-                  <th>Équipe</th>
+                  <th width="22%">Matricule</th>
+                  <th width="22%">Nom</th>
+                  <th width="22%">Rôle</th>
+                  <th width="22%">Équipe</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -114,10 +114,9 @@
                     </select>
                   </td>
                   <td>
-                    <select class="form-select">
-                      <!-- formControlName="role"> -->
-                      <option selected>Équipe...</option>
-                    </select>
+                    <ng-select formControlName="team.id[]" [multiple]="true" placeholder="Équipe.." #searchTeam>
+                      <ng-option *ngFor="let obj of (userService.teams$ | async)" [value]="obj.id">{{obj.titre}}</ng-option>
+                    </ng-select>
                   </td>
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -164,9 +163,10 @@
                     ></ngb-highlight>
                   </td>
                   <td>
-                    <ngb-highlight
-                      [result]="user.team"
-                    ></ngb-highlight>
+                    <a 
+                      *ngIf="user.team"
+                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', user.team.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{user.team.titre}}</a>
                   </td>
                   <td align="center">
                     <div ngbDropdown 
@@ -237,7 +237,7 @@
                 <div class="text-md-right float-md-end pagination-rounded">
                   <ngb-pagination
                     [collectionSize]="pagination.totalRecords"
-                    [(page)]="userService.page$"
+                    [(page)]="userService.page"
                     [pageSize]="userService.pageSize"
                     (pageChange)="userService.onPaginate($event)"
                   >

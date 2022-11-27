@@ -9,22 +9,27 @@
       <div class="card-body pt-5">
         <div class="table-responsive">
           <table class="table table-nowrap mb-0">
-            <tbody *ngIf="user$">
+            <tbody *ngIf="user">
               <tr>
                 <th scope="row">Nom :</th>
-                <td>{{(user$ | async).fullName}}</td>
+                <td>{{user.fullName}}</td>
               </tr>
               <tr>
                 <th scope="row">Matricule :</th>
-                <td>{{(user$ | async ).username}}</td>
+                <td>{{user.username}}</td>
               </tr>
               <tr>
                 <th scope="row">Rôle :</th>
-                <td>{{(user$ | async)?.roles | replace : '_' : ' '}}</td>
+                <td>{{user?.roles | replace : '_' : ' '}}</td>
               </tr>
-              <tr>
+              <tr valign="middle">
                 <th scope="row">Équipe :</th>
-                <td>California, United States</td>
+                <td>
+                  <a 
+                      *ngIf="user.team"
+                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', user.team.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{user.team.titre}}</a>
+                </td>
               </tr>
             </tbody>
           </table>

@@ -67,6 +67,15 @@
                 </div>
               </div>
             </div>
+
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Équipe</label>
+              <div class="col-md-10">
+                <ng-select formControlName="team" placeholder="Équipe..">
+                  <ng-option *ngFor="let team of (userService.teams$ | async)" [value]="team['@id']">{{team.titre}}</ng-option>
+                </ng-select>
+              </div>
+            </div>
   
             <div class="mb-3 row">
               <div class="col-12">
@@ -115,7 +124,7 @@
   
             <div class="row justify-content-end">
               <div class="col-auto">
-                <button class="btn btn-light me-2" routerLink="/users">Annuler</button>
+                <button class="btn btn-light me-2" routerLink="/users"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
                 <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="userService.submitted && (userService.loading$ | async)"></i> Sauvegarder</button>
               </div>
             </div>

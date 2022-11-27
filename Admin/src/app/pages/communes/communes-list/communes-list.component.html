@@ -1,0 +1,184 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Les Communes"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <a routerLink="/communes/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('communes_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.communeForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(service.communes$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(service.communes$ | async) && (service.communes$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let commune of (service.communes$ | async); let i = index" valign="middle">
+                  <td>
+                    <ngb-highlight
+                        [result]="commune.titre"
+                        [term]="searchTitre.value"
+                      ></ngb-highlight>
+                  </td>
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('communes_details') || authService.isAuthorized('communes_update') || authService.isAuthorized('communes_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', commune.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('communes_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('communes_update')"
+                          (click)="service.onUpdate(commune.id, commune.titre)"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('communes_delete')"
+                          (click)="service.deleteItem(commune.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <form class="card" [formGroup]="service.communeForm" (ngSubmit)="service.onSave()">
+        <fieldset class="card-body justify-content-center d-flex flex-column">
+            
+          <div class="mb-3 row">
+            <h4 class="card-title my-4">Créer une nouvelle commune</h4>
+            <label for="name-input" class="col-md-2 col-form-label">Titre</label>
+            <div class="col-md-10">
+              <input
+                formControlName="titre"
+                [ngClass]="{'is-invalid':service.titre.invalid && service.submitted}"
+                class="form-control"
+                type="text"
+                id="name-input"
+                required
+              />
+              <div
+                *ngIf="service.submitted && service.titre.errors"
+                class="invalid-feedback">
+                <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-end mb-4">
+            <div class="col-auto">
+              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
+            </div>
+          </div>
+
+        </fieldset>
+        <!-- end col -->
+      </form>
+    </div>
+  </div>
+
+</div>

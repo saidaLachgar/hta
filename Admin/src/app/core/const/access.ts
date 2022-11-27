@@ -34,7 +34,17 @@ export const EntitiesAccess:EntityAccess[] = [
     },
     {
         name: 'Équipes',
-        value: 'equipes',
+        value: 'teams',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Départements',
+        value: 'departements',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Commune',
+        value: 'communes',
         permissions: [0, 1, 2, 3, 4]
     },
     {

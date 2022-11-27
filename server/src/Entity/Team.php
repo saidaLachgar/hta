@@ -2,37 +2,69 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\TeamRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource()
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
+
+
+ /**
+ * @ApiResource(
+ *   order= {"id" = "DESC"},
+ *   normalizationContext={"groups"={"teams"}},
+ *   itemOperations={
+ *      "put"= {"access_control"="is_granted('hasPermission', 'teams_update')"},
+ *      "get"= {"access_control"="is_granted('hasPermission', 'teams_details')"},
+ *      "delete"= {"access_control"="is_granted('hasPermission', 'teams_delete')"},
+ *   },
+ *   collectionOperations={
+ *      "post"= {"access_control"="is_granted('hasPermission', 'teams_add')"},
+ *      "get"= { "access_control"="is_granted('hasPermission', 'teams_show')"},
+ *   },
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "titre"=SearchFilter::STRATEGY_PARTIAL,
+ *          "membres.id"=SearchFilter::STRATEGY_EXACT,
+ *          "departements.id"=SearchFilter::STRATEGY_EXACT
+ *      }
+ * )
  * @ORM\Entity(repositoryClass=TeamRepository::class)
  */
 class Team
 {
+    public static $ROUTE_NAME = "teams/details/:id";
+    public static $TRANSLATED_NAME = "équipe";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
+     * @Groups({"teams","users", "depar:read"})
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
+     * @Groups({"teams","users", "depar:read"})
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $titre;
 
     /**
+     * @Groups({"teams"})
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="team")
      */
     private $membres;
 
     /**
+     * @Groups({"teams"})
      * @ORM\OneToMany(targetEntity=Departement::class, mappedBy="team")
      */
     private $departements;
@@ -42,7 +74,10 @@ class Team
         $this->membres = new ArrayCollection();
         $this->departements = new ArrayCollection();
     }
-
+    public function __toString()
+    {
+        return $this->titre;
+    }
     public function getId(): ?int
     {
         return $this->id;

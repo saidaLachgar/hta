@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ApiResource(
  *     order= {"id" = "DESC"},
- *     normalizationContext={"groups"={"logs_list"}},
+ *     normalizationContext={"groups"={"logs"}},
  *     collectionOperations={
  *      "get"= { "access_control"="is_granted('hasPermission', 'logs_show')"},
  *   },
@@ -42,12 +42,12 @@ class Log
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      */
     private $id;
 
     /**
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      * @ORM\Column(type="text")
      */
     private $message;
@@ -63,19 +63,19 @@ class Log
     private $level;
 
     /**
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      * @ORM\Column(type="string", length=50)
      */
     private $levelName;
 
     /**
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      * @ORM\Column(type="array", nullable=true)
      */
     private $extra = [];
 
     /**
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      * @ORM\Column(type="datetime")
      * @var \DateTime
      */
@@ -85,7 +85,7 @@ class Log
     // *    readableLink=true
     // *  )
     /**
-     * @Groups({"logs_list"})
+     * @Groups({"logs"})
      * @ORM\ManyToOne(targetEntity="User", inversedBy="logs", fetch="EAGER")
      */
     private $user;

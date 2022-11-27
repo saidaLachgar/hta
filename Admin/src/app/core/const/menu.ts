@@ -57,7 +57,7 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 10,
-        label: 'Postes',
+        label: 'Postes de distribution',
         icon: 'fas fa-network-wired',
         link: '/postes',
     },
@@ -70,12 +70,12 @@ export const MENU: MenuItem[] = [
     {
         id: 12,
         label: 'Utilisateurs',
-        icon: 'bx bx-cog',
+        icon: 'bx bx-user',
         subItems: [
             {
                 id: 13,
                 label: 'Équipes',
-                link: '/users/team',
+                link: '/teams',
                 checkPermissions: 'teams',
                 parentId: 12
             },
@@ -105,7 +105,25 @@ export const MENU: MenuItem[] = [
         id: 17,
         label: 'Source des données',
         icon: 'bx bx-cog',
+        subItems: [
+            {
+                id: 18,
+                label: 'Départements',
+                link: '/departements',
+                checkPermissions: 'departements',
+                parentId: 17
+            },
+            {
+                id: 19,
+                label: 'Commune',
+                link: '/communes',
+                checkPermissions: 'communes',
+                parentId: 17
+            },
+            
+        ]
     },
+    
 
 ];
 

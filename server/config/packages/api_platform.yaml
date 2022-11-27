@@ -8,6 +8,7 @@ api_platform:
         jsonld: ['application/ld+json']
         jsonapi: ['application/vnd.api+json']
         json: ['application/json']
+        multipart: ['multipart/form-data']
     swagger:
         versions: [3]
         api_keys:

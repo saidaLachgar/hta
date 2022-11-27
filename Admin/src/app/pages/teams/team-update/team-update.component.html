@@ -1,0 +1,62 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <app-page-title
+      title="Mettre à jour l'équipe"
+      [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+  
+    <form class="row mt-4" [formGroup]="teamService.teamForm" (ngSubmit)="teamService.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="teamService.loading$ | async">
+        <div class="card">
+          <div class="card-body">
+           
+
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Nom</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="titre"
+                  [ngClass]="{'is-invalid':teamService.titre.invalid && teamService.submitted}"
+                  class="form-control"
+                  type="text"
+                  id="name-input"
+                />
+                <div
+                  *ngIf="teamService.submitted && teamService.titre.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="teamService.titre.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Départements</label>
+              <div class="col-md-10">
+                <ng-select formControlName="departements" [multiple]="true" placeholder="Départements..">
+                  <ng-option *ngFor="let depar of (teamService.departements$ | async)" [value]="depar['@id']">{{depar.titre}}</ng-option>
+                </ng-select>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Membres</label>
+              <div class="col-md-10">
+                <ng-select formControlName="membres" [multiple]="true" placeholder="Membres.." #searchMembres>
+                  <ng-option *ngFor="let user of (teamService.membres$ | async)" [value]="user['@id']">{{user.fullName}}</ng-option>
+                </ng-select>
+              </div>
+            </div>
+  
+            <div class="row justify-content-end">
+              <div class="col-auto">
+                <button class="btn btn-light me-2" routerLink="/teams"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="teamService.submitted && (teamService.loading$ | async)"></i> Sauvegarder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <!-- end col -->
+    </form>
+    <!-- end row -->
+  </div>
+  

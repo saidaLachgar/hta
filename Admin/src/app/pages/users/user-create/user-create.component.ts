@@ -10,11 +10,14 @@ export class UserCreateComponent {
   
   constructor(private fb: FormBuilder, public userService: UserService) {
     this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Nouvel utilisateur', active: true }];
+    userService.loadTeams();
+
     userService.userForm = this.fb.group({
       fullName: ["", Validators.required],
       username: ["", Validators.required],
       password: ["", [Validators.required, Validators.minLength(6)]],
       roles: ["", Validators.required],
+      team: [""],
     });
   }
 }
