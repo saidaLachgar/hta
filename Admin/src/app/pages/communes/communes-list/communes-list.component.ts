@@ -9,7 +9,6 @@ import { communeService } from "../commune.service";
 })
 export class communesListComponent {
   breadCrumbItems: Array<{}>;
-  public hideExport = true;
 
   constructor(
     public service: communeService,

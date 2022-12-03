@@ -55,7 +55,7 @@ export class communeService extends EntityCollectionServiceBase<Commune> {
    * @param target html element
    */
   deleteItem(id: number, target: HTMLElement) {
-    this.confirmDialogService.setConfirmation("Are you sure to delete?", () => {
+    this.confirmDialogService.setConfirmation("Vous êtes sûr de vouloir supprimer?", () => {
       this.delete(id)
         .pipe(
           this.toast.observe({

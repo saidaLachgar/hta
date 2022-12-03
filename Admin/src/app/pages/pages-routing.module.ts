@@ -21,6 +21,16 @@ const routes: Routes = [
       import("./departements/departement.module").then((m) => m.departementModule),
   },
   {
+    path: "postes",
+    loadChildren: () =>
+      import("./postes/poste.module").then((m) => m.posteModule),
+  },
+  {
+    path: "appareils",
+    loadChildren: () =>
+      import("./appareils/appareil.module").then((m) => m.appareilModule),
+  },
+  {
     path: "communes",
     loadChildren: () =>
       import("./communes/commune.module").then((m) => m.communeModule),

@@ -3,39 +3,41 @@ import { FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
-  EntityCollectionServiceElementsFactory,
+  EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
-import { Pagination, Team, Departement, User } from "src/app/core/models";
+import { Commune, Departement, Pagination, Poste } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
+import { communeService } from "../communes/commune.service";
 import { departementService } from "../departements/departement.service";
-import { UserService } from "../users/user.service";
+
+const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
+
 
 @Injectable({
   providedIn: "root",
 })
-export class teamService extends EntityCollectionServiceBase<Team> {
+export class posteService extends EntityCollectionServiceBase<Poste> {
   readonly pageSize = environment.pageSize;
-  teams$: Observable<Team[]>;
-  membres$: Observable<User[]>;
+  postes$: Observable<Poste[]>;
+  communes$: Observable<Commune[]>;
   departements$: Observable<Departement[]>;
-
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page:number = 1;
   lastSearchedParams;
-  public teamForm: FormGroup;
+  public posteForm: FormGroup;
 
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     public DepartementService: departementService,
-    public UserService: UserService,
+    public communeService: communeService,
     private toast: HotToastService
   ) {
-    super("teams", serviceElementsFactory);
+    super("postes", serviceElementsFactory);
   }
 
   /**
@@ -45,8 +47,8 @@ export class teamService extends EntityCollectionServiceBase<Team> {
     this.findByCriteria({ page: 1 });
   }
   
-  loadMembers() : void{
-    this.membres$ = this.UserService.getWithQuery("properties[]=id&properties[]=fullName");
+  loadCommunes() : void{
+    this.communes$ = this.communeService.getWithQuery("properties[]=id&properties[]=fullName");
   }
   loadDepartements() : void{
     this.departements$ = this.DepartementService.getWithQuery("properties[]=id&properties[]=titre");
@@ -64,7 +66,7 @@ export class teamService extends EntityCollectionServiceBase<Team> {
 
   /**
    * Delete item
-   * @param id team id
+   * @param id poste id
    * @param target html element
    */
   deleteItem(id: number, target: HTMLElement) {
@@ -75,7 +77,7 @@ export class teamService extends EntityCollectionServiceBase<Team> {
             loading: "Suppression...",
             success: () => {
               target.closest("tr").remove();
-              return "L'équipe supprimé avec succès";
+              return "Poste supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })
@@ -89,7 +91,7 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    */
   onSearch(): void {
     this.page = 1;
-    this.lastSearchedParams = this.teamForm.value;
+    this.lastSearchedParams = this.posteForm.value;
     this.findByCriteria({ page: 1, ...this.lastSearchedParams });
   }
 
@@ -97,17 +99,23 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * Persist : Create
    */
   onCreate(): void {
-    let teamForm = this.teamForm;
+    let posteForm = this.posteForm;
     this.submitted = true;
-    if (teamForm.invalid) return;
+    if (posteForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let team = teamForm.value as Team;
-    this.add(team).subscribe({
+    let obj = posteForm.value;
+    // remove empty values
+    let poste = Object.keys(obj)
+      .filter((k) => obj[k] != "" && obj[k] != null)
+      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Poste;
+    poste["dateMst"] && (poste["dateMst"] = formatDate(poste["dateMst"]));
+
+    this.add(poste).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
-        teamForm.reset();
-        toast.success("L'équipe ajouté avec succès");
+        posteForm.reset();
+        toast.success("Poste ajouté avec succès");
       },
     });
   }
@@ -115,30 +123,26 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * Persist : update
    */
   onUpdate(id:number): void {
-    let teamForm = this.teamForm;
+    let posteForm = this.posteForm;
     this.submitted = true;
-    if (teamForm.invalid) return;
+    if (posteForm.invalid) return;
     this.submitted = false;
-
     let toast = this.toast;
-    let team:Team = {...teamForm.value};
-    team.id = id;
-      this.update(team).subscribe({
+    let obj = posteForm.value;
+
+    // remove empty values
+    let poste = Object.keys(obj)
+      .filter((k) => obj[k] != "" && obj[k] != null)
+      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Poste;
+    poste["dateMst"] && (poste["dateMst"] = formatDate(poste["dateMst"]));
+    poste.id = id;
+
+      this.update(poste).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
         complete() {
-          toast.success("L'équipe a été mis à jour avec succès");
+          toast.success("Poste a été mis à jour avec succès");
         },
       });
-  }
-
-  get titre() {
-    return this.teamForm.get("titre");
-  }
-  get membres() {
-    return this.teamForm.get("membres");
-  }
-  get departements() {
-    return this.teamForm.get("departements");
   }
 
   /**
@@ -146,12 +150,20 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * @param obj query parameters
    */
   findByCriteria(obj): void {
-    this.teams$ = of([]); // clear table
+    this.postes$ = of([]); // clear table
+
+    // format date
+    if(Object.keys(obj).length > 1){
+      // console.log(obj);
+      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: formatDate(obj[key]) })[key];
+      updateObj("before");updateObj("after");
+    }
+
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
-    this.teams$ = this.getWithQuery(queryParams);
+    this.postes$ = this.getWithQuery(queryParams);
     this.getPagination();
   }
 
@@ -161,5 +173,8 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    */
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
+  }
+  get designation() {
+    return this.posteForm.get("designation");
   }
 }

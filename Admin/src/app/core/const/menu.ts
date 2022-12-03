@@ -115,6 +115,13 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 19,
+                label: 'Appareils coupeur',
+                link: '/appareils',
+                checkPermissions: 'appareils',
+                parentId: 17
+            },
+            {
+                id: 20,
                 label: 'Commune',
                 link: '/communes',
                 checkPermissions: 'communes',

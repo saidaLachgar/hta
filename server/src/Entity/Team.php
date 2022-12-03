@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 
  /**
@@ -36,7 +36,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "membres.id"=SearchFilter::STRATEGY_EXACT,
  *          "departements.id"=SearchFilter::STRATEGY_EXACT
  *      }
- * )
+ *    )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=TeamRepository::class)
  */
 class Team

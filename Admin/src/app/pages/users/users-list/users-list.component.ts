@@ -10,7 +10,6 @@ import { NgSelectConfig } from "@ng-select/ng-select";
 })
 export class UsersListComponent {
   breadCrumbItems: Array<{}>;
-  public hideExport = true;
 
   constructor(
     public userService: UserService,

@@ -2,29 +2,29 @@ import { Component } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { NgSelectConfig } from "@ng-select/ng-select";
 import { AuthenticationService } from "src/app/core/services/auth.service";
-import { teamService } from "../team.service";
+import { appareilService } from "../appareil.service";
 
 @Component({
-  selector: "app-teams-list",
-  templateUrl: "./teams-list.component.html",
+  selector: "app-appareils-list",
+  templateUrl: "./appareils-list.component.html",
 })
-export class teamsListComponent {
+export class appareilsListComponent {
   breadCrumbItems: Array<{}>;
 
   constructor(
-    public teamService: teamService,
+    public service: appareilService,
     private fb: FormBuilder,
     public authService: AuthenticationService,
     private config: NgSelectConfig
   ) {
-    teamService.findAll();
-    teamService.loadMembers();
-    teamService.loadDepartements();
+    service.findAll();
+    service.loadPostes();
+    service.loadDepartements();
 
-    teamService.teamForm = fb.group({
+    service.appareilForm = fb.group({
       titre: [''],
       "departements.id[]": [''],
-      "membres.id[]": [''],
+      "postes.id[]": [''],
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';

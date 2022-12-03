@@ -1,14 +1,14 @@
-<div class="container-fluid">
+<div class="container-fluid mb-5">
   <div class="row align-items-center justify-content-between mb-4">
     <div class="col-auto">
       <app-page-title
-        title="Utilisateurs"
+        title="Les appareils coupeur"
         [breadcrumbItems]="breadCrumbItems"
       ></app-page-title>
     </div>
     <div class="col-auto">
-      <a routerLink="/users/add" class="btn btn-primary ms-2"
-      *ngIf="authService.isAuthorized('users_add')"
+      <a routerLink="/appareils/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('appareils_add')"
         ><i class="fas fa-plus-circle"></i> Ajouter</a
       >
     </div>
@@ -19,41 +19,45 @@
       <div class="card">
         <div class="card-body">
           <!-- Table -->
-          <form [formGroup]="userService.userForm" (ngSubmit)="userService.onSearch()" class="table-responsive">
+          <form [formGroup]="service.appareilForm" (ngSubmit)="service.onSearch()" class="table-responsive">
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th width="22%">Matricule</th>
-                  <th width="22%">Nom</th>
-                  <th width="22%">Rôle</th>
-                  <th width="22%">Équipe</th>
+                  <th>Titre</th>
+                  <th width="30%">Départements</th>
+                  <th width="30%">Postes</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr valign="middle" 
                 >
-                  <td><input type="text" placeholder="Matricule..." formControlName="username" #searchUsername class="form-control"></td>
-                  <td><input type="text" placeholder="Nom..." formControlName="fullName" #searchFullName class="form-control"></td>
+                  <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
                   <td>
-                    <select class="form-select"
-                      formControlName="roles" #searchRoles>
-                      <option value="" selected>Rôle...</option>
-                      <option value="ROLE_USER">USER</option>
-                      <option value="ROLE_ADMIN">ADMIN</option>
-                      <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
-                    </select>
+                    <ng-select [items]="service.departements$ | async"
+                              #searchDepar
+                              formControlName="departements.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              [hideSelected]="true"
+                              [minTermLength]="2"
+                              placeholder="Départements.."
+                              [loading]="service.departementLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.departementInput$">
+                    </ng-select>
                   </td>
                   <td>
-                    <ng-select formControlName="team.id[]" [multiple]="true" placeholder="Équipe.." #searchTeam>
-                      <ng-option *ngFor="let obj of (userService.teams$ | async)" [value]="obj.id">{{obj.titre}}</ng-option>
+                    <ng-select formControlName="postes.id[]" [multiple]="true" placeholder="Postes.." #searchPostes>
+                      <ng-option *ngFor="let poste of (service.postes$ | async)" [value]="poste.id">{{poste.designation}}</ng-option>
                     </ng-select>
                   </td>
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
                       <i class="bx bx-search me-1"></i>Rechercher
                     </button>
-                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="userService.findAll()">
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
                       <i class="bx bx-x me-1"></i>Réinitialiser
                     </button>
                   </td>
@@ -62,47 +66,45 @@
                   <td
                     class="text-center"
                     colspan="5"
-                    *ngIf="!(userService.users$ | async) && userService.loading$ | async"
+                    *ngIf="!(service.appareils$ | async) && service.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
                     colspan="5"
-                    *ngIf="(userService.users$ | async) && (userService.users$ | async).length === 0 && userService.loaded$ | async"
+                    *ngIf="(service.appareils$ | async) && (service.appareils$ | async).length === 0 && service.loaded$ | async"
                   >
                   Aucune donnée trouvée !
                   </td>
                 </tr>
-                <tr *ngFor="let user of (userService.users$ | async); let i = index">
+                <tr *ngFor="let appareil of (service.appareils$ | async); let i = index">
                   <td>
                     <ngb-highlight
-                      [result]="user.username"
-                      [term]="searchUsername.value"
+                      [result]="appareil.titre"
+                      [term]="searchTitre.value"
                     ></ngb-highlight>
                   </td>
-                  <td>
-                    <ngb-highlight
-                      [result]="user.fullName"
-                      [term]="searchFullName.value"
-                    ></ngb-highlight>
-                  </td>
-                  <td>
-                    <ngb-highlight
-                      [result]="user.roles | replace : '_' : ' '"
-                      [term]="searchRoles.options[searchRoles.options.selectedIndex].text"
-                    ></ngb-highlight>
-                  </td>
+                  
+                  
                   <td>
                     <a 
-                      *ngIf="user.team"
-                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', user.team.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{user.team.titre}}</a>
+                      *ngIf="appareil.departement"
+                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', appareil.departement.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{appareil.departement.titre}}</a>
                   </td>
+                  <td>
+                    <div *ngFor="let poste of appareil.postes">
+                      <a 
+                        [routerLink]="authService.isAuthorized('postes_details') ? ['/postes/details', poste.id] : null"
+                        target="_blank" rel="noopener noreferrer">- {{poste.titre}}</a>
+                    </div>
+                  </td>
+                  
                   <td align="center">
                     <div ngbDropdown 
                       placement="bottom-left"
-                      *ngIf="authService.isAuthorized('users_details') || authService.isAuthorized('users_update') || authService.isAuthorized('users_delete')"
+                      *ngIf="authService.isAuthorized('appareils_details') || authService.isAuthorized('appareils_update') || authService.isAuthorized('appareils_delete')"
                       >
                       <i
                         class="fas fa-ellipsis-h dropdown-toggle c-pointer"
@@ -115,17 +117,17 @@
                         ngbDropdownMenu
                       >
                         <a class="dropdown-item"
-                          [routerLink]="['details', user.id]"
+                          [routerLink]="['details', appareil.id]"
                           href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('users_details')"
+                          *ngIf="authService.isAuthorized('appareils_details')"
                           >
                           <i class="fas fa-eye me-2"></i> Voir
                         </a>
                         <a
                           class="dropdown-item"
                           href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('users_update')"
-                          [routerLink]="['update', user.id]"
+                          *ngIf="authService.isAuthorized('appareils_update')"
+                          [routerLink]="['update', appareil.id]"
                           >
                           <!-- skipLocationChange -->
                           <i class="fas fa-edit me-2"></i> Modifier
@@ -133,8 +135,8 @@
                         <a
                           class="dropdown-item text-danger"
                           href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('users_delete')"
-                          (click)="userService.deleteItem(user.id, $event.target)"
+                          *ngIf="authService.isAuthorized('appareils_delete')"
+                          (click)="service.deleteItem(appareil.id, $event.target)"
                         >
                           <i class="fas fa-trash me-2"></i> Supprimer
                         </a>
@@ -147,9 +149,9 @@
           </form>
           <!-- End table -->
           <!-- Pagination -->
-          <ng-container *ngIf="(userService.pagination$ | async) as pagination">
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
             <div
-              *ngIf="pagination.totalRecords > userService.pageSize"
+              *ngIf="pagination.totalRecords > service.pageSize"
               class="row justify-content-md-between align-items-md-center mt-2"
             >
               <div class="col-sm-12 col-md-5">
@@ -168,9 +170,9 @@
                 <div class="text-md-right float-md-end pagination-rounded">
                   <ngb-pagination
                     [collectionSize]="pagination.totalRecords"
-                    [(page)]="userService.page"
-                    [pageSize]="userService.pageSize"
-                    (pageChange)="userService.onPaginate($event)"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
                   >
                   </ngb-pagination>
                 </div>

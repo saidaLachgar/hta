@@ -8,16 +8,20 @@ const entityMetadata: EntityMetadataMap = {
   departements: {},
   media_objects: {},
   communes: {},
+  postes: {},
+  appareil_coupeurs: {},
 };
 
 const pluralNames = { 
   users: 'users',
-  departements: 'departements',
-  teams: 'teams',
-  logs: 'logs',
   user_permissions: 'user_permissions',
+  logs: 'logs',
+  teams: 'teams',
+  departements: 'departements',
   media_objects: 'media_objects',
   communes: 'communes',
+  postes: 'postes',
+  appareil_coupeurs: 'appareil_coupeurs',
  };
 
 export const entityConfig: EntityDataModuleConfig = { 

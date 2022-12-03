@@ -11,7 +11,6 @@ import { Lightbox } from 'ngx-lightbox';
 })
 export class departementsListComponent {
   breadCrumbItems: Array<{}>;
-  public hideExport = true;
 
   constructor(
     public departementService: departementService,

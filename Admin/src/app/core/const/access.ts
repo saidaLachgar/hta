@@ -48,6 +48,11 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: [0, 1, 2, 3, 4]
     },
     {
+        name: 'Appareils coupeur',
+        value: 'appareils',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
         name: 'Members',
         value: 'users',
         permissions: [0, 1, 2, 3, 4]

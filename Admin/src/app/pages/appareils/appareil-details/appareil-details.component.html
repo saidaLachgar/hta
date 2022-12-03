@@ -1,0 +1,44 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <app-page-title
+      title="Détails de l'appareil"
+      [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+    <div class="card mt-4">
+      <div class="card-body pt-5">
+        <div class="table-responsive">
+          <table class="table table-nowrap mb-0">
+            <tbody *ngIf="appareil">
+              <tr>
+                <th scope="row">Nom :</th>
+                <td>appareil.titre}}</td>
+              </tr>
+              <tr valign="middle">
+                <th scope="row">Département :</th>
+                <td>
+                  <a 
+                      *ngIf="appareil.departement"
+                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', appareil.departement.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{appareil.departement.titre}}</a>
+                </td>
+              </tr>
+              <tr valign="middle">
+                <th scope="row">Postes :</th>
+                <td>
+                  <div *ngFor="let poste of appareil.postes">
+                    <a 
+                      [routerLink]="authService.isAuthorized('postes_details') ? ['/postes/details', poste.id] : null"
+                      target="_blank" rel="noopener noreferrer">- {{poste.titre}}</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-light mt-4 float-end" routerLink="/appareils"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+      </div>
+    </div>
+  </div>
+
+  

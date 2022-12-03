@@ -7,3 +7,5 @@ export * from './log.model';
 export * from './team.model';
 export * from './commune.model';
 export * from './media.model';
+export * from './poste.model';
+export * from './appareil.model';

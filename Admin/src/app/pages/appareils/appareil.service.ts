@@ -5,37 +5,43 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
-import { Pagination, Team, Departement, User } from "src/app/core/models";
+import { concat, Observable, of, Subject } from "rxjs";
+import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { Pagination, AppareilCoupeur, Departement, Poste } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { departementService } from "../departements/departement.service";
-import { UserService } from "../users/user.service";
+import { posteService } from "../postes/poste.service";
 
 @Injectable({
   providedIn: "root",
 })
-export class teamService extends EntityCollectionServiceBase<Team> {
+export class appareilService extends EntityCollectionServiceBase<AppareilCoupeur> {
   readonly pageSize = environment.pageSize;
-  teams$: Observable<Team[]>;
-  membres$: Observable<User[]>;
+  appareils$: Observable<AppareilCoupeur[]>;
+  
+  postes$: Observable<Poste[]>;
+  posteLoading = false;
+  posteInput$ = new Subject<string>();
+  
   departements$: Observable<Departement[]>;
+  departementLoading = false;
+  departementInput$ = new Subject<string>();
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page:number = 1;
   lastSearchedParams;
-  public teamForm: FormGroup;
+  public appareilForm: FormGroup;
 
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     public DepartementService: departementService,
-    public UserService: UserService,
+    public PosteService: posteService,
     private toast: HotToastService
   ) {
-    super("teams", serviceElementsFactory);
+    super("appareil_coupeurs", serviceElementsFactory);
   }
 
   /**
@@ -45,12 +51,37 @@ export class teamService extends EntityCollectionServiceBase<Team> {
     this.findByCriteria({ page: 1 });
   }
   
-  loadMembers() : void{
-    this.membres$ = this.UserService.getWithQuery("properties[]=id&properties[]=fullName");
+  loadPostes() : void{
+    this.postes$ = concat(
+      of([]), // default items
+      this.posteInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.posteLoading = true),
+          switchMap(term => this.PosteService.getWithQuery("properties[]=id&properties[]=titre&designation="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.posteLoading = false)
+          ))
+      )
+    );
   }
+
   loadDepartements() : void{
-    this.departements$ = this.DepartementService.getWithQuery("properties[]=id&properties[]=titre");
+    this.departements$ = concat(
+      of([]), // default items
+      this.departementInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departementLoading = true),
+          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.departementLoading = false)
+          ))
+      )
+    );
   }
+
+  
   /**
    * Get pagination
    */
@@ -64,18 +95,18 @@ export class teamService extends EntityCollectionServiceBase<Team> {
 
   /**
    * Delete item
-   * @param id team id
+   * @param id appareil id
    * @param target html element
    */
   deleteItem(id: number, target: HTMLElement) {
-    this.confirmDialogService.setConfirmation("Vous êtes sûr de vouloir supprimer?", () => {
+    this.confirmDialogService.setConfirmation("Vous êtes sûr de vouloir supprimer cet appareil ?", () => {
       this.delete(id)
         .pipe(
           this.toast.observe({
             loading: "Suppression...",
             success: () => {
               target.closest("tr").remove();
-              return "L'équipe supprimé avec succès";
+              return "L'appareil supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })
@@ -89,7 +120,7 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    */
   onSearch(): void {
     this.page = 1;
-    this.lastSearchedParams = this.teamForm.value;
+    this.lastSearchedParams = this.appareilForm.value;
     this.findByCriteria({ page: 1, ...this.lastSearchedParams });
   }
 
@@ -97,17 +128,18 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * Persist : Create
    */
   onCreate(): void {
-    let teamForm = this.teamForm;
+    let appareilForm = this.appareilForm;
     this.submitted = true;
-    if (teamForm.invalid) return;
+    if (appareilForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let team = teamForm.value as Team;
-    this.add(team).subscribe({
+    let appareil = appareilForm.value as AppareilCoupeur;
+
+    this.add(appareil).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
-        teamForm.reset();
-        toast.success("L'équipe ajouté avec succès");
+        appareilForm.reset();
+        toast.success("L'appareil ajouté avec succès");
       },
     });
   }
@@ -115,30 +147,30 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * Persist : update
    */
   onUpdate(id:number): void {
-    let teamForm = this.teamForm;
+    let appareilForm = this.appareilForm;
     this.submitted = true;
-    if (teamForm.invalid) return;
+    if (appareilForm.invalid) return;
     this.submitted = false;
 
     let toast = this.toast;
-    let team:Team = {...teamForm.value};
-    team.id = id;
-      this.update(team).subscribe({
+    let appareil:AppareilCoupeur = {...appareilForm.value};
+    appareil.id = id;
+      this.update(appareil).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
         complete() {
-          toast.success("L'équipe a été mis à jour avec succès");
+          toast.success("L'appareil a été mis à jour avec succès");
         },
       });
   }
 
   get titre() {
-    return this.teamForm.get("titre");
+    return this.appareilForm.get("titre");
   }
   get membres() {
-    return this.teamForm.get("membres");
+    return this.appareilForm.get("membres");
   }
   get departements() {
-    return this.teamForm.get("departements");
+    return this.appareilForm.get("departements");
   }
 
   /**
@@ -146,12 +178,12 @@ export class teamService extends EntityCollectionServiceBase<Team> {
    * @param obj query parameters
    */
   findByCriteria(obj): void {
-    this.teams$ = of([]); // clear table
+    this.appareils$ = of([]); // clear table
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
-    this.teams$ = this.getWithQuery(queryParams);
+    this.appareils$ = this.getWithQuery(queryParams);
     this.getPagination();
   }
 

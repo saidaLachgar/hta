@@ -120,34 +120,31 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 01:40 : create dbprocessor > utillity
 
 
-<!-- checklist 📃 -->
-Dev. Backend
-    - Create entity
-    - __string + constant vars
-    - grant access of REST methods + api filter
-Inté Frontend
-    - HTML, component, service, routing, model
-    - menu.ts (url)
-    - access.ts (access value ex : logs_show)
-    - pages-routing.module.ts (model)
-    - entity-metadata.ts (entity name)
+🧶 Checklist
+  Dev. Backend
+      - Create entity
+      - __string + constant vars
+      - grant access of REST methods + api filter
+  Inté Frontend
+      - HTML, component, service, routing, model
+      - menu.ts (url)
+      - access.ts (access value ex : logs_show)
+      - pages-routing.module.ts (model)
+      - entity-metadata.ts (entity name)
 
 
-A TESTER
-    - REFRESH TOKEN
-
-
-A fixer
+🧵 A fixer
   Urgent
     - Departement CRUD should have multiple team to choose
-    
-    - fix api platform -> date filter 
+  Normale
+    - fix DATE filter -> api platform   (logs, postes )
     - Token session refresh?!
     - wrong password error
     - toggle password show -> login
-    - breadcrumbs + form titles
+    - check breadcrumbs + form titles + authService.isAuthorized links
 
-A FAIR
+
+🎈 A FAIR
     x authorized menu items
     x users
     x history
@@ -156,18 +153,21 @@ A FAIR
       - Long aérien / LP ( original ) + total of each post length
     x teams
     x Commune
-    - poste de distribution (designation, xDépart, origine, MLE, P KVA, Nb clients, xCommune, Date MST)
-    - Appareil coupeur
+    x poste de distribution (designation, xDépart, origine, MLE, P KVA, Nb clients, xCommune, Date MST)
+    - Appareils coupeur (titre, depar(many to one), postes(many to many))
     - visites ou sol
     - travuex/inteription
     - anomalies
     
 
-
-A AMÉLIORER
+🎁 A AMÉLIORER 
   - add update && delete actions in view (details)
   - password toggle -> user update/add
+  - disable submit buttons while it's loading
+  - add symfony index to entities
+  - permissions list to a table 
 
 
-FAST TODOs
-  update depars to a real names chichawa..
+⚽ FAST TODOs
+  x update depars to a real names chichawa..
+  x do u really need the service getters? only for validation

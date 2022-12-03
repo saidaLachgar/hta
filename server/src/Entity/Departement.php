@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
  /**
  * @ApiResource(
@@ -36,6 +36,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "longueur"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=DepartementRepository::class)
  */
 class Departement
@@ -47,14 +48,14 @@ class Departement
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"teams","depar:read"})
+     * @Groups({"teams","depar:read", "postes", "appareils"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"teams","depar:read"})
+     * @Groups({"teams","depar:read", "postes", "appareils"})
      */
     private $titre;
 
@@ -85,9 +86,15 @@ class Departement
      */
     private $postes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=AppareilCoupeur::class, mappedBy="departement")
+     */
+    private $appareilsCoupeur;
+
     public function __construct()
     {
         $this->postes = new ArrayCollection();
+        $this->appareilsCoupeur = new ArrayCollection();
     }
 
     public function __toString()
@@ -171,6 +178,36 @@ class Departement
             // set the owning side to null (unless already changed)
             if ($poste->getDepartement() === $this) {
                 $poste->setDepartement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AppareilCoupeur>
+     */
+    public function getAppareilsCoupeur(): Collection
+    {
+        return $this->appareilsCoupeur;
+    }
+
+    public function addAppareilsCoupeur(AppareilCoupeur $appareilsCoupeur): self
+    {
+        if (!$this->appareilsCoupeur->contains($appareilsCoupeur)) {
+            $this->appareilsCoupeur[] = $appareilsCoupeur;
+            $appareilsCoupeur->setDepartement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAppareilsCoupeur(AppareilCoupeur $appareilsCoupeur): self
+    {
+        if ($this->appareilsCoupeur->removeElement($appareilsCoupeur)) {
+            // set the owning side to null (unless already changed)
+            if ($appareilsCoupeur->getDepartement() === $this) {
+                $appareilsCoupeur->setDepartement(null);
             }
         }
 
