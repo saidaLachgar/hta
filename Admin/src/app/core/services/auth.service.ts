@@ -57,8 +57,10 @@ export class AuthenticationService {
                 tap(result => {
                     // login successful if there's a jwt token in the response
                     // get user role
-                    roles = this.decodeToken(result.token).roles;
+                    const PAYLOAD = this.decodeToken(result.token);
+                    roles = PAYLOAD.roles;
                     let user: User = {
+                        id: PAYLOAD.id,
                         username: username,
                         jwt: result,
                         roles: roles,

@@ -6,8 +6,8 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { concat, Observable, of, Subject } from "rxjs";
+import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Pagination, Team, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -19,6 +19,8 @@ export class UserService extends EntityCollectionServiceBase<User> {
   readonly pageSize = environment.pageSize;
   private server = environment.serverURL;
   teams$: Observable<Team[]>;
+  teamLoading = false;
+  teamInput$ = new Subject<string>();
   users$: Observable<User[]>;
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
@@ -42,9 +44,23 @@ export class UserService extends EntityCollectionServiceBase<User> {
     this.findByCriteria({ page: 1 });
   }
 
-  loadTeams(): void {
-    this.teams$ =  this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre`)
-    .pipe(map(response => response["hydra:member"]));
+  loadTeams(defaultVal = []) : void{
+    this.teams$ = concat(
+      of(defaultVal), // default items
+      this.teamInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.teamLoading = true),
+          switchMap(term => 
+            this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=`+term)
+            .pipe(
+              map(response => response["hydra:member"]),
+              catchError(() => of([])), // empty list on error
+              tap(() => this.teamLoading = false)
+            )
+          )
+      )
+    );
   }
 
   /**

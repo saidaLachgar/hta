@@ -15,13 +15,14 @@ export class departementUpdateComponent  {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: departementService) {
     this.breadCrumbItems = [{ label: 'Départements' }, { label: 'Mise à jour du département', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    service.loadTeams();
     service.departementForm = fb.group({
       titre: ["", Validators.required],
       team: [""],
       longueur: [null],
     });
     service.getByKey(this.id).subscribe((obj) => {
+      service.loadTeams([obj.team]);
+
       service.uploadedFile = obj.visuel ? {id : obj.visuel.id, url: obj.visuel.contentUrl} : null;
       service.departementForm.setValue({
         titre: obj.titre,

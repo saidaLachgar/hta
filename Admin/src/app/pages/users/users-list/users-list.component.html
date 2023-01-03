@@ -45,9 +45,19 @@
                     </select>
                   </td>
                   <td>
-                    <ng-select formControlName="team.id[]" [multiple]="true" placeholder="Équipe.." #searchTeam>
-                      <ng-option *ngFor="let obj of (userService.teams$ | async)" [value]="obj.id">{{obj.titre}}</ng-option>
-                    </ng-select>
+                  <ng-select [items]="userService.teams$ | async"
+                            #searchTeam
+                            formControlName="team.id[]"
+                            bindLabel="titre"
+                            bindValue="id"
+                            [multiple]="true"
+                            
+                            [minTermLength]="2"
+                            placeholder="Équipe.."
+                            [loading]="userService.teamLoading"
+                            typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                            [typeahead]="userService.teamInput$">
+                  </ng-select>
                   </td>
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">

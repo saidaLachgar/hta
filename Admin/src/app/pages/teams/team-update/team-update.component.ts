@@ -14,14 +14,14 @@ export class teamUpdateComponent {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public teamService: teamService) { 
     this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Mettre à jour l\'utilisateur', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    teamService.loadMembers();
-    teamService.loadDepartements();
     teamService.teamForm = this.fb.group({
       titre: ["", Validators.required],
       departements: [[]],
       membres: [[]],
     });
     this.teamService.getByKey(this.id).subscribe((obj) => {
+      teamService.loadMembers(obj.departements);
+      teamService.loadDepartements(obj.membres);
       teamService.teamForm.setValue({
         titre : obj.titre,
         departements : obj.departements.map((e)=>e["@id"]),

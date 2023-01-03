@@ -46,7 +46,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 class Poste
 {
     public static $ROUTE_NAME = "postes/details/:id";
-    public static $TRANSLATED_NAME = "postes";
+    public static $TRANSLATED_NAME = "poste";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -100,6 +100,7 @@ class Poste
 
     /**
      * @ORM\ManyToMany(targetEntity=AppareilCoupeur::class, mappedBy="postes")
+     * @Groups({"postes"})
      */
     private $appareilsCoupeur;
 

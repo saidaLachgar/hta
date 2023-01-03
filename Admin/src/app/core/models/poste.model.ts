@@ -1,4 +1,4 @@
-import { Departement, Commune } from ".";
+import { Departement, Commune, AppareilCoupeur } from ".";
 
 export interface Poste {
     id?: number;
@@ -9,4 +9,5 @@ export interface Poste {
     nb_clients?: number;
     commune?: Commune;
     date_mst?: string;
+    appareilsCoupeur?: AppareilCoupeur[];
 }

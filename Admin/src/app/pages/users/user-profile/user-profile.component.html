@@ -1,0 +1,149 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <app-page-title
+      title="Profile"
+      [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+  
+    <form class="row mt-4" [formGroup]="userService.userForm" (ngSubmit)="userService.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="userService.loading$ | async">
+        <div class="card card-body">
+          <div class="row">
+
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Nom</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="fullName"
+                  [ngClass]="{'is-invalid':userService.fullName.invalid && userService.submitted}"
+                  class="form-control"
+                  type="text"
+                  id="name-input"
+                />
+                <div
+                  *ngIf="userService.submitted && userService.fullName.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.fullName.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="text-input" class="col-md-2 col-form-label"
+                >Matricule</label
+              >
+              <div class="col-md-10">
+                <input
+                  [ngClass]="{'is-invalid':userService.username.invalid && userService.submitted}"
+                  formControlName="username"
+                  class="form-control"
+                  type="text"
+                  id="text-input"
+                />
+                <div
+                  *ngIf="userService.submitted && userService.username.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.username.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="password-input" class="col-md-2 col-form-label"
+                >Mot de passe</label
+              >
+              <div class="col-md-10">
+                <input
+                  class="form-control"
+                  [ngClass]="{'is-invalid':userService.password.invalid && userService.submitted}"
+                  type="password"
+                  formControlName="password"
+                  id="password-input"
+                />
+                <div
+                  *ngIf="userService.submitted && userService.password.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.password.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="userService.password.errors.minlength">Le mot de passe doit comporter au moins 6 caractères.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="password-input" class="col-md-2 col-form-label"
+                >Confirmation du mot de passe</label
+              >
+              <div class="col-md-10">
+                <input
+                  class="form-control"
+                  [ngClass]="{'is-invalid':userService.password.invalid && userService.submitted}"
+                  type="password"
+                  formControlName="password"
+                  id="password-input"
+                />
+                <div
+                  *ngIf="userService.submitted && userService.password.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.password.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="userService.password.errors.minlength">Le mot de passe doit comporter au moins 6 caractères.</span>
+                </div>
+              </div>
+            </div>
+  
+            <!-- <div class="mb-3 row">
+              <div class="col-12">
+                <h5 
+                  class="font-size-14"
+                  [ngClass]="{ 'is-invalid': userService.roles.invalid && userService.submitted }">Rôle</h5>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    formControlName="roles"
+                    id="role1"
+                    value="ROLE_SUPER_ADMIN"
+                  />
+                  <label class="form-check-label" for="role1">
+                    Super Admin
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    formControlName="roles"
+                    id="role2"
+                    value="ROLE_ADMIN"
+                  />
+                  <label class="form-check-label" for="role2">Admin</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    formControlName="roles"
+                    id="role3"
+                    value="ROLE_USER"
+                  />
+                  <label class="form-check-label" for="role3">User</label>
+                </div>
+                <div
+                  *ngIf="userService.roles.invalid && userService.submitted"
+                  class="invalid-feedback">
+                  <span *ngIf="userService.roles.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div> -->
+  
+            <div class="row justify-content-end">
+              <div class="col-auto">
+                <button class="btn btn-light me-2" routerLink="/users"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="userService.submitted && (userService.loading$ | async)"></i> Sauvegarder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <!-- end col -->
+    </form>
+    <!-- end row -->
+  </div>
+  

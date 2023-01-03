@@ -50,14 +50,14 @@ class AppareilCoupeur
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"appareils"})
+     * @Groups({"appareils", "postes"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"appareils"})
+     * @Groups({"appareils", "postes"})
      */
     private $titre;
 
@@ -75,9 +75,21 @@ class AppareilCoupeur
      */
     private $postes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Travaux::class, mappedBy="appareil")
+     */
+    private $travaux;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Travaux::class, mappedBy="ps")
+     */
+    private $ps_travaux;
+
     public function __construct()
     {
         $this->postes = new ArrayCollection();
+        $this->travaux = new ArrayCollection();
+        $this->ps_travaux = new ArrayCollection();
     }
     public function __toString()
     {
@@ -133,6 +145,66 @@ class AppareilCoupeur
     public function removePoste(Poste $poste): self
     {
         $this->postes->removeElement($poste);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Travaux>
+     */
+    public function getTravaux(): Collection
+    {
+        return $this->travaux;
+    }
+
+    public function addTravaux(Travaux $travaux): self
+    {
+        if (!$this->travaux->contains($travaux)) {
+            $this->travaux[] = $travaux;
+            $travaux->setAppareil($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTravaux(Travaux $travaux): self
+    {
+        if ($this->travaux->removeElement($travaux)) {
+            // set the owning side to null (unless already changed)
+            if ($travaux->getAppareil() === $this) {
+                $travaux->setAppareil(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Travaux>
+     */
+    public function getPsTravaux(): Collection
+    {
+        return $this->ps_travaux;
+    }
+
+    public function addPsTravaux(Travaux $psTravaux): self
+    {
+        if (!$this->ps_travaux->contains($psTravaux)) {
+            $this->ps_travaux[] = $psTravaux;
+            $psTravaux->setPs($this);
+        }
+
+        return $this;
+    }
+
+    public function removePsTravaux(Travaux $psTravaux): self
+    {
+        if ($this->ps_travaux->removeElement($psTravaux)) {
+            // set the owning side to null (unless already changed)
+            if ($psTravaux->getPs() === $this) {
+                $psTravaux->setPs(null);
+            }
+        }
 
         return $this;
     }

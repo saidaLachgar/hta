@@ -1,0 +1,301 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Les équipes"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <a routerLink="/travaux/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('travaux_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.travauxForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th width="75px">ID</th>
+                  <th width="8%">Département</th>
+                  <th width="8%">Source</th>
+                  <th width="9%">PS</th>
+                  <th width="14%">Date</th>
+                  <th width="7%">Durée</th>
+                  <th width="5%">Type</th>
+                  <th width="8%">Causes</th>
+                  <th width="7%">Nb Clients</th>
+                  <th width="5%">DMS</th>
+                  <th width="5%">IFS</th>
+                  <th class="font-size-12">Anomalies réparées</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="ID..." formControlName="id" #searchId class="form-control"></td>
+                  <td>
+                    <ng-select [items]="service.departements$ | async"
+                              #searchDepar
+                              formControlName="departements.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Départements.."
+                              [loading]="service.departementLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.departementInput$">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <ng-select [items]="service.appareils$ | async"
+                        #searchAppareils
+                        formControlName="appareil.id[]"
+                        bindLabel="titre"
+                        bindValue="id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        placeholder="Source.."
+                        [loading]="service.appareilLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.appareilInput$">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <ng-select [items]="service.ps$ | async"
+                        #searchps
+                        formControlName="ps.id[]"
+                        bindLabel="titre"
+                        bindValue="id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        placeholder="Source.."
+                        [loading]="service.psLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.psInput$">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                    <div class="input-group clockpicker">
+                      <input #searchDateStart ngbDatepicker formControlName="after" class="form-control" (click)="ds.open()" placeholder="De..." #ds="ngbDatepicker">
+                    </div>
+                    <div class="input-group clockpicker">
+                      <input #searchDateEnd ngbDatepicker formControlName="before" class="form-control" (click)="de.open()" placeholder="À..." #de="ngbDatepicker">
+                    </div>
+                    </div>
+                  </td>
+                  <td><input type="text" placeholder="Durée..." formControlName="duration" #searchDuration class="form-control"></td>
+                  <td>
+                    <ng-select placeholder="Type.." #searchType [searchable]="false" formControlName="type">
+                      <ng-option value="true">Yes</ng-option>
+                      <ng-option value="false">No</ng-option>
+                    </ng-select>
+                  </td>
+                  <td>
+                    <ng-select placeholder="Causes.." #searchCauses [searchable]="false" formControlName="causes">
+                      <ng-option value="1">Défauts matériels</ng-option>
+                      <ng-option value="2">Telescopare</ng-option>
+                      <ng-option value="3">Intenpaire </ng-option>
+                      <ng-option value="4">Cause inconnue</ng-option>
+                    </ng-select>
+                  </td>
+                  <td><input type="text" placeholder="Nb Clients..." formControlName="clients" #searchClients class="form-control"></td>
+                  <td><input type="text" placeholder="DMS..." formControlName="DMS" #searchDMS class="form-control"></td>
+                  <td><input type="text" placeholder="IFS..." formControlName="IFS" #searchIFS class="form-control"></td>
+                  <td><input type="text" placeholder="Anomalies réparées..." formControlName="NbAnomalies" #searchNbAnomalies class="form-control"></td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="13"
+                    *ngIf="!(service.travaux$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="13"
+                    *ngIf="(service.travaux$ | async) && (service.travaux$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let item of (service.travaux$ | async); let i = index">
+                  
+                  <td>
+                    <ngb-highlight
+                      [result]="item.id"
+                      [term]="searchId.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <a 
+                      *ngIf="item.departement"
+                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', item.departement.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.departement.titre}}</a>
+                  </td>
+                  <td>
+                    <a 
+                      *ngIf="item.appareil"
+                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.appareil.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.appareil.titre}}</a>
+                  </td>
+                  <td>
+                    <a 
+                      *ngIf="item.ps"
+                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.ps.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.ps.titre}}</a>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.dateStart | date:'shortDate'"
+                      [term]="searchDateStart.value+searchDateEnd.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.duration"
+                      [term]="searchDuration.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    {{searchType|json}}
+                    <!-- <ngb-highlight
+                      [result]="item.type"
+                      [term]="searchType.value"
+                    ></ngb-highlight> -->
+                  </td>
+                  <td>
+                    {{searchCauses|json}}
+                    <!-- <ngb-highlight
+                      [result]="item.causes"
+                      [term]="searchCauses.value"
+                    ></ngb-highlight> -->
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.clients"
+                      [term]="searchClients.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.DMS"
+                      [term]="searchDMS.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.IFS"
+                      [term]="searchIFS.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.NbAnomalies"
+                      [term]="searchNbAnomalies.value"
+                    ></ngb-highlight>
+                  </td>
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('travaux_details') || authService.isAuthorized('travaux_update') || authService.isAuthorized('travaux_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('travaux_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('travaux_update')"
+                          [routerLink]="['update', item.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('travaux_delete')"
+                          (click)="service.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

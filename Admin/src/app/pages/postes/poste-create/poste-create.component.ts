@@ -12,14 +12,16 @@ export class posteCreateComponent {
     this.breadCrumbItems = [{ label: 'Postes' }, { label: 'Nouveau poste', active: true }];
     posteService.loadCommunes();
     posteService.loadDepartements();
+    // posteService.loadAppareils();
     posteService.posteForm = this.fb.group({
       designation: ["", Validators.required],
       MLE: [""],
       PKVA: [null],
       nbClients: [null],
-      dateMst: [""],
+      dateMst: [null],
       departement: [""],
       commune: [""],
+      // appareils: [[]],
     });
   }
 }

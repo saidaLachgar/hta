@@ -15,7 +15,7 @@ export class TopbarComponent implements OnInit {
   username:string;
   element;
 
-  constructor(@Inject(DOCUMENT) private document: any, private authService: AuthenticationService,) {
+  constructor(@Inject(DOCUMENT) private document: any, private authService: AuthenticationService) {
     this.username = authService.getUserName();
   }
 

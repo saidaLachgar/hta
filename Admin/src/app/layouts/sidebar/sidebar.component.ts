@@ -72,24 +72,32 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
    * remove active and mm-active class
    */
   _removeAllClass(className) {
-    const els = document.getElementsByClassName(className);
-    while (els[0]) {
-      els[0].classList.remove(className);
-    }
+    const els = Array.from(document.getElementsByClassName(className));
+    els.forEach(element => {
+      element.classList.remove(className);
+    });
   }
 
   /**
    * Activate the parent dropdown
    */
   _activateMenuDropdown() {
-    this._removeAllClass('mm-active');
-    this._removeAllClass('mm-show');
-    const activeLink = document.querySelector('.side-nav-link-ref.active');
-    if (activeLink) {
-      const parentEl = activeLink.closest(".sub-menu");
-      if (parentEl && parentEl.parentElement) 
-        (parentEl.parentElement.querySelector(".is-parent") as HTMLElement).click();
-    }
+    setTimeout(() => {
+      this._removeAllClass('mm-active');
+      this._removeAllClass('mm-show');
+      const activeLink = document.querySelector('.side-nav-link-ref.active');
+      if (activeLink) {
+        const parentEl = activeLink.closest("li");
+        if (parentEl) {
+          (parentEl as HTMLElement).classList.add('mm-active');
+          const parentEl2 = parentEl.parentElement.closest("li");
+          if(parentEl2) {
+            (parentEl2 as HTMLElement).classList.add('mm-active');
+            (parentEl as HTMLElement).closest(".sub-menu").classList.add('mm-show');
+          }
+        }
+      }
+    });
   }
 
   /**

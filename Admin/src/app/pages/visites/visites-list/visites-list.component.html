@@ -1,0 +1,146 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col-auto">
+        <app-page-title
+          title="Les visites"
+          [breadcrumbItems]="breadCrumbItems"
+        ></app-page-title>
+      </div>
+    </div>
+
+    <div class="row col-12">
+        <div class="card card-body">
+            <form [formGroup]="form" class="d-flex align-items-center justify-content-center gap-3">
+                <h4 class="mb-0 flex-shrink-0">Les Indisponibilités Programmées & Imprévues du Mois</h4>
+                <div class="w-25 input-group">
+
+                  <div class="dropdown w-100 month-picker" ngbDropdown>
+                    <button class="btn btn bg-white border w-100 text-start dropdown-toggle" type="button" id="dropdownMenuButton"
+                      ngbDropdownToggle>
+                      Déc 2022 <i class="mdi mdi-chevron-down float-end"></i>
+                    </button>
+                    <div class="dropdown-menu px-2" ngbDropdownMenu>
+                      <div class="row px-2  mb-2">
+
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                              <button class="btn border btn-sm" (click)="year.value=year.value*1-1"><i class="fas fa-chevron-left"></i></button>
+                          </div>
+                          <input type="number" #year class="form-control form-control-sm" formControlName="year" [min]="minYear" [max]="maxYear" autocomplete="off" disabled>
+                          <div class="input-group-prepend">
+                              <button class="btn border btn-sm" (click)="year.value=year.value*1+1"><i class="fas fa-chevron-right"></i></button>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="row text-nowrap px-4" role="group" aria-label="Month picker">
+                        <input type="radio" class="sr-only" formControlName="month" id="month1" [value]="1" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month1">janv.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month2" [value]="2" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month2">févr.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month3" [value]="3" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month3">mars</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month4" [value]="4" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month4">avr.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month5" [value]="5" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month5">mai</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month6" [value]="6" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month6">juin</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month7" [value]="7" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month7">juill.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month8" [value]="8" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month8">août</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month9" [value]="9" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month9">sept</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month10" [value]="10" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month10">oct.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month11" [value]="11" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month11">nov.</label>
+
+                        <input type="radio" class="sr-only" formControlName="month" id="month12" [value]="12" autocomplete="off">
+                        <label class="col-4 btn btn-outline-info border-0" for="month12">déc.</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  
+                  
+                </div>
+                <h4 class="mb-0">LHTA</h4>
+                <div class="w-25">
+                    <ng-select [items]="service.departements$ | async"
+                        formControlName="departement"
+                        bindLabel="titre"
+                        bindValue="id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        placeholder="Départements.."
+                        [loading]="service.departementLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.departementInput$">
+                    </ng-select>
+                </div>
+            </form>
+        </div>
+    </div>
+  
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Table -->
+            <form class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th width="123px">Jour</th>
+                        <th width="123px">Date</th>
+                        <th>Demandeur</th>
+                        <th>P. Source</th>
+                        <th>Départ</th>
+                        <th>Installation demandée</th>
+                        <th>Nature des travaux</th>
+                        <th>Type  Indispo</th>
+                        <th width="130px">H. programmée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td
+                      class="text-center"
+                      colspan="9"
+                      >
+                      <!-- *ngIf="!(visiteService.visites$ | async) && visiteService.loading$ | async" -->
+                      Chargement...
+                    </td>
+                  </tr>
+                  <tr *ngFor="let date of calendar; let i = index">
+                    <td>{{date.day}}</td>
+                    <td>{{date.date}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{date.value ? (date.value.date | date:'HH:mm') : ''}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+            <!-- End table -->
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

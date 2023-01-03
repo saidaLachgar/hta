@@ -32,16 +32,29 @@
             <div class="mb-3 row">
               <label for="name-input" class="col-md-2 col-form-label">Départements</label>
               <div class="col-md-10">
-                <ng-select formControlName="departement" placeholder="Département..">
-                  <ng-option *ngFor="let depar of (appareilService.departements$ | async)" [value]="depar['@id']">{{depar.titre}}</ng-option>
+                <ng-select [items]="appareilService.departements$ | async"
+                          formControlName="departement"
+                          bindLabel="titre"
+                          bindValue="@id"
+                          [minTermLength]="2"
+                          [loading]="appareilService.departementLoading"
+                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                          [typeahead]="appareilService.departementInput$">
                 </ng-select>
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Membres</label>
+              <label for="name-input" class="col-md-2 col-form-label">Postes</label>
               <div class="col-md-10">
-                <ng-select formControlName="postes" [multiple]="true" placeholder="Postes.." #searchPostes>
-                  <ng-option *ngFor="let poste of (appareilService.postes$ | async)" [value]="poste['@id']">{{poste.designation}}</ng-option>
+                <ng-select [items]="appareilService.postes$ | async"
+                          formControlName="postes"
+                          bindLabel="designation"
+                          bindValue="@id"
+                          [multiple]="true"
+                          [minTermLength]="2"
+                          [loading]="appareilService.posteLoading"
+                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                          [typeahead]="appareilService.posteInput$">
                 </ng-select>
               </div>
             </div>

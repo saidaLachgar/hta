@@ -19,18 +19,18 @@ import { posteService } from "../postes/poste.service";
 export class appareilService extends EntityCollectionServiceBase<AppareilCoupeur> {
   readonly pageSize = environment.pageSize;
   appareils$: Observable<AppareilCoupeur[]>;
-  
+
   postes$: Observable<Poste[]>;
   posteLoading = false;
   posteInput$ = new Subject<string>();
-  
+
   departements$: Observable<Departement[]>;
   departementLoading = false;
   departementInput$ = new Subject<string>();
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
-  page:number = 1;
+  page: number = 1;
   lastSearchedParams;
   public appareilForm: FormGroup;
 
@@ -50,38 +50,38 @@ export class appareilService extends EntityCollectionServiceBase<AppareilCoupeur
   findAll(): void {
     this.findByCriteria({ page: 1 });
   }
-  
-  loadPostes() : void{
+
+  loadPostes(defaultVal = []): void {
     this.postes$ = concat(
-      of([]), // default items
+      of(defaultVal), // default items
       this.posteInput$.pipe(
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.posteLoading = true),
-          switchMap(term => this.PosteService.getWithQuery("properties[]=id&properties[]=titre&designation="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.posteLoading = false)
-          ))
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.posteLoading = true),
+        switchMap(term => this.PosteService.getWithQuery("properties[]=id&properties[]=designation&designation=" + term).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.posteLoading = false)
+        ))
       )
     );
   }
 
-  loadDepartements() : void{
+  loadDepartements(defaultVal = []): void {
     this.departements$ = concat(
-      of([]), // default items
+      of(defaultVal), // default items
       this.departementInput$.pipe(
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.departementLoading = true),
-          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.departementLoading = false)
-          ))
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.departementLoading = true),
+        switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.departementLoading = false)
+        ))
       )
     );
   }
 
-  
+
   /**
    * Get pagination
    */
@@ -146,21 +146,21 @@ export class appareilService extends EntityCollectionServiceBase<AppareilCoupeur
   /**
    * Persist : update
    */
-  onUpdate(id:number): void {
+  onUpdate(id: number): void {
     let appareilForm = this.appareilForm;
     this.submitted = true;
     if (appareilForm.invalid) return;
     this.submitted = false;
 
     let toast = this.toast;
-    let appareil:AppareilCoupeur = {...appareilForm.value};
+    let appareil: AppareilCoupeur = { ...appareilForm.value };
     appareil.id = id;
-      this.update(appareil).subscribe({
-        error: () => toast.error("un problème est survenu, veuillez réessayer"),
-        complete() {
-          toast.success("L'appareil a été mis à jour avec succès");
-        },
-      });
+    this.update(appareil).subscribe({
+      error: () => toast.error("un problème est survenu, veuillez réessayer"),
+      complete() {
+        toast.success("L'appareil a été mis à jour avec succès");
+      },
+    });
   }
 
   get titre() {

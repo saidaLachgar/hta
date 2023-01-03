@@ -36,6 +36,16 @@ const routes: Routes = [
       import("./communes/commune.module").then((m) => m.communeModule),
   },
   {
+    path: "visites",
+    loadChildren: () =>
+      import("./visites/visite.module").then((m) => m.visiteModule),
+  },
+  {
+    path: "travaux",
+    loadChildren: () =>
+      import("./travaux/travaux.module").then((m) => m.travauxModule),
+  },
+  {
     path: "autorisation",
     loadChildren: () =>
       import("./UserPermissions/user-permissions.module").then((m) => m.UserPermissionsModule),

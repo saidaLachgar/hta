@@ -18,6 +18,11 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: 4
     },
     {
+        name: 'Visites',
+        value: 'visites',
+        permissions: 4
+    },
+    {
         name: 'Objectifs de l\'année',
         value: 'objectifs',
         permissions: 4
@@ -55,7 +60,7 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Members',
         value: 'users',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: [0, 1, 2, 3, 4, 7]
     },
     {
         name: 'Autorisation',
@@ -82,4 +87,5 @@ export const PermissionsIndex = [ // has all checkboxes -> -1
     {name:'Afficher', value: 'show'}, // -> 4
     {name:'Exporter', value: 'export'}, // -> 5
     {name:'Importer', value: 'import'}, // -> 6
+    {name:'Profile', value: 'profile'}, // -> 7
 ]

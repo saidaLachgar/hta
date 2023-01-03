@@ -89,8 +89,17 @@
                 >
                   <td><input type="text" placeholder="Designation..." formControlName="designation" #searchDesignation class="form-control"></td>
                   <td>
-                    <ng-select formControlName="departement.id[]" [multiple]="true" placeholder="Départements.." #searchDepar>
-                      <ng-option *ngFor="let depar of (posteService.departements$ | async)" [value]="depar.id">{{depar.titre}}</ng-option>
+                    <ng-select [items]="posteService.departements$ | async"
+                              #searchDepar
+                              formControlName="departement.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Départements.."
+                              [loading]="posteService.departementLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="posteService.departementInput$">
                     </ng-select>
                   </td>
                   <td><input type="text" placeholder="MLE..." formControlName="MLE" #searchMLE class="form-control"></td>
@@ -98,8 +107,18 @@
                   <td><input type="text" placeholder="Nb de clients..." formControlName="nb_clients" #searchNbClients class="form-control"></td>
 
                   <td>
-                    <ng-select formControlName="commune.id[]" [multiple]="true" placeholder="Communes.." #searchCommunes>
-                      <ng-option *ngFor="let user of (posteService.communes$ | async)" [value]="user.id">{{user.titre}}</ng-option>
+                    <ng-select [items]="posteService.communes$ | async"
+                              #searchCommunes
+                              formControlName="commune.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Communes.."
+                              [loading]="posteService.communeLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="posteService.communeInput$">
                     </ng-select>
                   </td>
 

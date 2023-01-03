@@ -14,7 +14,60 @@
     </div>
 
     <div class="d-flex">
-
+      <!--  -->
+      <div class="dropdown d-none d-lg-block ms-2" ngbDropdown>
+        <button type="button" class="btn header-item text-uppercase font-size-12 px-3" ngbDropdownToggle data-toggle="dropdown" aria-haspopup="false"
+          aria-expanded="false" style="background: #2a3042;color: #e6f0ff;">
+          <i class="mdi mdi-plus"></i>
+          Ajout rapide
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu style="width: 205px;">
+          <div class="row">
+            <div class="col-12 ps-4">
+              <ul class="list-unstyled mb-0 megamenu-list">
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Travaux</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Anomalies</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Visites</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Postes de distribution</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Équipes</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Members</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Départements</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Appareils coupeur</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Commune</a>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- fullscreen -->
       <div class="dropdown d-none d-lg-inline-block ms-1">
         <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">
           <i class="bx bx-fullscreen"></i>
@@ -22,8 +75,7 @@
       </div>
       <!-- notification -->
       <div class="dropdown d-inline-block" ngbDropdown>
-        <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"
-          ngbDropdownToggle>
+        <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown" ngbDropdownToggle>
           <i class="bx bx-bell bx-tada"></i>
           <span class="badge bg-danger rounded-pill">3</span>
         </button>
@@ -32,10 +84,10 @@
           <div class="p-3">
             <div class="row align-items-center">
               <div class="col">
-                <h6 class="m-0">{{ 'HEADER.NOTIFICATIONS.TITLE' }} </h6>
+                <h6 class="m-0">NOTIFICATIONS </h6>
               </div>
               <div class="col-auto">
-                <a href="javascript: void(0);" class="small">{{ 'HEADER.NOTIFICATIONS.VIEW_ALL' }}</a>
+                <a href="javascript: void(0);" class="small">VIEW ALL</a>
               </div>
             </div>
           </div>
@@ -48,11 +100,11 @@
                   </span>
                 </div>
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TITLE' }}</h6>
+                  <h6 class="mt-0 mb-1">Notif. Example</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TEXT' }}</p>
+                    <p class="mb-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates incidunt.</p>
                     <p class="mb-0"><i class="mdi mdi-clock-outline"></i>
-                      {{ 'HEADER.NOTIFICATIONS.FIRST.TIME' }}</p>
+                      yesterday</p>
                   </div>
                 </div>
               </div>
@@ -61,10 +113,10 @@
               <div class="media">
                 <img src="assets/images/users/avatar-3.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
                 <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TITLE' }}</h6>
+                  <h6 class="mt-0 mb-1">Notif. Example</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TEXT' }}</p>
-                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.SECOND.TIME' }}</p>
+                    <p class="mb-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates incidunt.</p>
+                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>3 min ago</p>
                   </div>
                 </div>
               </div>
@@ -79,7 +131,7 @@
                 <div class="media-body">
                   <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TEXT' }}</p>
+                    <p class="mb-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates incidunt.</p>
                     <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.THIRD.TIME' }}</p>
                   </div>
                 </div>
@@ -91,7 +143,7 @@
                 <div class="media-body">
                   <h6 class="mt-0 mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TITLE' }}</h6>
                   <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TEXT' }}</p>
+                    <p class="mb-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates incidunt.</p>
                     <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'HEADER.NOTIFICATIONS.FOUR.TIME' }}</p>
                   </div>
                 </div>
@@ -106,7 +158,7 @@
           </div>
         </div>
       </div>
-
+      <!-- profile -->
       <div class="dropdown d-inline-block" ngbDropdown>
         <button type="button" class="btn header-item d-flex align-items-center" ngbDropdownToggle id="page-header-user-dropdown">
           <!-- <div class="avatar-sm me-2 ms-2"><span class="avatar-title rounded-circle bg-transparent border text-muted"><i class="fas fa-user"></i></span></div> -->
@@ -115,10 +167,8 @@
         </button>
         <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
           <!-- item-->
-          <a class="dropdown-item" routerLink="/contacts/profile"><i class="bx bx-user font-size-16 align-middle me-1"></i>
+          <a class="dropdown-item" routerLink="/users/profile"><i class="bx bx-user font-size-16 align-middle me-1"></i>
             profile</a>
-          <a class="dropdown-item" href="javascript: void(0);"><i class="bx bx-lock-open font-size-16 align-middle me-1"></i>
-            Verrouiller l'écran</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item text-danger" href="javascript: void(0);" (click)="logout()"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
               Déconnexion</a>

@@ -5,8 +5,8 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { concat, Observable, of, Subject } from "rxjs";
+import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Pagination, Team, Departement, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -19,8 +19,17 @@ import { UserService } from "../users/user.service";
 export class teamService extends EntityCollectionServiceBase<Team> {
   readonly pageSize = environment.pageSize;
   teams$: Observable<Team[]>;
+
   membres$: Observable<User[]>;
+  membreLoading = false;
+  membreInput$ = new Subject<string>();
+
+
   departements$: Observable<Departement[]>;
+  departementLoading = false;
+  departementInput$ = new Subject<string>();
+
+
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
@@ -45,11 +54,33 @@ export class teamService extends EntityCollectionServiceBase<Team> {
     this.findByCriteria({ page: 1 });
   }
   
-  loadMembers() : void{
-    this.membres$ = this.UserService.getWithQuery("properties[]=id&properties[]=fullName");
+  loadMembers(defaultVal = []) : void{
+    this.membres$ = concat(
+      of(defaultVal), // default items
+      this.membreInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.membreLoading = true),
+          switchMap(term => this.UserService.getWithQuery("properties[]=id&properties[]=fullName&fullName="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.membreLoading = false)
+          ))
+      )
+    );
   }
-  loadDepartements() : void{
-    this.departements$ = this.DepartementService.getWithQuery("properties[]=id&properties[]=titre");
+  loadDepartements(defaultVal = []) : void{
+    this.departements$ = concat(
+      of(defaultVal), // default items
+      this.departementInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departementLoading = true),
+          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.departementLoading = false)
+          ))
+      )
+    );
   }
   /**
    * Get pagination

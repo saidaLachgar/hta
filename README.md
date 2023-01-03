@@ -90,6 +90,9 @@ Fix : add string or remove from logs
 Error : method not found
 Fix : remove last slash from url
 
+Error : Error: x EntityAction guard for "[x] ...": payload has a missing or invalid entity key 
+Fix : add group annotations
+
 
 
 
@@ -136,11 +139,13 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 🧵 A fixer
   Urgent
     - Departement CRUD should have multiple team to choose
-  Normale
     - fix DATE filter -> api platform   (logs, postes )
+  Normale
     - Token session refresh?!
+    - Communes toggle form text (edit/add)
     - wrong password error
     - toggle password show -> login
+    x menu active elm
     - check breadcrumbs + form titles + authService.isAuthorized links
 
 
@@ -154,10 +159,10 @@ https://nehalist.io/logging-events-to-database-in-symfony/
     x teams
     x Commune
     x poste de distribution (designation, xDépart, origine, MLE, P KVA, Nb clients, xCommune, Date MST)
-    - Appareils coupeur (titre, depar(many to one), postes(many to many))
-    - visites ou sol
-    - travuex/inteription
+    x Appareils coupeur (titre, depar(many to one), postes(many to many))
+    - visites au sol
     - anomalies
+    - travaux/inteription (deprtement, Appareils coupeur, ps, datetime depart/end,type de travaux, Causes, list anomalies )
     
 
 🎁 A AMÉLIORER 
@@ -171,3 +176,130 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 ⚽ FAST TODOs
   x update depars to a real names chichawa..
   x do u really need the service getters? only for validation
+
+
+
+
+
+
+SELECT 
+t.id, t.departement_id,	t.appareil_id, t.ps_id, t.date_start,t.type,t.causes,
+-- get Duration
+timediff(date_end,date_start) as `DIFF`,
+time_format((select DIFF),'%H:%i:%s') as `Duration`,
+-- time_format((select DIFF),'%H') * 1 as "Hours",
+TIME_TO_SEC((select DIFF)) as "Seconds",
+(SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as "CC",
+
+CASE
+    -- depar & endTime are null
+    WHEN date_end IS Null or t.departement_id IS Null THEN NULL
+    -- source IS NULL & ps IS NULL
+    WHEN t.appareil_id IS Null and t.ps_id IS Null THEN (SELECT CC)
+    -- source NOT NULL & ps IS NULL
+    WHEN t.appareil_id IS NOT Null and t.ps_id IS Null THEN 
+        (SELECT sum(nb_clients) FROM poste as p2 
+        LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+        WHERE p2.departement_id = d.id 
+        AND ap.appareil_coupeur_id = t.appareil_id )
+        -- source IS NULL & ps NOT NULL
+    WHEN t.appareil_id IS Null and t.ps_id IS NOT Null THEN 
+        (SELECT sum(nb_clients) FROM poste as p2 
+        WHERE p2.departement_id = d.id 
+        AND p2.id NOT IN (
+            SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+        ))
+    -- source NOT NULL & ps NOT NULL
+    ELSE 
+        (SELECT sum(nb_clients) FROM poste as p2 
+        LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+        WHERE p2.departement_id = d.id 
+        AND ap.appareil_coupeur_id = t.appareil_id 
+        AND p2.id NOT IN (
+            SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+        ))
+    END as "CI",
+-- CALC
+((SELECT Seconds) * (SELECT CI) / (SELECT CC * 3600)) as `DMS`
+
+-- Anomalies
+-- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
+-- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
+
+FROM `travaux` as t
+LEFT JOIN  departement d ON t.departement_id = d.id 
+-- LEFT JOIN  appareil_coupeur ap1 ON appareil_id = d.id AND
+-- LEFT JOIN  appareil_coupeur ap2 ON ps_id = d.id
+
+
+
+
+
+
+
+
+where date_end is not null
+
+
+-- Do not calc when date_end && depart is null
+-- if 
+
+-- on presist
+    -- set the value of depar if depar is null but one of the ps or source(apprai) is set
+
+
+
+
+
+
+
+SELECT sum(nb_clients) FROM poste as p2 
+LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+WHERE p2.departement_id = 26 
+AND ap.appareil_coupeur_id = 4 
+AND ap.appareil_coupeur_id NOT IN (3)
+
+
+
+SELECT sum(nb_clients) FROM poste as p2 
+LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+WHERE p2.departement_id = 26 
+AND ap.appareil_coupeur_id = 4 
+AND p2.id NOT IN (
+    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
+)
+
+
+
+SELECT ac.id,ac.titre,p.id, p.designation FROM `appareil_coupeur_poste` as ap
+LEFT JOIN  poste p ON ap.poste_id = p.id 
+LEFT JOIN  appareil_coupeur ac ON ap.appareil_coupeur_id = ac.id
+
+
+SELECT * FROM poste as p2 
+LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+WHERE p2.departement_id = 26 ORDER BY ap.appareil_coupeur_id
+-- AND ap.appareil_coupeur_id NOT IN (3)
+
+SELECT * FROM poste as p2 
+WHERE p2.departement_id = 26 
+AND p2.id NOT IN (
+    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
+)
+
+
+
+
+-- get CI
+(SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as `CC`,
+-- if ps and ap has not set and 
+-- (CASE WHEN ps_id is null then CC else   
+(
+SELECT sum(nb_clients) FROM poste as p2 
+LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+WHERE p2.departement_id = d.id 
+AND ap.appareil_coupeur_id = t.appareil_id 
+AND p2.id NOT IN (
+    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+)) as `CI`,
+-- END) as `CI`,

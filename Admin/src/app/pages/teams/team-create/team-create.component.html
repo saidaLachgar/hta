@@ -31,16 +31,30 @@
           <div class="mb-3 row">
             <label for="name-input" class="col-md-2 col-form-label">Départements</label>
             <div class="col-md-10">
-              <ng-select formControlName="departements" [multiple]="true" placeholder="Départements..">
-                <ng-option *ngFor="let depar of (teamService.departements$ | async)" [value]="depar['@id']">{{depar.titre}}</ng-option>
+              <ng-select [items]="teamService.departements$ | async"
+                        formControlName="departements"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        [loading]="teamService.departementLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="teamService.departementInput$">
               </ng-select>
             </div>
           </div>
           <div class="mb-3 row">
             <label for="name-input" class="col-md-2 col-form-label">Membres</label>
             <div class="col-md-10">
-              <ng-select formControlName="membres" [multiple]="true" placeholder="Membres.." #searchMembres>
-                <ng-option *ngFor="let user of (teamService.membres$ | async)" [value]="user['@id']">{{user.fullName}}</ng-option>
+              <ng-select [items]="teamService.membres$ | async"
+                        formControlName="membres"
+                        bindLabel="fullName"
+                        bindValue="@id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        [loading]="teamService.membreLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="teamService.membreInput$">
               </ng-select>
             </div>
           </div>

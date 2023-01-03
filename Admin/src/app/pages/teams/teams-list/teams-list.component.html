@@ -34,13 +34,33 @@
                 >
                   <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
                   <td>
-                    <ng-select formControlName="departements.id[]" [multiple]="true" placeholder="Départements.." #searchDepar>
-                      <ng-option *ngFor="let depar of (teamService.departements$ | async)" [value]="depar.id">{{depar.titre}}</ng-option>
+                    <ng-select [items]="teamService.departements$ | async"
+                              #searchDepar
+                              formControlName="departements.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Départements.."
+                              [loading]="teamService.departementLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="teamService.departementInput$">
                     </ng-select>
                   </td>
                   <td>
-                    <ng-select formControlName="membres.id[]" [multiple]="true" placeholder="Membres.." #searchMembres>
-                      <ng-option *ngFor="let user of (teamService.membres$ | async)" [value]="user.id">{{user.fullName}}</ng-option>
+                    <ng-select [items]="teamService.membres$ | async"
+                              #searchMembres
+                              formControlName="membres.id[]"
+                              bindLabel="fullName"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Membres.."
+                              [loading]="teamService.membreLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="teamService.membreInput$">
                     </ng-select>
                   </td>
                   <td>

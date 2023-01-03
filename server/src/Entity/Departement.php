@@ -91,10 +91,16 @@ class Departement
      */
     private $appareilsCoupeur;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Travaux::class, mappedBy="departement")
+     */
+    private $travaux;
+
     public function __construct()
     {
         $this->postes = new ArrayCollection();
         $this->appareilsCoupeur = new ArrayCollection();
+        $this->travaux = new ArrayCollection();
     }
 
     public function __toString()
@@ -208,6 +214,36 @@ class Departement
             // set the owning side to null (unless already changed)
             if ($appareilsCoupeur->getDepartement() === $this) {
                 $appareilsCoupeur->setDepartement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Travaux>
+     */
+    public function getTravaux(): Collection
+    {
+        return $this->travaux;
+    }
+
+    public function addTravaux(Travaux $travaux): self
+    {
+        if (!$this->travaux->contains($travaux)) {
+            $this->travaux[] = $travaux;
+            $travaux->setDepartement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTravaux(Travaux $travaux): self
+    {
+        if ($this->travaux->removeElement($travaux)) {
+            // set the owning side to null (unless already changed)
+            if ($travaux->getDepartement() === $this) {
+                $travaux->setDepartement(null);
             }
         }
 

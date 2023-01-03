@@ -1,13 +1,14 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { FormGroup, ValidationErrors } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
-import { Commune, Departement, Pagination, Poste } from "src/app/core/models";
+import { concat, Observable, of, Subject } from "rxjs";
+import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { AppareilCoupeur, Commune, Departement, Pagination, Poste } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
@@ -21,9 +22,17 @@ const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + d
 })
 export class posteService extends EntityCollectionServiceBase<Poste> {
   readonly pageSize = environment.pageSize;
+  private server = environment.serverURL;
   postes$: Observable<Poste[]>;
   communes$: Observable<Commune[]>;
+  communeLoading = false;
+  communeInput$ = new Subject<string>();
   departements$: Observable<Departement[]>;
+  departementLoading = false;
+  departementInput$ = new Subject<string>();
+  appareils$: Observable<AppareilCoupeur[]>;
+  appareilLoading = false;
+  appareilInput$ = new Subject<string>();
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page:number = 1;
@@ -35,6 +44,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     private confirmDialogService: ConfirmDialogService,
     public DepartementService: departementService,
     public communeService: communeService,
+    private http: HttpClient,
     private toast: HotToastService
   ) {
     super("postes", serviceElementsFactory);
@@ -47,11 +57,51 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     this.findByCriteria({ page: 1 });
   }
   
-  loadCommunes() : void{
-    this.communes$ = this.communeService.getWithQuery("properties[]=id&properties[]=fullName");
+  loadCommunes(defaultVal = []) : void{
+    this.communes$ = concat(
+      of(defaultVal), // default items
+      this.communeInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.communeLoading = true),
+          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.communeLoading = false)
+          ))
+      )
+    );
   }
-  loadDepartements() : void{
-    this.departements$ = this.DepartementService.getWithQuery("properties[]=id&properties[]=titre");
+  loadDepartements(defaultVal = []) : void{
+    this.departements$ = concat(
+      of(defaultVal), // default items
+      this.departementInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departementLoading = true),
+          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.departementLoading = false)
+          ))
+      )
+    );
+  }
+  loadAppareils(defaultVal = []) : void{
+    this.appareils$ = concat(
+      of(defaultVal), // default items
+      this.appareilInput$.pipe(
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.appareilLoading = true),
+          switchMap(term => 
+            this.http.get<AppareilCoupeur[]>(`${this.server}/api/appareil_coupeurs?properties[]=id&properties[]=titre&titre=`+term)
+            .pipe(
+              map(response => response["hydra:member"]),
+              catchError(() => of([])), // empty list on error
+              tap(() => this.appareilLoading = false)
+            )
+          )
+      )
+    );
   }
   /**
    * Get pagination
@@ -105,6 +155,8 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     this.submitted = false;
     let toast = this.toast;
     let obj = posteForm.value;
+    // console.log(obj);
+    // return;
     // remove empty values
     let poste = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)

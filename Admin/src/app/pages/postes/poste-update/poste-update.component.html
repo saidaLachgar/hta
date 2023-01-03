@@ -31,9 +31,15 @@
             <div class="mb-3 row">
               <label for="name-input" class="col-md-2 col-form-label">Départements</label>
               <div class="col-md-10">
-                <ng-select formControlName="departement" placeholder="Département..">
-                  <ng-option *ngFor="let depar of (posteService.departements$ | async)" [value]="depar['@id']">{{depar.titre}}</ng-option>
-                </ng-select>
+              <ng-select [items]="posteService.departements$ | async"
+                        formControlName="departement"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="posteService.departementLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="posteService.departementInput$">
+              </ng-select>
               </div>
             </div>
             <div class="mb-3 row">
@@ -75,8 +81,14 @@
             <div class="mb-3 row">
               <label for="name-input" class="col-md-2 col-form-label">Commune</label>
               <div class="col-md-10">
-                <ng-select formControlName="commune" placeholder="Commune..">
-                  <ng-option *ngFor="let obj of (posteService.communes$ | async)" [value]="obj['@id']">{{obj.titre}}</ng-option>
+                <ng-select [items]="posteService.communes$ | async"
+                        formControlName="commune"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="posteService.communeLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="posteService.communeInput$">
                 </ng-select>
               </div>
             </div>
@@ -88,6 +100,21 @@
                 </div>
               </div>
             </div>
+            <!-- <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Appareils coupeur</label>
+              <div class="col-md-10">
+                <ng-select [items]="posteService.appareils$ | async"
+                          formControlName="appareils"
+                          bindLabel="titre"
+                          bindValue="@id"
+                          [multiple]="true"
+                          [minTermLength]="2"
+                          [loading]="posteService.appareilLoading"
+                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                          [typeahead]="posteService.appareilInput$">
+                </ng-select>
+              </div>
+            </div> -->
   
             <div class="row justify-content-end">
               <div class="col-auto">

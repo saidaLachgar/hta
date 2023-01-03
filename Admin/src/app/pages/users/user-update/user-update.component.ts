@@ -14,7 +14,6 @@ export class UserUpdateComponent {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public userService: UserService) { 
     this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Mettre à jour l\'utilisateur', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    userService.loadTeams();
 
     userService.userForm = this.fb.group({
       fullName: ['', Validators.required],
@@ -24,6 +23,7 @@ export class UserUpdateComponent {
       team: [""],
     });
     this.userService.getByKey(this.id).subscribe((usr) => {
+      userService.loadTeams([usr.team]);
       userService.userForm.setValue({
         fullName : usr.fullName,
         username : usr.username,

@@ -23,10 +23,14 @@ export class posteUpdateComponent {
       nbClients: [null],
       dateMst: [""],
       departement: [""],
+      // appareils: [[]],
       commune: [""],
     });
     this.posteService.getByKey(this.id).subscribe((obj) => {
       let date = obj.date_mst?  new Date(obj.date_mst) : null;
+      posteService.loadCommunes(obj.departement ? [obj.departement] : []);
+      posteService.loadDepartements(obj.commune ? [obj.commune] : []);
+      // posteService.loadAppareils(obj.appareilsCoupeur ? obj.appareilsCoupeur : []);
 
       posteService.posteForm.setValue({
         designation : obj.designation,
@@ -39,6 +43,7 @@ export class posteUpdateComponent {
           day: date.getDay()
         } : null,
         departement: obj.departement ? obj.departement["@id"] : null,
+        // appareils: [ obj.appareilsCoupeur ? obj.appareilsCoupeur["@id"] :[]],
         commune: obj.commune ? obj.commune["@id"] : null,
       });
     });

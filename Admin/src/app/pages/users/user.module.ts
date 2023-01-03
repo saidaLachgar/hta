@@ -9,6 +9,7 @@ import { UserDetailsComponent } from './user-details/user-details.component';
 import { UserUpdateComponent } from './user-update/user-update.component';
 import { UsersListComponent } from './users-list/users-list.component';
 import { ReplacePipe } from 'src/app/core/pipes';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 // import { ReplacePipe } from 'src/app/core/pipes';
 
 @NgModule({
@@ -21,6 +22,7 @@ import { ReplacePipe } from 'src/app/core/pipes';
     UserCreateComponent,
     UserUpdateComponent,
     UserDetailsComponent,
+    UserProfileComponent,
     ReplacePipe,
   ],
 })

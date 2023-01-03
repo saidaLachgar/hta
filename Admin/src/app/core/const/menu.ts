@@ -1,136 +1,123 @@
 import { MenuItem } from '../models/menu.model';
 export const MENU: MenuItem[] = [
     {
-        id: 1,
+        id:1,
         label: 'Menu',
         isTitle: true
     },
     {
-        id: 2,
+        id:2,
         label: 'Tableau de bord',
         icon: 'bx bx-home-circle',
         link: '/dashboard',
     },
     {
-        id: 3,
-        label: 'Tâches',
-        icon: 'bx bx-task',
-        subItems: [
-            {
-                id: 4,
-                label: 'Anomalies',
-                link: '/tasks/list',
-                parentId: 3
-            },
-            {
-                id: 5,
-                label: 'Visites',
-                link: '/tasks/kanban',
-                parentId: 3
-            },
-            {
-                id: 6,
-                label: 'Nouvelle visite',
-                link: '/tasks/create',
-                parentId: 3
-            }
-        ]
-    },
-    {
-        id: 7,
+        id:3,
         label: 'Travaux',
         icon: 'fas fa-hard-hat',
-        link: '/calendar',
+        link: '/travaux',
     },
-
     {
-        id: 8,
+        id:4,
+        label: 'Anomalies',
+        link: '/tasks/list',
+        icon: 'bx bx-task',
+    },
+    {
+        id:5,
+        label: 'Visites',
+        link: '/visites',
+        icon: 'bx bx-walk',
+        parentId: 3
+    },
+    {
+        id:6,
         label: 'Calendrier',
         icon: 'bx bx-calendar',
         link: '/calendar',
     },
     {
-        id: 9,
+        id:7,
         label: 'Objectifs de l\'année',
         icon: 'bx bx-bullseye',
         link: '/calendar',
     },
     {
-        id: 10,
+        id:8,
         label: 'Postes de distribution',
         icon: 'fas fa-network-wired',
         link: '/postes',
     },
     {
-        id: 11,
+        id:9,
         label: 'Statistiques',
         icon: 'bx bx-line-chart',
         link: '/statistiques',
     },
     {
-        id: 12,
+        id:10,
         label: 'Utilisateurs',
         icon: 'bx bx-user',
         subItems: [
             {
-                id: 13,
+                id:11,
                 label: 'Équipes',
                 link: '/teams',
                 checkPermissions: 'teams',
-                parentId: 12
+                parentId: 10
             },
             {
-                id: 14,
+                id:12,
                 label: 'Members',
                 link: '/users',
                 checkPermissions: 'users',
-                parentId: 12
+                parentId: 10
             },
             {
-                id: 15,
+                id:13,
                 label: 'Autorisation',
                 link: '/autorisation',
                 checkPermissions: 'autorisation',
-                parentId: 12
+                parentId: 10
             },
             {
-                id: 16,
+                id:14,
                 label: 'Historique',
                 link: '/historique',
-                parentId: 12
+                parentId: 10
             }
         ]
     },
     {
-        id: 17,
+        id:15,
         label: 'Source des données',
         icon: 'bx bx-cog',
         subItems: [
             {
-                id: 18,
+                id:16,
                 label: 'Départements',
                 link: '/departements',
                 checkPermissions: 'departements',
-                parentId: 17
+                parentId: 15
             },
             {
-                id: 19,
+                id:17,
                 label: 'Appareils coupeur',
                 link: '/appareils',
                 checkPermissions: 'appareils',
-                parentId: 17
+                parentId: 15
             },
             {
-                id: 20,
+                id:18,
                 label: 'Commune',
                 link: '/communes',
                 checkPermissions: 'communes',
-                parentId: 17
+                parentId: 15
             },
-            
+
         ]
     },
-    
+
 
 ];
 
