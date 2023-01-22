@@ -47,13 +47,13 @@ class Team
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @Groups({"teams","users", "depar:read"})
+     * @Groups({"teams","users", "visite", "depar:read"})
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @Groups({"teams","users", "depar:read"})
+     * @Groups({"teams","users", "visite", "depar:read"})
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $titre;

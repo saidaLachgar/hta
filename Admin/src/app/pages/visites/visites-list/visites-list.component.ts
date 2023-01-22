@@ -1,121 +1,97 @@
 import { Component } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
-import { NgbDatepickerNavigateEvent } from "@ng-bootstrap/ng-bootstrap";
-import * as moment from 'moment';
-import { Departement, Poste } from "src/app/core/models";
+import { FormBuilder } from "@angular/forms";
+import { NgSelectConfig } from "@ng-select/ng-select";
+import { AuthenticationService } from "src/app/core/services/auth.service";
 import { visiteService } from "../visite.service";
 
-interface calendar {
-  date?: Date|string;
-  day?: string;
-  value?: Visite;
+// Chart data
+export interface ChartType {
+  chart?: any;
+  plotOptions?: any;
+  colors?: any;
+  series?: any;
+  stroke?: any;
+  fill?: any;
+  labels?: any;
+  markers?: any;
+  legend?: any;
+  xaxis?: any;
+  yaxis?: any;
+  tooltip?: any;
+  grid?: any;
+  datasets?: any;
+  options?: any;
+  toolbar?: any;
+  type?: any;
+  height?: any;
+  dataLabels?: any;
+  sparkline?: any;
+  responsive?: any;
+  states?: any;
+  title?: any;
+  subtitle?: any;
 }
-interface Visite {
-  id?: number;
-  demandeur?: string;
-  posteSource?: Poste;
-  departement?: Departement;
-  installationDemandee?: string;
-  natureTravaux?: string;
-  typeIndispo?: string;
-  date?:string;
-}
-moment.locale('fr'); 
+
 
 @Component({
   selector: "app-visites-list",
   templateUrl: "./visites-list.component.html",
 })
-export class VisitesListComponent {
-  readonly maxYear: number = parseInt(moment().format("YYYY")) + 80;
-  readonly minYear: number = parseInt(moment().format("YYYY")) - 80;
+export class visitesListComponent {
   breadCrumbItems: Array<{}>;
-  calendar: calendar[] = [];
-  form: FormGroup;
-  date:moment.Moment = moment();
-  month: string = this.date.format("M");
-  year: string = this.date.format("YYYY");
-  selectedDate: string = this.date.format("MMMM") +" "+ this.year;
-  dep: string;
-  
+  public hideExport = true;
+  Chartdata: ChartType;
+
   constructor(
-    private route: ActivatedRoute,
     public service: visiteService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    public authService: AuthenticationService,
+    private config: NgSelectConfig,
   ) {
-    let params = this.route.snapshot.paramMap;
-    params.get('m') && console.log(params);
-    params.get('m') && (this.date = moment(params.get('y')+"-"+params.get('m')+"-01", 'YYYY-MM-DD'))
-           && (this.dep = params.get('d'));
+    service.findAll();
+    service.loadTeams();
 
 
-    this.form = fb.group({
-      month: [this.month],
-      year: [this.year],
-      departement: ['']
+    service.visiteForm = fb.group({
+      nbSupport: [null],
+      before: [""],
+      after: [""],
+      "departements.id[]": [""],
+      "source.id[]": [""],
+      "destination.id[]": [""],
+      "team.id[]": [""],
     });
 
-    this.makeCalendar();
-    this.fillCalendar();
-    console.log(this.calendar);
-    service.loadDepartements();
-  }
+    config.notFoundText = 'Aucune donnée trouvée !';
 
-  makeCalendar(date:Date = undefined){
-    var a = moment(date).startOf('month');
-    var b = moment(date).endOf('month');
 
-    for (var m = moment(a); m.isBefore(b); m.add(1, 'days')) {
-        // console.log(m.format('YYYY-MM-DD'));
-        this.calendar.push({
-          date:  m.format('D/M/YYYY'),
-          day:  m.format('dddd'),
-        });
-    }
-  }
-  fillCalendar(){
-    let data:Visite[] = [
-      {
-        id:1,
-        date:"2022-12-05T17:58:15+00:00",
+    this.Chartdata = {
+      chart: {
+        height: 220,
+        type: 'bar',
+        toolbar: {
+          show: false
+        }
       },
-      {
-        id:2,
-        date:"2022-12-06T16:58:15+00:00",
+      plotOptions: {
+        bar: {
+          horizontal: true,
+        }
       },
-      {
-        id:3,
-        date:"2022-12-07T15:58:15+00:00",
+      dataLabels: {
+        enabled: false
       },
-      {
-        id:4,
-        date:"2022-12-08T14:58:15+00:00",
+      series: [{
+        data: [380, 430, 450, 475, 550, 584]
+      }],
+      colors: ['#269ffb'],
+      xaxis: {
+        // tslint:disable-next-line: max-line-length
+        categories: ['LAMZOUDIA', 'Chichaoua', 'SIDI BOUZID', 'Saidate', 'SIDI MED DALIL', 'Ahdil'],
       },
-      {
-        id:5,
-        date:"2022-12-09T13:58:15+00:00",
+      grid: {
+        borderColor: '#f1f1f1'
       },
-      {
-        id:6,
-        date:"2022-12-10T12:58:15+00:00",
-      },
-      {
-        id:7,
-        date:"2022-12-11T11:58:15+00:00",
-      },
-    ]
-    data.forEach(visite => {
-      let programmedDate = new Date(visite.date);
-      let index = moment(programmedDate).format("D");
-      this.calendar[index].value = visite;
-    });
-    console.log(this.calendar);
-  }
-
-  dateNavigate($event: NgbDatepickerNavigateEvent) {
-    console.log($event.next.month);
-    console.log($event.next.year);
-    // old value is contained in $event.current
+    };
   }
 }

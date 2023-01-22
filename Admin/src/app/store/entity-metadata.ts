@@ -10,6 +10,7 @@ const entityMetadata: EntityMetadataMap = {
   communes: {},
   postes: {},
   travauxes: {},
+  visites: {},
   appareil_coupeurs: {},
 };
 
@@ -23,6 +24,7 @@ const pluralNames = {
   communes: 'communes',
   postes: 'postes',
   travauxes: 'travauxes',
+  visites: 'visites',
   appareil_coupeurs: 'appareil_coupeurs',
  };
 

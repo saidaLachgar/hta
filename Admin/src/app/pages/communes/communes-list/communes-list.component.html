@@ -6,12 +6,6 @@
         [breadcrumbItems]="breadCrumbItems"
       ></app-page-title>
     </div>
-    <div class="col-auto">
-      <a routerLink="/communes/add" class="btn btn-primary ms-2"
-      *ngIf="authService.isAuthorized('communes_add')"
-        ><i class="fas fa-plus-circle"></i> Ajouter</a
-      >
-    </div>
   </div>
 
   <div class="row">
@@ -21,12 +15,6 @@
           <!-- Table -->
           <form [formGroup]="service.communeForm" (ngSubmit)="service.onSearch()" class="table-responsive">
             <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Titre</th>
-                  <th width="123px"></th>
-                </tr>
-              </thead>
               <tbody>
                 <tr valign="middle" 
                 >
@@ -146,12 +134,12 @@
         </div>
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-6" *ngIf="authService.isAuthorized('communes_add')">
       <form class="card" [formGroup]="service.communeForm" (ngSubmit)="service.onSave()">
         <fieldset class="card-body justify-content-center d-flex flex-column">
             
           <div class="mb-3 row">
-            <h4 class="card-title my-4">Créer une nouvelle commune</h4>
+            <h4 class="card-title my-4">{{service.persistence === false ? "Créer une nouvelle commune" : "Mise à jour de la commune"}}</h4>
             <label for="name-input" class="col-md-2 col-form-label">Titre</label>
             <div class="col-md-10">
               <input
@@ -171,7 +159,7 @@
           </div>
           <div class="row justify-content-end mb-4">
             <div class="col-auto">
-              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
+              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> {{service.persistence === false ? "Ajouter" : "Sauvegarder"}}</button>
             </div>
           </div>
 

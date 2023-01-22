@@ -15,7 +15,8 @@ import { appareilService } from "../appareils/appareil.service";
 import { departementService } from "../departements/departement.service";
 
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
-const DateToString = (date, time) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}T${zeroPad(time.hour)}:${zeroPad(time.minute)}:${zeroPad(time.second)}.110Z`;
+const DateTimeToString = (date, time) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}T${zeroPad(time.hour)}:${zeroPad(time.minute)}:${zeroPad(time.second)}.110Z`;
+const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
 
 @Injectable({
   providedIn: "root",
@@ -151,7 +152,8 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
             success: () => {
               target && target.closest("tr").remove();
               // !id && this.travauxForm.reset(this.initialValues);
-              !id && window.location.reload();
+              // !id && window.location.reload();
+              this.router.navigate(['/travaux']);
               return "L'interruption supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
@@ -177,17 +179,17 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
     let form = this.travauxForm.value;
     let toast = this.toast;
     let travaux = {
-      dateStart: DateToString(form.date, form.dateStart),
-      ...(form.dateEnd && { dateEnd: DateToString(form.date, form.dateEnd) }),
-      ...(form.type && { type: JSON.parse(form.type) }),
-      ...(form.causes && { causes: JSON.parse(form.causes) }),
-      ...(form.departement != "" && { departement: form.departement }),
-      ...(form.appareil != "" && { appareil: form.appareil }),
-      ...(form.ps != "" && form.source !== 0 && { ps: form.ps })
+      dateStart: DateTimeToString(form.date, form.dateStart),
+      dateEnd : form.dateEnd ? DateTimeToString(form.date, form.dateEnd) : null,
+      type : form.type ? JSON.parse(form.type) : null,
+      causes : form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
+      departement : form.departement ? form.departement : null,
+      appareil : form.appareil ? form.appareil : null,
+      ps : form.ps && form.source !== 0 ? form.ps: null
     } as Travaux;
 
     // console.log(form);
-    // console.log(travaux);
+    console.log(travaux);
     // return;
     // compare last query with the new one to avoid unnecessary requests
     if (JSON.stringify(this.lastFormData) === JSON.stringify(travaux)) return;
@@ -211,6 +213,9 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
   get source() {
     return this.travauxForm.get("source");
   }
+  get type() {
+    return this.travauxForm.get("type");
+  }
   get appareil() {
     return this.travauxForm.get("appareil");
   }
@@ -231,6 +236,14 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
    */
   findByCriteria(obj): void {
     this.travaux$ = of([]); // clear table
+
+    // format date
+    if(Object.keys(obj).length > 1){
+      // console.log(obj);
+      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["dateStart["+key+"]"]: DateToString(obj[key]) })[key];
+      updateObj("before");updateObj("after");
+    }
+
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)

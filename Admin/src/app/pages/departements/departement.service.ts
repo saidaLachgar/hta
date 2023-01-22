@@ -93,7 +93,7 @@ export class departementService extends EntityCollectionServiceBase<Departement>
             loading: "Suppression...",
             success: () => {
               target.closest("tr").remove();
-              return "Département supprimé avec succès";
+              return "Départ supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })
@@ -151,7 +151,7 @@ export class departementService extends EntityCollectionServiceBase<Departement>
         form.reset();
         _this.isLoading = false;
         _this.selectedFile = null;
-        toast.success("Département ajouté avec succès");
+        toast.success("Départ ajouté avec succès");
       },
     });
   }
@@ -209,11 +209,11 @@ export class departementService extends EntityCollectionServiceBase<Departement>
         if (_this.FileRemoved !== false) {
           _this.MediasService.delete(_this.FileRemoved as number).subscribe(() => {
             _this.isLoading = false;
-            toast.success("Département a été mis à jour avec succès");
+            toast.success("Départ a été mis à jour avec succès");
           })
         } else {
           _this.isLoading = false;
-          toast.success("Département a été mis à jour avec succès");
+          toast.success("Départ a été mis à jour avec succès");
         }
       },
     });

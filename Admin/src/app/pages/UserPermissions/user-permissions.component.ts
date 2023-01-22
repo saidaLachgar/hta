@@ -106,3 +106,25 @@ export class UserPermissionsComponent {
 
     }
 }
+
+// userRoles = [
+//     { name: 'Admin' },
+//     { name: 'Editor' },
+//     { name: 'Viewer' },
+//   ];
+//   permissionsForm: FormGroup;
+
+// constructor() {
+//     this.permissionsForm = new FormGroup({});
+//     this.userRoles.forEach((role, index) => {
+//       this.permissionsForm.addControl(`${index}_edit`, new FormControl(false));
+//       this.permissionsForm.addControl(`${index}_modify`, new FormControl(false));
+//       this.permissionsForm.addControl(`${index}_delete`, new FormControl(false));
+//       this.permissionsForm.addControl(`${index}_add`, new FormControl(false));
+//       this.permissionsForm.addControl(`${index}_import`, new FormControl(false));
+//     });
+//   }
+
+//   onEditChange(role: string, value: boolean) {
+//     console.log(`${role} can edit: ${value}`);
+//   }

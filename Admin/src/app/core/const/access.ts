@@ -20,7 +20,7 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Visites',
         value: 'visites',
-        permissions: 4
+        permissions: -1
     },
     {
         name: 'Objectifs de l\'année',

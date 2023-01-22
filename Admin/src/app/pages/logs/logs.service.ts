@@ -9,6 +9,9 @@ import { map } from "rxjs/operators";
 import { Log, Pagination } from "src/app/core/models";
 import { environment } from "src/environments/environment";
 
+const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
+const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
+
 @Injectable({
   providedIn: "root",
 })
@@ -66,8 +69,7 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
     // format date
     if(Object.keys(obj).length > 1){
       // console.log(obj);
-      const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
-      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: formatDate(obj[key]) })[key];
+      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: DateToString(obj[key]) })[key];
       updateObj("before");updateObj("after");
     }
 

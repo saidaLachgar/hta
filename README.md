@@ -1,6 +1,11 @@
 ## APP VERSION
     SYMFONY 5.4 | PHP 7.4 | Angular CLI 13.2
 
+## APP INFOS
+
+The website is an Electric Power Quality Monitoring System (SQE CMMS). It is a web application that allows users to track and manage the performance of electricity production, transmission, and distribution. The app allows users to monitor and measure the quality of electricity service, including continuity of service, interruption frequency, and downtime. It also allows workers to log and track breakdowns and schedule visits to fix anomalies. Additionally, it allows tracking the monthly objectives of each year, like how many visits they should do, which includes how many kilometers they will cover, and how much equipment they should set up. All data will be stored in a database and can be analyzed and visualized in charts and other forms of analysis.
+
+
 ## BACKEND SETUP
     - composer install
     - php bin/console assets:install public
@@ -123,6 +128,30 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 01:40 : create dbprocessor > utillity
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 🧶 Checklist
   Dev. Backend
       - Create entity
@@ -137,15 +166,11 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 
 
 🧵 A fixer
-  Urgent
-    - Departement CRUD should have multiple team to choose
-    - fix DATE filter -> api platform   (logs, postes )
-  Normale
+    ? Departement CRUD should have multiple team to choose
     - Token session refresh?!
     - Communes toggle form text (edit/add)
     - wrong password error
     - toggle password show -> login
-    x menu active elm
     - check breadcrumbs + form titles + authService.isAuthorized links
 
 
@@ -154,15 +179,14 @@ https://nehalist.io/logging-events-to-database-in-symfony/
     x users
     x history
     ~ Departement
-      x crud 
       - Long aérien / LP ( original ) + total of each post length
     x teams
     x Commune
-    x poste de distribution (designation, xDépart, origine, MLE, P KVA, Nb clients, xCommune, Date MST)
-    x Appareils coupeur (titre, depar(many to one), postes(many to many))
-    - visites au sol
+    x poste de distribution
+    x Appareils coupeur 
+    x visites au sol
     - anomalies
-    - travaux/inteription (deprtement, Appareils coupeur, ps, datetime depart/end,type de travaux, Causes, list anomalies )
+    x travaux/inteription
     
 
 🎁 A AMÉLIORER 
@@ -171,11 +195,125 @@ https://nehalist.io/logging-events-to-database-in-symfony/
   - disable submit buttons while it's loading
   - add symfony index to entities
   - permissions list to a table 
+  - save form searched values
 
 
 ⚽ FAST TODOs
-  x update depars to a real names chichawa..
-  x do u really need the service getters? only for validation
+
+  x traveux details
+  - inté anomalies
+  - log list fill users dropdown
+  - tester log traveux name to string
+  - fix profile user permistions
+
+
+
+
+
+
+
+
+
+
+
+
+
+Global
+  x Département -> Départ
+  x Communes toggle form text (edit/add)
+  x toggle password show -> login
+  3 - wrong password error
+  3 - Token session refresh
+--------------------
+
+
+
+visites:
+  x Distance parcourue ++ per Month tracking 
+  x Change source -> point coupure  - ps -> PS
+  5 - Get total kms of a transom -> show it in the table (Nb Support)
+  5 - Get count of visites for each commune of the current year ++ add this in communes list
+  5 - Get count of Distance parcourue for this year and this month
+  5 - Get total visites of this year
+--------------------
+
+
+
+Traveaux
+  1 - Coupeur n'apas de Causes ( hide in form + dash in table)
+  2 - Calculate ++ table IFS nb client Coupeur/ nb c total
+  2 - in inturaption could the user selet multiple ps? +++ select multiple ps
+  2 - chart DMS / Mois +++ per year xx remove Coupeur
+  5 - get SUM DMS values of each month of this year then per year
+  5 - Total des interruptions (year and month)
+  5 - Get avrange interpution time (year and month)
+  5 - get count of interpution foreach cause (year and month)
+  5 - get total in interpution foreach type (year and month)
+  0 - Total anomalies show only undone
+  0 - travauex column ++ taux de realisation 23/40 anomalies
+--------------------
+
+  0 - traveux -> all anomalies of transome -> same date same transome
+  0 - visit -> anomalies of that day
+--------------------
+
+
+Departement : 
+  3 - Long aérien / LP ( original ) + total of each post length
+--------------------
+
+
+Logs :
+  1 - log list fill users dropdown
+--------------------
+
+
+Users
+ 5 - Mot de passe oublié 
+ 5 - Remember me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -303,3 +441,126 @@ AND p2.id NOT IN (
     SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
 )) as `CI`,
 -- END) as `CI`,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+There are a few ways to detect when an admin has updated a user's role and update it immediately:
+
+    Webhooks: You can set up webhooks on your backend to notify your frontend when a user's role has been updated by an admin. This way, your frontend can immediately update the user's role in local storage without having to send a request to the server.
+
+
+
+
+
+Here's an example of how you might implement webhooks in your Symfony and Angular application:
+
+    On the Symfony backend, you will need to create a new route for your webhook endpoint. This route should be responsible for receiving the notification when a user's role is updated and sending a notification to the frontend with the updated role information. You can use the Symfony's EventDispatcher component to dispatch an event when a user role is updated and listen to this event in a listener that will be responsible for sending the notification.
+
+    On the Angular frontend, you will need to create a service that will listen for the notification sent by the backend when a user's role is updated. This service should be responsible for updating the user's role in local storage.
+
+    On the Symfony backend, after the admin updates the user's role, you can use the EventDispatcher to dispatch an event with the updated role information.
+
+    On the Angular frontend, your service should listen to the event, extract the updated role information, and update the user's role in local storage.
+
+    Once the user's role is updated in local storage, you can update the UI accordingly to reflect the new role.
+
+It's important to note that you should use secure communication channels such as HTTPS to prevent unauthorized access to your webhook endpoint, validate the request origin and make sure that the webhook request comes from a trusted source.
+Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+Salma Lachgar
+write me the script of each step
+
+I will provide you with an example of how you might implement webhooks in your Symfony and Angular application, but please keep in mind that this is just one possible implementation and you should adjust it to fit your specific use case.
+
+    On the Symfony backend:
+
+    Create a new route for your webhook endpoint, for example, '/webhook/user-role-updated'.
+    Create a new Event class, for example, 'UserRoleUpdatedEvent' that will hold the updated user's role information.
+    Create a new Listener class, for example, 'UserRoleUpdatedListener' that will listen to the 'UserRoleUpdatedEvent' and send a notification to the frontend with the updated role information.
+    In the 'UserRoleUpdatedListener' use Symfony's HttpClient to send a HTTP request to the frontend with the updated role information.
+    In the controller that handles the user role update, Dispatch the 'UserRoleUpdatedEvent' and pass the updated role information.
+    Use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+
+    On the Angular frontend:
+
+    Create a new service, for example, 'UserRoleService' that will listen for the notification sent by the backend when a user's role is updated.
+    In the 'UserRoleService', create a method, for example, 'listenForUpdates' that will listen to the notification and extract the updated role information.
+    In the 'listenForUpdates' method, use the Angular's HttpClient to listen to the notification from the backend.
+    After extracting the updated role information, update the user's role in local storage using Angular's local storage.
+    Once the user's role is updated in local storage, you can update the UI accordingly to reflect the new role.
+
+It's important to note that you should use secure communication channels such as HTTPS to prevent unauthorized access to your webhook endpoint, validate the request origin and make sure that the webhook request comes from a trusted source.
+Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+
+Please note that this is just an example, you should adjust it to fit your specific use case, and it might not be complete and may require additional steps.
+
+
+
+
+
+
+
+I will provide you with an example of how you might implement webhooks in your Symfony and Angular application, but please keep in mind that this is just one possible implementation and you should adjust it to fit your specific use case.
+
+    On the Symfony backend:
+
+    Create a new route for your webhook endpoint, for example, '/webhook/user-role-updated'.
+    Create a new Event class, for example, 'UserRoleUpdatedEvent' that will hold the updated user's role information.
+    Create a new Listener class, for example, 'UserRoleUpdatedListener' that will listen to the 'UserRoleUpdatedEvent' and send a notification to the frontend with the updated role information.
+    In the 'UserRoleUpdatedListener' use Symfony's HttpClient to send a HTTP request to the frontend with the updated role information.
+    In the controller that handles the user role update, Dispatch the 'UserRoleUpdatedEvent' and pass the updated role information.
+    Use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+
+    On the Angular frontend:
+
+    Create a new service, for example, 'UserRoleService' that will listen for the notification sent by the backend when a user's role is updated.
+    In the 'UserRoleService', create a method, for example, 'listenForUpdates' that will listen to the notification and extract the updated role information.
+    In the 'listenForUpdates' method, use the Angular's HttpClient to listen to the notification from the backend.
+    After extracting the updated role information, update the user's role in local storage using Angular's local storage.
+    Once the user's role is updated in local storage, you can update the UI accordingly to reflect the new role.
+
+It's important to note that you should use secure communication channels such as HTTPS to prevent unauthorized access to your webhook endpoint, validate the request origin and make sure that the webhook request comes from a trusted source.
+Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+
+Please note that this is just an example, you should adjust it to fit your specific use case, and it might not be complete and may require additional steps.

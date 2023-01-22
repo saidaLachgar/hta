@@ -15,7 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 /**
-  * @ApiResource(
+ * @ApiResource(
  *   order= {"id" = "DESC"},
  *   normalizationContext={"groups"={"postes"}},
  *  itemOperations={

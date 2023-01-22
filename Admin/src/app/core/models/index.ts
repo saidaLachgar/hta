@@ -10,3 +10,5 @@ export * from './media.model';
 export * from './poste.model';
 export * from './appareil.model';
 export * from './travaux.model';
+export * from './anomalie.model';
+export * from './visite.model';

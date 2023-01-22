@@ -1,146 +1,363 @@
-<div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col-auto">
-        <app-page-title
-          title="Les visites"
-          [breadcrumbItems]="breadCrumbItems"
-        ></app-page-title>
+<div class="container-fluid mb-5">
+  
+
+  <!-- statistics -->
+  <div class="row">
+    <div class="col-6 d-flex flex-column">
+      <div class="card card-body py-2 flex-grow-0">
+      <div class="row">
+        <div class="col-7 p-1">
+          <div class="border p-3 rounded-3">
+            <p class="fw-medium mb-1">Distance parcourue</p>
+            <div class="row">
+              <div class="col-6">
+                <small class="text-muted">Année courante</small>
+                <strong class="h2 d-block">1800 <small class="text-muted">/12000 km</small></strong>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Mois en cours</small>
+                <strong class="h2 d-block">800 km</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-5 p-1">
+          <div class="border p-3 rounded-3">
+            <p class="fw-medium mb-2">Anomalies <small class="text-muted">(mois en cours)</small></p>
+            <p class="mt-2 mb-2">
+              <span class="badge badge-soft-success font-size-11 me-2"> 0.6% 
+              <i class="mdi mdi-arrow-up"></i></span><small>De la période précédente</small>
+            </p>
+            <strong class="h2 mb-0">239</strong>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="card card-body flex-1">
+        <div>
+            <div class="py-2">
+                <h5 class="fw-medium mb-2">Total des visites <small class="text-muted">(par objectif annuel)</small><span class="float-end">78%</span></h5>
+                <div class="progress animated-progess progress-sm">
+                    <div class="progress-bar" role="progressbar" style="width: 78%"
+                        aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
       </div>
     </div>
+    <div class="col-6">
+      <div class="card card-body pb-0">
+        <p class="fw-medium mb-0">Vistes par communes <small class="text-muted">(année courante)</small></p>
+        <apx-chart class="apex-charts" dir="ltr" [series]="Chartdata.series" [chart]="Chartdata.chart"
+            [plotOptions]="Chartdata.plotOptions" [dataLabels]="Chartdata.dataLabels" [xaxis]="Chartdata.xaxis"
+            [colors]="Chartdata.colors" [grid]="Chartdata.grid"></apx-chart>
+      </div>
+    </div>
+  </div>
 
-    <div class="row col-12">
-        <div class="card card-body">
-            <form [formGroup]="form" class="d-flex align-items-center justify-content-center gap-3">
-                <h4 class="mb-0 flex-shrink-0">Les Indisponibilités Programmées & Imprévues du Mois</h4>
-                <div class="w-25 input-group">
 
-                  <div class="dropdown w-100 month-picker" ngbDropdown>
-                    <button class="btn btn bg-white border w-100 text-start dropdown-toggle" type="button" id="dropdownMenuButton"
-                      ngbDropdownToggle>
-                      Déc 2022 <i class="mdi mdi-chevron-down float-end"></i>
-                    </button>
-                    <div class="dropdown-menu px-2" ngbDropdownMenu>
-                      <div class="row px-2  mb-2">
+  <!-- actions -->
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Liste des visites"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    
+    <div class="col-auto">
+      <button class="btn bg-light text-primary ms-2" 
+        data-toggle="collapse" *ngIf="authService.isAuthorized('visites_export')"
+        (click)="hideExport = !hideExport"
+        title="Exporter">
+        <i class="fas fa-upload"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Importer" 
+        *ngIf="authService.isAuthorized('visites_import')">
+        <i class="fas fa-download"></i>
+      </button>
+      <a routerLink="/visites/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('visites_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
 
-                        <div class="input-group">
-                          <div class="input-group-prepend">
-                              <button class="btn border btn-sm" (click)="year.value=year.value*1-1"><i class="fas fa-chevron-left"></i></button>
-                          </div>
-                          <input type="number" #year class="form-control form-control-sm" formControlName="year" [min]="minYear" [max]="maxYear" autocomplete="off" disabled>
-                          <div class="input-group-prepend">
-                              <button class="btn border btn-sm" (click)="year.value=year.value*1+1"><i class="fas fa-chevron-right"></i></button>
-                          </div>
-                        </div>
-
-                      </div>
-                      <div class="row text-nowrap px-4" role="group" aria-label="Month picker">
-                        <input type="radio" class="sr-only" formControlName="month" id="month1" [value]="1" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month1">janv.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month2" [value]="2" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month2">févr.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month3" [value]="3" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month3">mars</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month4" [value]="4" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month4">avr.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month5" [value]="5" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month5">mai</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month6" [value]="6" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month6">juin</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month7" [value]="7" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month7">juill.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month8" [value]="8" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month8">août</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month9" [value]="9" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month9">sept</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month10" [value]="10" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month10">oct.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month11" [value]="11" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month11">nov.</label>
-
-                        <input type="radio" class="sr-only" formControlName="month" id="month12" [value]="12" autocomplete="off">
-                        <label class="col-4 btn btn-outline-info border-0" for="month12">déc.</label>
-                      </div>
+  <!-- data -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.visiteForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Départ</th>
+                  <th>De</th>
+                  <th>À</th>
+                  <th>Nb Support</th>
+                  <th>Équipe</th>
+                  <th width="123px"></th>
+                  <th class="text-center">Anomalies</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- search -->
+                <tr valign="middle">
+                  <!-- date -->
+                  <td>
+                    <div class="d-flex gap-2">
+                    <div class="input-group clockpicker">
+                      <input #searchDateStart ngbDatepicker formControlName="after" class="form-control" (click)="ds.open()" placeholder="De..." #ds="ngbDatepicker">
                     </div>
-                  </div>
-
-                  
-                  
-                </div>
-                <h4 class="mb-0">LHTA</h4>
-                <div class="w-25">
+                    <div class="input-group clockpicker">
+                      <input #searchDateEnd ngbDatepicker formControlName="before" class="form-control" (click)="de.open()" placeholder="À..." #de="ngbDatepicker">
+                    </div>
+                    </div>
+                  </td>
+                  <!-- Départ -->
+                  <td>
                     <ng-select [items]="service.departements$ | async"
-                        formControlName="departement"
+                              #searchDepar
+                              formControlName="departements.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Départements.."
+                              [loading]="service.departementLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.departementInput$">
+                    </ng-select>
+                  </td>
+                  <!-- source -->
+                  <td>
+                    <ng-select [items]="service.sources$ | async"
+                        #searchSources
+                        formControlName="source.id[]"
                         bindLabel="titre"
                         bindValue="id"
                         [multiple]="true"
                         [minTermLength]="2"
-                        placeholder="Départements.."
-                        [loading]="service.departementLoading"
+                        placeholder="Source.."
+                        [loading]="service.sourceLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="service.departementInput$">
+                        [typeahead]="service.sourceInput$">
                     </ng-select>
-                </div>
-            </form>
-        </div>
-    </div>
-  
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- Table -->
-            <form class="table-responsive">
-              <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th width="123px">Jour</th>
-                        <th width="123px">Date</th>
-                        <th>Demandeur</th>
-                        <th>P. Source</th>
-                        <th>Départ</th>
-                        <th>Installation demandée</th>
-                        <th>Nature des travaux</th>
-                        <th>Type  Indispo</th>
-                        <th width="130px">H. programmée</th>
-                    </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td
-                      class="text-center"
-                      colspan="9"
+                  </td>
+                  <!-- destination -->
+                  <td>
+                    <ng-select [items]="service.destinations$ | async"
+                        #searchDestinations
+                        formControlName="destination.id[]"
+                        bindLabel="titre"
+                        bindValue="id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        placeholder="destination.."
+                        [loading]="service.destinationLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.destinationInput$">
+                    </ng-select>
+                  </td>
+                  <!-- Nb Support -->
+                  <td>
+                    <input type="text" placeholder="Nb Support..." formControlName="nbSupport" #searchNbSupport class="form-control">
+                  </td>
+                  <!-- Équipe -->
+                  <td>
+                    <ng-select [items]="service.teams$ | async"
+                              #searchTeam
+                              formControlName="team.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Équipe.."
+                              [loading]="service.teamLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.teamInput$">
+                    </ng-select>
+                  </td>
+                 <!-- Actions -->
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                  <!-- anomalies -->
+                  <td></td>
+                </tr>
+                <!-- state -->
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="8"
+                    *ngIf="!(service.visites$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="8"
+                    *ngIf="(service.visites$ | async) && (service.visites$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <!-- data -->
+                <tr *ngFor="let item of (service.visites$ | async); let i = index" valign="middle">
+                  <!-- date -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.date | date:'long'"
+                      [term]="searchDateStart.value+searchDateEnd.value"
+                    ></ngb-highlight>
+                  </td>
+                  <!-- departement -->
+                  <td>
+                    <a 
+                      *ngIf="item.departement"
+                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', item.departement.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.departement.titre}}</a>
+                  </td>
+                  <!-- source -->
+                  <td>
+                    <a 
+                      *ngIf="item.source"
+                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.source.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.source.titre}}</a>
+                  </td>
+                  
+                  <!-- designation -->
+                  <td>
+                    <a 
+                      *ngIf="item.destination"
+                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.destination.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.destination.titre}}</a>
+                  </td>
+                  
+                  <!-- Nb Support -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.nbSupport"
+                      [term]="searchNbSupport.value"
+                    ></ngb-highlight>
+                  </td>
+
+                  <!-- team -->
+                  <td>
+                    <a 
+                      *ngIf="item.team"
+                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', item.team.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.team.titre}}</a>
+                  </td>
+
+
+                  <!-- actions -->
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('visites_details') || authService.isAuthorized('visites_update') || authService.isAuthorized('visites_delete')"
                       >
-                      <!-- *ngIf="!(visiteService.visites$ | async) && visiteService.loading$ | async" -->
-                      Chargement...
-                    </td>
-                  </tr>
-                  <tr *ngFor="let date of calendar; let i = index">
-                    <td>{{date.day}}</td>
-                    <td>{{date.date}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>{{date.value ? (date.value.date | date:'HH:mm') : ''}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </form>
-            <!-- End table -->
-          </div>
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('visites_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('visites_update')"
+                          [routerLink]="['update', item.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('visites_delete')"
+                          (click)="service.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Anomalies -->
+                  <td>
+                    <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
+                      <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
+                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
+                      </div>
+                    </ng-container>
+                    <ng-template #NoAnomalies>
+                      <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+                        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
+                      </div>
+                    </ng-template>
+                  </td>
+                  
+                  
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
         </div>
       </div>
     </div>
+  </div>
 </div>

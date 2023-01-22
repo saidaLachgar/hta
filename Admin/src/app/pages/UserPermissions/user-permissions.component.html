@@ -13,6 +13,30 @@
             <div class="card">
                 <div class="card-body">
                     <i class="bx bx-loader-alt fa-spin text-center fs-1 text-primary d-block m-5" *ngIf="!submitted && (service.loading$ | async)"></i>
+
+                    <!-- <ng-container *ngIf="(UserPermissions$ | async) as UserPermissions">
+                    <div *ngFor="let role of userRoles; let i = index">
+                        <h4>{{role.name}}</h4>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" [formControlName]="i + '_edit'" (change)="onEditChange(role.name, $event.target.checked)"> Edit
+                            </label>
+                            <label>
+                                <input type="checkbox" [formControlName]="i + '_modify'" (change)="onModifyChange(role.name, $event.target.checked)"> Modify
+                            </label>
+                            <label>
+                                <input type="checkbox" [formControlName]="i + '_delete'" (change)="onDeleteChange(role.name, $event.target.checked)"> Delete
+                            </label>
+                            <label>
+                                <input type="checkbox" [formControlName]="i + '_add'" (change)="onAddChange(role.name, $event.target.checked)"> Add
+                            </label>
+                            <label>
+                                <input type="checkbox" [formControlName]="i + '_import'" (change)="onImportChange(role.name, $event.target.checked)"> Import
+                            </label>
+                        </div>
+                    </div>
+                    </ng-container> -->
+                    
                     <ng-container *ngIf="(UserPermissions$ | async) as UserPermissions">
                     <div class="row">
                         <ul ngbNav #nav="ngbNav" [activeId]="0" class="nav-tabs">
@@ -28,25 +52,6 @@
                                         <div class="col-6 mt-4" *ngFor="let access of EntitiesAccess; let i=index">
                                             <h5 class="mb-3">{{access.name}}</h5>
                                             <div class="ms-3">
-<!--                                                 
-                                                <ng-container *ngVar="(
-                                                        access.name + '_' +
-                                                        (access.permissions === -1 ? permission : 
-                                                        ((access.permissions | typeof) === 'number' ? 
-                                                        permissions[access.permissions] : permissions[key])) 
-                                                    ) as value">
-                                                    <div *ngFor="let permission of permissions; let i=index">
-                                                            <label>
-                                                                <input type="checkbox" 
-                                                                    [formArrayName]="r.role"
-                                                                    [value]="value"
-                                                                    (change)="onChange($event, r.role)"
-                                                                    [checked]="isChecked(value, r.role)"
-                                                            >
-                                                            {{permission}}
-                                                        </label>
-                                                    </div>
-                                                </ng-container> -->
 
                                                 <ng-container *ngIf="access.permissions === -1;else second">
                                                     <div *ngFor="let permission of PermissionsIndex; let i=index">

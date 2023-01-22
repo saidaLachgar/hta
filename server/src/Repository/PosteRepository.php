@@ -70,58 +70,51 @@ class PosteRepository extends ServiceEntityRepository
        ->select("sum(p.nb_clients)")
            ->andWhere('d.id = :departement')
            ->setParameter('departement', $departement)
-           ->innerJoin('t.departement', 'd')
+           ->innerJoin('p.departement', 'd')
            ->getQuery()
-           ->getOneOrNullResult()
+           ->getSingleScalarResult()
        ;
    }
    public function ClientTotalInRange($departement, $source, $destination): ?int
    {
 
-    // (SELECT sum(nb_clients) FROM poste as p4 
-    // LEFT JOIN  appareil_coupeur_poste ap ON p4.id = ap.poste_id 
-    // WHERE p4.departement_id = d.id 
-    // AND ap.appareil_coupeur_id = t.appareil_id 
-    // AND p4.id NOT IN (
-    //     SELECT ap.poste_id from appareil_coupeur_poste as ap where ap.appareil_coupeur_id = t.ps_id
-    // ));
-
-    $qb2 = $this->createQueryBuilder('p2');
-    $qb = $this->createQueryBuilder('p')
-        ->select("sum(p.nb_clients)")
-
+    $query = $this->createQueryBuilder('p')
+        ->select("p.nb_clients")
+        // ->select("p.designation", "p.nb_clients")
         ->andWhere('d.id = :departement')
         ->setParameter('departement', $departement)
-        ->innerJoin('t.departement', 'd')
+        ->innerJoin('p.departement', 'd')
+        ->innerJoin('p.appareilsCoupeur', 'ap')
+        ->groupBy('p.id')
+        ;
 
-        ->andWhere('s.id = :source')
-        ->setParameter('source', $source)
-        ->innerJoin('p.appareil', 's');
-        
-        $qb->andWhere(
-            $qb->expr()->notIn(
+    !is_null($source) && $query->andWhere('ap.id = :source')
+        ->setParameter('source', $source->getId());
+
+    if(!is_null($destination)){
+        // get id of all post that belongs to appr 4
+        // add where post id not in
+        $qb2 = $this->createQueryBuilder('p2');
+        $query->andWhere(
+            $query->expr()->notIn(
                 'p.id',
                 $qb2->select('p2.id')
 
-                ->andWhere('d.id = :destination')
-                ->setParameter('destination', $destination)
-                ->innerJoin('ap.postes', 'd')
-                ->from('App\Entity\Poste', 'ap')
+                    ->andWhere('ap2.id = :destination')
+                    ->innerJoin('p2.appareilsCoupeur', 'ap2')
 
-                ->andWhere('s.id = :destination')
-                ->setParameter('destination', $destination)
-                ->innerJoin('p.appareil', 's')
+                    ->andWhere('d2.id = :departement')
+                    ->innerJoin('p2.departement', 'd2')
 
-                ->andWhere('d.id = :departement')
-                ->setParameter('departement', $departement)
-                ->innerJoin('t.departement', 'd')
-
-                ->getQuery()->getDQL()
+                    ->getDQL()
             )
-        );
-    $qb->getQuery()->getSingleScalarResult();
-    // SELECT ap.poste_id from appareil_coupeur_poste as ap where ap.appareil_coupeur_id = t.ps_id
-
-
+        )
+        ->setParameter('destination', $destination->getId());
+    }
+    // This will return an array of rows each row containing nb_clients
+    // array_reduce -> calc sum of the result  
+    return array_reduce($query->getQuery()->getResult(), function($holder, $item) {
+        return $holder + $item['nb_clients'];
+    }, 0);
    }
 }

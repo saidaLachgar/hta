@@ -5,11 +5,13 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 use App\Repository\TravauxRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\IsNull;
 
 /**
  * @ApiResource(
@@ -22,14 +24,22 @@ use Doctrine\ORM\Mapping as ORM;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'travaux_add')"},
- *      "list"={
- *          "method"="GET",
- *          "path"="/travaux/list",
- *          "access_control"="is_granted('hasPermission', 'travaux_show')"
- *       }
+ *      "get"= { "access_control"="is_granted('hasPermission', 'travaux_show')"},
  *   },
  * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "departements.id"=SearchFilter::STRATEGY_EXACT,
+ *          "appareil.id"=SearchFilter::STRATEGY_EXACT,
+ *          "ps.id"=SearchFilter::STRATEGY_EXACT,
+ *          "causes"=SearchFilter::STRATEGY_EXACT,
+ *          "DMS"=SearchFilter::STRATEGY_EXACT,
+ *          "type"=SearchFilter::STRATEGY_EXACT
+ *      }
+ * )
  * @ApiFilter(PropertyFilter::class)
+ * @ApiFilter(DateFilter::class, properties={"dateStart"})
  * @ORM\Entity(repositoryClass=TravauxRepository::class)
  */
 class Travaux
@@ -49,7 +59,8 @@ class Travaux
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     *
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
      * @Groups({"travaux"})
      */
     private $dateStart;
@@ -101,13 +112,25 @@ class Travaux
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"postes"})
+     * @Groups({"travaux"})
      */
     private $DMS;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"travaux"})
+     */
+    private $IFS;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"travaux"})
+     */
+    private $nbClients;
 
     public function __toString()
     {
-        return (string)$this->id;
+        return $this->type ? (string) $this->id :
+            ($this->type ? "Déclenchement" : "Coupeur");
     }
 
     public function getId(): ?int
@@ -207,6 +230,29 @@ class Travaux
     public function setDMS(?string $DMS): self
     {
         $this->DMS = $DMS;
+
+        return $this;
+    }
+    public function getIFS(): ?string
+    {
+        return $this->IFS;
+    }
+
+    public function setIFS(?string $IFS): self
+    {
+        $this->IFS = $IFS;
+
+        return $this;
+    }
+
+    public function getNbClients(): ?string
+    {
+        return $this->nbClients;
+    }
+
+    public function setNbClients(?string $nbClients): self
+    {
+        $this->nbClients = $nbClients;
 
         return $this;
     }

@@ -70,3 +70,17 @@
         border-color: #50a5f1 !important;
     }
 }
+
+
+
+.ngb-dp-weekdays {
+    margin-bottom: 0.6rem !important;
+}
+
+.ngb-dp-month:first-child .ngb-dp-week {
+    padding-left: 0.85rem !important;
+}
+
+.ngb-dp-month:last-child .ngb-dp-week {
+    padding-right: 0.85rem !important;
+}

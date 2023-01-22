@@ -1,0 +1,152 @@
+<?php
+// src/DataPersister/UserDataPersister.php
+
+namespace App\DataPersister;
+
+use App\Entity\Travaux;
+use App\Repository\PosteRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use App\Entity\Poste;
+class TravauxDataPersister implements ContextAwareDataPersisterInterface
+{
+    private $em;
+    private $serializer;
+
+    public function __construct ( EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {
+        $this->em = $entityManager;
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($data, array $context = []): bool
+    {
+        return $data instanceof Travaux;
+    }
+
+    /**
+     * @param Travaux $Travaux
+     */
+    public function persist($Travaux, array $context = [])
+    {
+
+        // persist DMS, IFS, nbClients
+        // Calculation conditions :
+        // Only if depart has been chosen :
+            // if (DMS is null) OR (depar, ps, source have changed) calculate everything
+            // elseif duration changed -> update only dms duration with the old CC && CI
+
+        // Depar is null
+        if(is_null($Travaux->getDepartement())) {
+            $Travaux->setIFS(null);
+            $Travaux->setDMS(null);
+            $Travaux->setNbClients(null);
+
+        } else { 
+            $DS = $Travaux->getDateStart();
+            $DE = $Travaux->getDateEnd();
+
+            // Get the previous state of the entity
+            $previousData = $context['previous_data'] ?? null;
+            if ($previousData) {
+
+                // Compare the current and new states of the entity
+                $attributes = ['Appareil', 'Ps', 'Departement', 'DateEnd', 'DateStart'];
+                $timeChange = false;
+                $majorChange = false;
+                foreach ($attributes as $attribute) {
+                    $getter = 'get' . $attribute;
+                    if(empty($previousData->$getter()) && empty($Travaux->$getter())) continue;
+                    if (
+                        (empty($previousData->$getter()) && !empty($Travaux->$getter())) ||
+                        (!empty($previousData->$getter()) && empty($Travaux->$getter()))
+                    ){
+                        $timeChange = true;
+                        $majorChange = true;
+                    }else{
+                        if(!in_array($attribute,['DateEnd', 'DateStart'])){
+                            if ($previousData->$getter()->getId() !== $Travaux->$getter()->getId()){
+                                $majorChange = true;
+                            }
+                        } else if ($this->dateToTime($previousData->$getter()) != $this->dateToTime($Travaux->$getter())){
+                            $timeChange = true;
+                        }
+                    }
+                    
+                    if($majorChange || $timeChange) break;
+                }
+
+            }
+
+            if(is_null($Travaux->getDMS()) or $majorChange){ //||  depar, ps, source changed
+                // dd("majorChange or dms was null");
+
+                /** @var PosteRepository $PostRepo */
+                $PostRepo = $this->em->getRepository(Poste::class);
+                $DeparId = $Travaux->getDepartement()->getId();
+                $PS = $Travaux->getPs();
+                $SR = $Travaux->getAppareil();
+                $CC = $PostRepo->ClientTotalInDepart($DeparId); // clients connectés  
+                // Get Clients interrompus 
+                if(is_null($SR) and is_null($PS)) {
+                    // source IS NULL & ps IS NULL
+                    $CI = $CC;
+                } else {
+                    $CI = $PostRepo->ClientTotalInRange($DeparId, $SR, $PS);
+                }
+
+                // set DMS value depending if date end exists or not
+                if( !is_null($DE) ){
+                    $Travaux->setDMS($this->calcDMS($DE, $DS, $CI, $CC));
+                } else{
+                    $Travaux->setDMS(null);
+                }
+
+                $Travaux->setNbClients($CI."/".$CC);
+                $Travaux->setIFS(round(($CI/$CC), 3));
+                
+            } elseif($timeChange){ // duration changed
+                // dd("timeChange");
+                // calc DMS with the old clients count
+                $NbClients = preg_split("#/#", $Travaux->getNbClients());
+                $Travaux->setDMS($this->calcDMS(
+                    $DE, 
+                    $DS, 
+                    $NbClients[0], 
+                    $NbClients[1]
+                ));
+            } else {
+                // dd("no changes on dsm ifs :D");
+                return;
+
+            }
+        }
+        
+        $this->em->persist($Travaux);
+        $this->em->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($data, array $context = [])
+    {
+        $this->em->remove($data);
+        $this->em->flush();
+    }
+    public function calcDMS($dateEnd, $dateStart, $CI, $CC)
+    {
+        $differenceInSeconds =
+            $this->dateToTime($dateEnd) -
+            $this->dateToTime($dateStart); 
+
+        $DMS = $differenceInSeconds * $CI / ($CC * 3600);
+        return round($DMS, 3);
+    }
+
+    private function dateToTime($date) { return strtotime($date->format('Y-m-d H:i:s'));}
+}

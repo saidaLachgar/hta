@@ -10,7 +10,7 @@ export class departementCreateComponent{
   breadCrumbItems: Array<{}>;
   
   constructor(private fb: FormBuilder, public service: departementService) {
-    this.breadCrumbItems = [{ label: 'Départements' }, { label: 'Nouveau département', active: true }];
+    this.breadCrumbItems = [{ label: 'Départements' }, { label: 'Nouveau Départ', active: true }];
     service.loadTeams();
     service.departementForm = this.fb.group({
       titre: ["", Validators.required],

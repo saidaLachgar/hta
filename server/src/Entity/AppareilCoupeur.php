@@ -50,14 +50,14 @@ class AppareilCoupeur
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"appareils", "postes"})
+     * @Groups({"appareils", "postes", "travaux", "visite"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"appareils", "postes"})
+     * @Groups({"appareils", "postes", "travaux", "visite"})
      */
     private $titre;
 

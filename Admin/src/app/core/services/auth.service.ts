@@ -14,6 +14,7 @@ export class AuthenticationService {
     private currentUserSubject: BehaviorSubject<User>;
     private server = environment.serverURL;
     public currentUser: Observable<User>;
+    roles: string[];
     
 
     constructor(private http: HttpClient, private router: Router, private UserPermissionsService: UserPermissionsService) {
@@ -33,43 +34,43 @@ export class AuthenticationService {
         return JSON.parse(atob(token.split('.')[1]));
     }
     refreshToken() {
-        let roles: string[];
         return this.http.post<any>(`${this.server}/api/token/refresh`, { refresh_token: this.getToken().refresh_token })
             .pipe(
                 tap(result => {
-                    roles = this.decodeToken(result.token).roles;
+                    this.roles = this.decodeToken(result.token).roles;
                     let user: User = {
                         username: this.currentUserValue.username,
                         jwt: result,
-                        roles: roles,
+                        roles: this.roles,
                     };
                     // store user details and jwt token in local storage to keep user logged in between page refreshes
                     localStorage.setItem('currentUser', JSON.stringify(user));
                     this.currentUserSubject.next(user);
                 }),
-                switchMap(() => this.setPermissions(roles[0])),
+                switchMap(() => this.setPermissions(this.roles[0])),
             );
     }
+    
     login(username: string, password: string) {
-        let roles: string[];
+        this.roles = [];
         return this.http.post<any>(`${this.server}/api/login`, { username, password })
             .pipe(
                 tap(result => {
                     // login successful if there's a jwt token in the response
                     // get user role
                     const PAYLOAD = this.decodeToken(result.token);
-                    roles = PAYLOAD.roles;
+                    this.roles = PAYLOAD.roles;
                     let user: User = {
                         id: PAYLOAD.id,
                         username: username,
                         jwt: result,
-                        roles: roles,
+                        roles: this.roles,
                     };
                     // store user details and jwt token in local storage to keep user logged in between page refreshes
                     localStorage.setItem('currentUser', JSON.stringify(user));
                     this.currentUserSubject.next(user);
                 }),
-                switchMap(() => this.setPermissions(roles[0])),
+                switchMap(() => this.setPermissions(this.roles[0])),
             );
     }
 

@@ -13,7 +13,7 @@ export class departementUpdateComponent  {
   id: number;
 
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: departementService) {
-    this.breadCrumbItems = [{ label: 'Départements' }, { label: 'Mise à jour du département', active: true }];
+    this.breadCrumbItems = [{ label: 'Départements' }, { label: 'Mise à jour du Départ', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     service.departementForm = fb.group({
       titre: ["", Validators.required],
