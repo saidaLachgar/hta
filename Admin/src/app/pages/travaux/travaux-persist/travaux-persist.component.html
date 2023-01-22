@@ -49,6 +49,7 @@
                         formControlName="ps"
                         bindLabel="titre"
                         bindValue="@id"
+                        [multiple]="true"
                         [minTermLength]="2"
                         [loading]="service.psLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"

@@ -34,7 +34,7 @@ export class travauxPersistComponent {
       dateEnd: [""],
       causes: [""],
       source: ["1"],
-      ps: [""],
+      ps: [[]],
       type: [null],
       departement: [""],
       appareil: [""],
@@ -51,7 +51,7 @@ export class travauxPersistComponent {
         // fill ng-select
         service.loadDepartements(obj.departement ? [obj.departement] : []);
         service.loadAppareils(obj.appareil ? [obj.appareil] : []);
-        service.loadPs(obj.ps ? [obj.ps] : []);
+        service.loadPs(obj.ps ? obj.ps : []);
 
         // date / time start
         let dateStrat = null; let TimeStart = null;
@@ -75,7 +75,7 @@ export class travauxPersistComponent {
           causes: String(obj.causes), // not working !! 
           // source: ,
           type: String(obj.type),
-          ps: obj.ps ? obj.ps["@id"] : null,
+          ps: obj.ps.length ? obj.ps.map((e)=>e["@id"]) : [],
           departement: obj.departement ? obj.departement["@id"] : null,
           appareil: obj.appareil ? obj.appareil["@id"] : null,
         });

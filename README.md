@@ -2,8 +2,7 @@
     SYMFONY 5.4 | PHP 7.4 | Angular CLI 13.2
 
 ## APP INFOS
-
-The website is an Electric Power Quality Monitoring System (SQE CMMS). It is a web application that allows users to track and manage the performance of electricity production, transmission, and distribution. The app allows users to monitor and measure the quality of electricity service, including continuity of service, interruption frequency, and downtime. It also allows workers to log and track breakdowns and schedule visits to fix anomalies. Additionally, it allows tracking the monthly objectives of each year, like how many visits they should do, which includes how many kilometers they will cover, and how much equipment they should set up. All data will be stored in a database and can be analyzed and visualized in charts and other forms of analysis.
+    The website is an Electric Power Quality Monitoring System (SQE CMMS). It is a web application that allows users to track and manage the performance of electricity production, transmission, and distribution. The app allows users to monitor and measure the quality of electricity service, including continuity of service, interruption frequency, and downtime. It also allows workers to log and track breakdowns and schedule visits to fix anomalies. Additionally, it allows tracking the monthly objectives of each year, like how many visits they should do, which includes how many kilometers they will cover, and how much equipment they should set up. All data will be stored in a database and can be analyzed and visualized in charts and other forms of analysis.
 
 
 ## BACKEND SETUP
@@ -17,64 +16,50 @@ The website is an Electric Power Quality Monitoring System (SQE CMMS). It is a w
     - You can also make webpack listen for changes and compile only what’s needed as you work on your files using: npm run watch
 
 ## SERVE CLIENT SIDE
+> http://localhost:4200
+
     ng serve --open
-> http://localhost:4200/ 
 
 ## SERVE SERVER SIDE
-    symfony server:start
 >http://127.0.0.1:8000
+    
+    symfony serve
+## DATABASE SCHEMA
+>https://dbdiagram.io/d/63b9376d7d39e42284e977af
 
 <br>
 <br>
 
 Obtain a token for API access:  
-`curl -X POST 127.0.0.1:8000/login -d username=admin -d password=admin`
+`curl -X POST 127.0.0.1:8000/api/login -d username=admin -d password=adminadmin`
 
-Swagger API Docs http://127.0.0.1:8000/api/
+`curl -X POST http://127.0.0.1:8000/api/login -H "Content-Type: application/json" -d '{"username":"admin","password":"adminadmin"}'`
 
-
-| Username | Password | Roles              |
-|----------|----------|--------------------|
-| user     | user     | `ROLE_USER`        |
-| admin    | admin    | `ROLE_ADMIN`       |
-| super    | super    | `ROLE_SUPER_ADMIN` |
+| Username | Password    | Roles              |
+|----------|-------------|--------------------|
+| user     | useruser    | `ROLE_USER`        |
+| admin    | adminadmin  | `ROLE_ADMIN`       |
+| super    | supersuper  | `ROLE_SUPER_ADMIN` |
 
 <br>
 
 ## Symfony CLI
-- New Entity
-  - php bin/console make:entity
-  - php bin/console make:migration
-  - php bin/console doctrine:migrations:migrate
-  
-- New Admin
-  - php bin/console make:sonata:admin
-  
-- Clear cache
-  - php bin/console cache:clear
+    - Clear cache  - php bin/console cache:clear
+    - DB update    - php bin/console d:s:u --force
+    - New Entity   - php bin/console make:entity
+    - Show routes  - php bin/console debug:router  
 
-- Update database structure
-  - php bin/console d:s:u --dump-sql  (shows queries that will execute)
-  - php bin/console d:s:u --force (update db)
-  - php bin/console d:s:u --complete --force (update db and removed tables and columns)
-  - php bin/console d:d:d --force   ( doctrine:database:drop )
-  - php bin/console d:s:u --force   ( doctrine:database:update )
+    - Remove bundle composer remove (name of bundle)
+      d:s:u --dump-sql  (shows queries that will execute)
+      d:s:u --complete --force (update db and removed tables and columns)
+      d:d:d --force   ( doctrine:database:drop )
+      d:s:u --force   ( doctrine:database:update )
 
-- Show all routes
-  - php bin/console debug:router  
 
-- Remove bundle
-  - composer remove (name of bundle)
 
 ## Angular CLI
-- Code scaffolding
-  - Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-- Build
-  - Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-- Running unit tests
-  - Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-- Running end-to-end tests
-  - Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+    - Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+    - Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
     g : generate
     c : component
@@ -89,43 +74,18 @@ Swagger API Docs http://127.0.0.1:8000/api/
 
 
 
-Error : Object of class App\\Entity\\MediaObject could not be converted to string
-Fix : add string or remove from logs
+## COMMON ERRORS
+    Error : Object of class App\\Entity\\MediaObject could not be converted to string
+    Fix : add string or remove from logs
 
-Error : method not found
-Fix : remove last slash from url
+    Error : method not found
+    Fix : remove last slash from url
 
-Error : Error: x EntityAction guard for "[x] ...": payload has a missing or invalid entity key 
-Fix : add group annotations
-
-
+    Error : Error: x EntityAction guard for "[x] ...": payload has a missing or invalid entity key 
+    Fix : add group annotations
 
 
-How to grant access in front?
-    on login get user role from token which can be only (super_admin,admin,user)
-    send a new request to get the user's groupe ( using find by name )
-    store groupe in local storage
-        use ng guard to tell if a route can be accessed or not
-        you should add a validation foreach item in the menu if it can be accessed or not
-How to grant api by role dynamically?
-    in the api u can do something like (user.groupe.roles as json) contains current entity also current method (add,delete....)
-How to update stored roles for each user :
-    set authz for each REST api in backend
-    if gets an authz error (in front interceptor) 
-        -> refresh the user's token (which will get a new roles to the front)
-        -> refresh page
-        -> show a toast of something went wrong
-
-The changes may tak a while to be effected
-For having the permission changes immediately reflected, the user should logout and re-authenticate, otherwise the changes will be effected when the user is Unauthorized or denied from accessing an interface or when it session end which will take approximately one hour
-
-https://nehalist.io/logging-events-to-database-in-symfony/
-07:58 x download monolog bundel
-09:10 x create monolog.yml file config > package
-12:52 x create Monolog handler php src > utlity
-15:26 x create new entity log
-15:45 : update services.yaml > config
-01:40 : create dbprocessor > utillity
+<BR>
 
 
 
@@ -141,15 +101,7 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 
 
 
-
-
-
-
-
-
-
-
-
+## TASKS
 
 
 🧶 Checklist
@@ -212,18 +164,18 @@ https://nehalist.io/logging-events-to-database-in-symfony/
 
 
 
-
-
+👋👋👋 SAIDAAAAAAA 👋👋👋
+YOU ARE WORKING ON
+  Testing the DMS values insertions in all cases
+    U found a Bug
+    i guess i changed some values that are not major
+    am not sur just keep looking why i got a negative value on this shit
 
 
 
 
 Global
-  x Département -> Départ
-  x Communes toggle form text (edit/add)
-  x toggle password show -> login
-  3 - wrong password error
-  3 - Token session refresh
+  x Département -> Départ  
 --------------------
 
 
@@ -240,8 +192,9 @@ visites:
 
 
 Traveaux
-  1 - Coupeur n'apas de Causes ( hide in form + dash in table)
-  2 - Calculate ++ table IFS nb client Coupeur/ nb c total
+  x Coupeur n'apas de Causes ( hide in form + dash in table)
+  x prevent update dms on updating interception
+  x - Calculate ++ table IFS nb client Coupeur/ nb c total
   2 - in inturaption could the user selet multiple ps? +++ select multiple ps
   2 - chart DMS / Mois +++ per year xx remove Coupeur
   5 - get SUM DMS values of each month of this year then per year
@@ -253,6 +206,7 @@ Traveaux
   0 - travauex column ++ taux de realisation 23/40 anomalies
 --------------------
 
+  3 - on choose depar get only appr of that depar forms
   0 - traveux -> all anomalies of transome -> same date same transome
   0 - visit -> anomalies of that day
 --------------------
@@ -260,6 +214,7 @@ Traveaux
 
 Departement : 
   3 - Long aérien / LP ( original ) + total of each post length
+  x Communes toggle form text (edit/add)
 --------------------
 
 
@@ -271,6 +226,11 @@ Logs :
 Users
  5 - Mot de passe oublié 
  5 - Remember me
+ 3 - remove unautherized links from menu
+ 3 - user returnUrl when logged out to back to page
+ x toggle password show -> login
+ x - wrong password error
+ x - Token session refresh
 
 
 
@@ -307,16 +267,7 @@ Users
 
 
 
-
-
-
-
-
-
-
-
-
-
+## QUERIES
 
 
 
@@ -470,19 +421,33 @@ AND p2.id NOT IN (
 
 
 
+## ROLES management
 
+How to grant access in front?
+    on login get user role from token which can be only (super_admin,admin,user)
+    send a new request to get the user's groupe ( using find by name )
+    store groupe in local storage
+        use ng guard to tell if a route can be accessed or not
+        you should add a validation foreach item in the menu if it can be accessed or not
+How to grant api by role dynamically?
+    in the api u can do something like (user.groupe.roles as json) contains current entity also current method (add,delete....)
+How to update stored roles for each user :
+    set authz for each REST api in backend
+    if gets an authz error (in front interceptor) 
+        -> refresh the user's token (which will get a new roles to the front)
+        -> refresh page
+        -> show a toast of something went wrong
 
+The changes may tak a while to be effected
+For having the permission changes immediately reflected, the user should logout and re-authenticate, otherwise the changes will be effected when the user is Unauthorized or denied from accessing an interface or when it session end which will take approximately one hour
 
-
-
-
-
-
-
-
-
-
-
+https://nehalist.io/logging-events-to-database-in-symfony/
+07:58 x download monolog bundel
+09:10 x create monolog.yml file config > package
+12:52 x create Monolog handler php src > utlity
+15:26 x create new entity log
+15:45 : update services.yaml > config
+01:40 : create dbprocessor > utillity
 
 
 

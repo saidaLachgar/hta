@@ -181,11 +181,11 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
     let travaux = {
       dateStart: DateTimeToString(form.date, form.dateStart),
       dateEnd : form.dateEnd ? DateTimeToString(form.date, form.dateEnd) : null,
-      type : form.type ? JSON.parse(form.type) : null,
+      type : form.type != null ? JSON.parse(form.type) : null,
       causes : form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
       departement : form.departement ? form.departement : null,
       appareil : form.appareil ? form.appareil : null,
-      ps : form.ps && form.source !== 0 ? form.ps: null
+      ps : form.ps.length && form.source !== 0 ? form.ps: []
     } as Travaux;
 
     // console.log(form);

@@ -9,9 +9,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 use App\Repository\TravauxRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\IsNull;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
@@ -35,6 +37,7 @@ use Symfony\Component\Validator\Constraints\IsNull;
  *          "ps.id"=SearchFilter::STRATEGY_EXACT,
  *          "causes"=SearchFilter::STRATEGY_EXACT,
  *          "DMS"=SearchFilter::STRATEGY_EXACT,
+ *          "IFS"=SearchFilter::STRATEGY_EXACT,
  *          "type"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
@@ -102,13 +105,7 @@ class Travaux
      */
     private $appareil;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=AppareilCoupeur::class, inversedBy="ps_travaux")
-     * @ORM\JoinColumn(nullable=true)
-     *
-     * @Groups({"travaux"})
-     */
-    private $ps;
+   
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -126,6 +123,18 @@ class Travaux
      * @Groups({"travaux"})
      */
     private $nbClients;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=AppareilCoupeur::class)
+     * @ORM\JoinColumn(nullable=true)
+     * @Groups({"travaux"})
+     */
+    private $ps;
+
+    public function __construct()
+    {
+        $this->ps = new ArrayCollection();
+    }
 
     public function __toString()
     {
@@ -209,19 +218,7 @@ class Travaux
 
         return $this;
     }
-
-    public function getPs(): ?AppareilCoupeur
-    {
-        return $this->ps;
-    }
-
-    public function setPs(?AppareilCoupeur $ps): self
-    {
-        $this->ps = $ps;
-
-        return $this;
-    }
-
+     
     public function getDMS(): ?string
     {
         return $this->DMS;
@@ -253,6 +250,30 @@ class Travaux
     public function setNbClients(?string $nbClients): self
     {
         $this->nbClients = $nbClients;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AppareilCoupeur>
+     */
+    public function getPs(): Collection
+    {
+        return $this->ps;
+    }
+
+    public function addP(AppareilCoupeur $p): self
+    {
+        if (!$this->ps->contains($p)) {
+            $this->ps[] = $p;
+        }
+
+        return $this;
+    }
+
+    public function removeP(AppareilCoupeur $p): self
+    {
+        $this->ps->removeElement($p);
 
         return $this;
     }

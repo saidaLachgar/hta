@@ -46,10 +46,11 @@
               <tr>
                 <th scope="row">PS :</th>
                 <td>
-                  <a 
-                    *ngIf="travaux.ps"
-                    [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', travaux.ps.id] : null"
-                    target="_blank" rel="noopener noreferrer">{{travaux.ps.titre}}</a>
+                  <div *ngFor="let ps of travaux.ps">
+                    <a 
+                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', ps.id] : null"
+                      target="_blank" rel="noopener noreferrer">- {{ps.titre}}</a>
+                  </div>
                 </td>
               </tr>
               <tr>

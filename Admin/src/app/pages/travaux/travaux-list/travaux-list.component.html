@@ -200,12 +200,16 @@
             </select>
           </div>
           <div class="col-4">
+            <label>IFS</label>
+            <input type="text" placeholder="IFS..." formControlName="IFS" #searchIFS class="form-control">
+          </div>
+          <div class="col-4">
             <label>DMS</label>
             <input type="text" placeholder="DMS..." formControlName="DMS" #searchDMS class="form-control">
           </div>
           
           <div class="col d-flex justify-content-end align-items-end">
-            <button class="btn btn-primary ms-2" type="submit"><i class="fas fa-filter"></i> Filtrer</button>
+            <button class="btn btn-primary me-2" type="submit"><i class="fas fa-filter"></i> Filtrer</button>
             <button type="reset" class="btn text-primary" (click)="service.findAll()">
               <i class="bx bx-x me-1"></i>Réinitialiser
             </button>
@@ -232,10 +236,11 @@
                   <th>PS</th>
                   <th>Causes</th>
                   <th class="font-size-12">Nb Clients interrompus</th>
+                  <th>IFS</th>
                   <th>DMS</th>
                   <th class="font-size-12">Anomalies</th>
                   <th>Date</th>
-                  <th width="123px"></th>
+                  <th width="50px"></th>
                 </tr>
               </thead>
               <tbody>
@@ -243,14 +248,14 @@
                 <tr>
                   <td
                     class="text-center"
-                    colspan="13"
+                    colspan="12"
                     *ngIf="!(service.travaux$ | async) && service.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
-                    colspan="13"
+                    colspan="12"
                     *ngIf="(service.travaux$ | async) && (service.travaux$ | async).length === 0 && service.loaded$ | async"
                   >
                   Aucune donnée trouvée !
@@ -277,17 +282,18 @@
                   </td>
                   <!-- appareil source -->
                   <td>
-                    <a 
-                      *ngIf="item.appareil"
+                    <a *ngIf="item.appareil;else NoSource"
                       [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.appareil.id] : null"
                       target="_blank" rel="noopener noreferrer">{{item.appareil.titre}}</a>
+                    <ng-template #NoSource>LP</ng-template>
                   </td>
                   <!-- appareil ps -->
                   <td>
-                    <a 
-                      *ngIf="item.ps"
-                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.ps.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.ps.titre}}</a>
+                    <div *ngFor="let ps of item.ps">
+                      <a 
+                        [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', ps.id] : null"
+                        target="_blank" rel="noopener noreferrer">- {{ps.titre}}</a>
+                    </div>
                   </td>
                   <!-- causes -->
                   <td>
@@ -301,6 +307,8 @@
                   </td>
                   <!-- NB Clients -->
                   <td>{{item.nbClients}}</td>
+                  <!-- IFS -->
+                  <td><ngb-highlight [result]="item.IFS" [term]="searchIFS.value"></ngb-highlight></td>
                   <!-- DMS -->
                   <td><ngb-highlight [result]="item.DMS" [term]="searchDMS.value"></ngb-highlight></td>
                   <!-- Anomalies -->

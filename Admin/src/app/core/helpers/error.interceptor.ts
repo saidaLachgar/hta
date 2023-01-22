@@ -12,11 +12,9 @@ export class ErrorInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {
             let error = err.error.message || err.statusText;
-            // auto logout if 401 response returned from api
-            if(error == "JWT Token not found") {
+            if(error == "JWT Token not found" || error == "Expired JWT Token") {
                 this.authenticationService.logout();
             }
-            // auto refresh user token when unauthorized ( Expired JWT Token (24h) )
             if (error == "Forbidden" || err.status === 403){
                 this.authenticationService.refreshToken()
                     .subscribe({
@@ -35,7 +33,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 }
 
 
-// 403 -> Forbidden 'acess refusé'
-// 401 -> Unauthorized  'Identifiants invalides'
-// 401 -> JWT Token not found
+// 403 -> Forbidden -> 'Acess refusé'
+// 401 -> Unauthorized  -> 'Identifiants invalides', 'Expired JWT Token', "JWT Token not found"
 // 404 -> not found
+// 505 -> Server error

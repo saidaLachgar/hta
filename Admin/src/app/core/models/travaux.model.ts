@@ -11,6 +11,6 @@ export interface Travaux {
     DMS?: string;
     departement?: Departement;
     appareil?: AppareilCoupeur;
-    ps?: AppareilCoupeur;
+    ps?: AppareilCoupeur[];
     anomalies?: Anomalie[];
 }

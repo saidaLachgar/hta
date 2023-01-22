@@ -40,6 +40,7 @@ export class travauxListComponent {
       before: [null],
       causes: [""],
       DMS: [null],
+      IFS: [null],
       type: [null],
     });
 

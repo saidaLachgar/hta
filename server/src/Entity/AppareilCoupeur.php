@@ -80,16 +80,11 @@ class AppareilCoupeur
      */
     private $travaux;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Travaux::class, mappedBy="ps")
-     */
-    private $ps_travaux;
 
     public function __construct()
     {
         $this->postes = new ArrayCollection();
         $this->travaux = new ArrayCollection();
-        $this->ps_travaux = new ArrayCollection();
     }
     public function __toString()
     {
@@ -173,36 +168,6 @@ class AppareilCoupeur
             // set the owning side to null (unless already changed)
             if ($travaux->getAppareil() === $this) {
                 $travaux->setAppareil(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Travaux>
-     */
-    public function getPsTravaux(): Collection
-    {
-        return $this->ps_travaux;
-    }
-
-    public function addPsTravaux(Travaux $psTravaux): self
-    {
-        if (!$this->ps_travaux->contains($psTravaux)) {
-            $this->ps_travaux[] = $psTravaux;
-            $psTravaux->setPs($this);
-        }
-
-        return $this;
-    }
-
-    public function removePsTravaux(Travaux $psTravaux): self
-    {
-        if ($this->ps_travaux->removeElement($psTravaux)) {
-            // set the owning side to null (unless already changed)
-            if ($psTravaux->getPs() === $this) {
-                $psTravaux->setPs(null);
             }
         }
 

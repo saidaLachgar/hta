@@ -33,12 +33,13 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($Travaux, array $context = [])
     {
+        // dd($Travaux->getPs());
 
-        // persist DMS, IFS, nbClients
-        // Calculation conditions :
-        // Only if depart has been chosen :
-            // if (DMS is null) OR (depar, ps, source have changed) calculate everything
-            // elseif duration changed -> update only dms duration with the old CC && CI
+        // CALC DMS IFS nbClients ---
+            // Calculation conditions :
+            // Only if depart has been chosen :
+                // if (DMS is null) OR (depar, ps, source have changed) calculate everything
+                // elseif duration changed -> update only dms duration with the old CC && CI
 
         // Depar is null
         if(is_null($Travaux->getDepartement())) {
@@ -49,13 +50,15 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
         } else { 
             $DS = $Travaux->getDateStart();
             $DE = $Travaux->getDateEnd();
+            $PS = $Travaux->getPs();
+            // get IDs of selected destinations
+            $Destinations = $PS->isEmpty() ? null : $PS->map(function($obj){return $obj->getId();})->getValues();
 
             // Get the previous state of the entity
             $previousData = $context['previous_data'] ?? null;
             if ($previousData) {
-
                 // Compare the current and new states of the entity
-                $attributes = ['Appareil', 'Ps', 'Departement', 'DateEnd', 'DateStart'];
+                $attributes = ['Appareil', 'Departement', 'DateEnd', 'DateStart'];
                 $timeChange = false;
                 $majorChange = false;
                 foreach ($attributes as $attribute) {
@@ -79,7 +82,12 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
                     
                     if($majorChange || $timeChange) break;
                 }
-
+                // compare the collections
+                $PPS = $previousData->getPs();
+                $previousDestinations = $PPS->isEmpty() ? null : $PPS->map(function($obj){return $obj->getId();})->getValues();
+                if (sort($Destinations) !== sort($previousDestinations)) {
+                    $majorChange = true;
+                }
             }
 
             if(is_null($Travaux->getDMS()) or $majorChange){ //||  depar, ps, source changed
@@ -88,15 +96,14 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
                 /** @var PosteRepository $PostRepo */
                 $PostRepo = $this->em->getRepository(Poste::class);
                 $DeparId = $Travaux->getDepartement()->getId();
-                $PS = $Travaux->getPs();
                 $SR = $Travaux->getAppareil();
                 $CC = $PostRepo->ClientTotalInDepart($DeparId); // clients connectés  
                 // Get Clients interrompus 
-                if(is_null($SR) and is_null($PS)) {
+                if(is_null($SR) and $PS->isEmpty()) {
                     // source IS NULL & ps IS NULL
                     $CI = $CC;
                 } else {
-                    $CI = $PostRepo->ClientTotalInRange($DeparId, $SR, $PS);
+                    $CI = $PostRepo->ClientTotalInRange($DeparId, $SR, $Destinations);
                 }
 
                 // set DMS value depending if date end exists or not
