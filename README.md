@@ -170,6 +170,8 @@ YOU ARE WORKING ON
     U found a Bug
     i guess i changed some values that are not major
     am not sur just keep looking why i got a negative value on this shit
+    >CAUSE -> date end smaller than date start
+    > Solution -> if dateend<datestart add one day to dateend
 
 
 

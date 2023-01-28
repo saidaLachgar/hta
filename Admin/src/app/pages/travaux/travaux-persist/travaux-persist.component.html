@@ -7,22 +7,37 @@
   ></app-page-title>
   <!-- end page title -->
 
-  <form class="row mt-4" [formGroup]="service.travauxForm">
-    <div class="col-12">
+  <div class="row mt-4">
+    <form class="col-12" [formGroup]="service.travauxForm">
       <div class="card">
         <div class="card-body">
 
-          <button 
-            [class.d-none]="!EditeMode || !service.interruption" 
-            (click)="service.deleteItem()"
-            type="button" class="btn text-danger float-end fw-medium btn-light">
-            <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
-          </button>
+        <button
+          (click)="Submit('EDIT')"
+          [disabled]="(service.loading$ | async)"
+         class="btn btn-primary float-end"
+        ><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
 
-          <button 
-            routerLink="/travaux"
-            class="btn btn-light me-2 float-end text-muted"
-            ><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+        <button
+          (click)="Submit('NEW')"
+          [disabled]="(service.loading$ | async)"
+          *ngIf="!EditeMode"
+          class="btn btn-light me-2 float-end text-primary"
+          >Créer et ajouter un nouveau</button>
+
+        <button
+          [disabled]="(service.loading$ | async)"
+          (click)="Submit('LIST')"
+          class="btn btn-light me-2 float-end text-primary"
+          ><i class="fas fa-arrow-circle-left me-1"></i> Sauvegarder et retourner à la liste</button>
+
+        <button 
+          [disabled]="(service.loading$ | async)"
+          [class.d-none]="!EditeMode || !service.interruption" 
+          (click)="service.deleteItem()"
+          type="button" class="btn text-danger float-end me-2 fw-medium btn-light">
+          <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
+        </button>
 
           <div class="card-title mb-5">
             Formulaire d'interruption 
@@ -199,10 +214,11 @@
 
             </div>
           </div>
+
           
         </div>
       </div>
-    </div>
+    </form>
     <!-- end col -->
 
     <form class="col-12" (ngSubmit)="addAnomaly(anomalyInput.value); anomalyInput.value = ''">
@@ -249,7 +265,7 @@
         </div>
       </div>
     </form>
-  </form>
+  </div>
   <!-- end row -->
 </div>
 

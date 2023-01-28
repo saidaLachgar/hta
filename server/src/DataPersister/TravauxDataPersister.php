@@ -52,7 +52,7 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
             $DE = $Travaux->getDateEnd();
             $PS = $Travaux->getPs();
             // get IDs of selected destinations
-            $Destinations = $PS->isEmpty() ? null : $PS->map(function($obj){return $obj->getId();})->getValues();
+            $Destinations = $PS->isEmpty() ? [] : $PS->map(function($obj){return $obj->getId();})->getValues();
 
             // Get the previous state of the entity
             $previousData = $context['previous_data'] ?? null;
@@ -84,7 +84,7 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
                 }
                 // compare the collections
                 $PPS = $previousData->getPs();
-                $previousDestinations = $PPS->isEmpty() ? null : $PPS->map(function($obj){return $obj->getId();})->getValues();
+                $previousDestinations = $PPS->isEmpty() ? [] : $PPS->map(function($obj){return $obj->getId();})->getValues();
                 if (sort($Destinations) !== sort($previousDestinations)) {
                     $majorChange = true;
                 }

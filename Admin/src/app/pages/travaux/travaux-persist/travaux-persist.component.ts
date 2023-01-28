@@ -109,24 +109,28 @@ export class travauxPersistComponent {
       value && (this.dateEnd = timeTostring(value));
     });
 
-    merge(
-      ...Object.keys(this.service.travauxForm.controls).map(
-        k => this.service.travauxForm.controls[k].valueChanges
-      )
-    ).subscribe((data) => {
-      setTimeout(() => {
-        // return;
-        // create new Taff
-        if (!this.EditeMode) {
-          this.service.Persist();
-          this.EditeMode = true;
-        } else {
-          // update Taff
-          this.service.interruption && this.service.Persist((this.service.interruption as Travaux).id);
-        }
+    // merge(
+    //   ...Object.keys(this.service.travauxForm.controls).map(
+    //     k => this.service.travauxForm.controls[k].valueChanges
+    //   )
+    // ).subscribe((data) => {
+    //   setTimeout(() => {
+    //     // return;
+    //     // create new Taff
+        
 
-      });
-    })
+    //   });
+    // })
+  }
+
+  Submit(Action){
+    if (!this.EditeMode) {
+      this.service.Persist(null, Action);
+      this.EditeMode = Action == 'EDIT';
+    } else {
+      // update Taff
+      this.service.interruption && this.service.Persist((this.service.interruption as Travaux).id, Action);
+    }
   }
 
   addAnomaly(value: string) {

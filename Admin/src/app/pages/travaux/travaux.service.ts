@@ -175,8 +175,11 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
   /**
    * Persist : Create / update
    */
-  Persist(id = null): void {
+  Persist(id = null, action): void {
+    this.submitted = action == 'EDIT';
+
     let form = this.travauxForm.value;
+    let _this= this;
     let toast = this.toast;
     let travaux = {
       dateStart: DateTimeToString(form.date, form.dateStart),
@@ -198,12 +201,22 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
       travaux.id = id;
       this.update(travaux).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
+        complete() {
+          toast.success("L'interuption a été sauvegardée avec succès ");
+          action == 'LIST' && _this.router.navigate(['/travaux']);
+          _this.submitted = false;
+        },
       });
     } else {
-
       this.add(travaux).pipe(tap(data => this.interruption = data))
         .subscribe({
           error: () => toast.error("un problème est survenu, veuillez réessayer"),
+          complete() {
+            toast.success("L'interuption ajoutée avec succès");
+            action == 'NEW' && _this.router.navigate(['/travaux/persist']);
+            action == 'LIST' && _this.router.navigate(['/travaux']);
+            _this.submitted = false;
+          },
         });
     }
   }
