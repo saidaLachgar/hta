@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import { merge } from "rxjs";
 import { Anomalie, Travaux, User } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { travauxService } from "../travaux.service";

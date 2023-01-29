@@ -3,6 +3,7 @@
 
 namespace App\DataPersister;
 
+use App\Entity\AppareilCoupeur;
 use App\Entity\Travaux;
 use App\Repository\PosteRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,7 +34,17 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($Travaux, array $context = [])
     {
+        $DS = $Travaux->getDateStart();
+        $DE = $Travaux->getDateEnd();
+        $PS = $Travaux->getPs();
+        $SR = $Travaux->getAppareil();
         // dd($Travaux->getPs());
+
+        // add one day if date start smaller than date end
+        if(!empty($DE) && !empty($DS) && $this->dateToTime($DE) < $this->dateToTime($DS)){
+            $DE->modify('+1 day');
+            $Travaux->setDateEnd($DE);
+        }
 
         // CALC DMS IFS nbClients ---
             // Calculation conditions :
@@ -42,15 +53,13 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
                 // elseif duration changed -> update only dms duration with the old CC && CI
 
         // Depar is null
-        if(is_null($Travaux->getDepartement())) {
+        if(is_null($Travaux->getDepartement()) && $PS->isEmpty() && is_null($SR)) {
             $Travaux->setIFS(null);
             $Travaux->setDMS(null);
             $Travaux->setNbClients(null);
 
         } else { 
-            $DS = $Travaux->getDateStart();
-            $DE = $Travaux->getDateEnd();
-            $PS = $Travaux->getPs();
+            
             // get IDs of selected destinations
             $Destinations = $PS->isEmpty() ? [] : $PS->map(function($obj){return $obj->getId();})->getValues();
 
@@ -95,9 +104,23 @@ class TravauxDataPersister implements ContextAwareDataPersisterInterface
 
                 /** @var PosteRepository $PostRepo */
                 $PostRepo = $this->em->getRepository(Poste::class);
-                $DeparId = $Travaux->getDepartement()->getId();
-                $SR = $Travaux->getAppareil();
-                $CC = $PostRepo->ClientTotalInDepart($DeparId); // clients connectés  
+                
+
+                // Get Depar from appareilsCoupeur if depar is null
+                if(is_null($Travaux->getDepartement())){
+                    if(is_null($SR)){
+                        // dump($PS);
+                        $DeparId = $PS->first()->getDepartement()->getId();
+                    }else{
+                        $DeparId = $SR->getDepartement()->getId();
+                    }
+                } else {
+                    $DeparId = $Travaux->getDepartement()->getId();
+                }
+
+                // Get clients connectés
+                $CC = $PostRepo->ClientTotalInDepart($DeparId);   
+                
                 // Get Clients interrompus 
                 if(is_null($SR) and $PS->isEmpty()) {
                     // source IS NULL & ps IS NULL

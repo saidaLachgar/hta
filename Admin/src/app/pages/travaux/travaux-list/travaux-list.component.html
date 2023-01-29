@@ -71,7 +71,21 @@
     </div>
     <div class="col-4">
       <div class="card card-body">
-        <p class="fw-bold mb-3">DMS / Mois <br><small class="text-muted">(Moyenne des interruptions de l'année en cours)</small></p>
+        <div class="fw-bold mb-4">
+          DMS <small class="text-muted font-size-12">(Moyenne des interruptions de l'année en cours)</small>
+          <div class="float-end">
+            <ul class="nav nav-pills">
+              <li class="nav-item">
+                <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(false)"
+                [ngClass]="{'active': !DMSMonthly}">Année</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(true)"
+                      [ngClass]="{'active': DMSMonthly}">Mois</a>
+              </li>
+            </ul>
+          </div>
+        </div>
         <apx-chart
           [series]="DMSChart.series"
           [chart]="DMSChart.chart"
@@ -297,13 +311,13 @@
                   </td>
                   <!-- causes -->
                   <td>
-                    <ng-container *ngIf="item.type != null && item.type; else NoCauses">
+                    <ng-container *ngIf="item.type != null && item.type;">
                       <ngb-highlight
                         [result]="causesList[item.causes + 3]"
                         [term]="searchCauses.options[searchCauses.options.selectedIndex].text"
                       ></ngb-highlight>
                     </ng-container>
-                    <ng-template #NoCauses>-</ng-template>
+                    <!-- <ng-template #NoCauses>-</ng-template> -->
                   </td>
                   <!-- NB Clients -->
                   <td>{{item.nbClients}}</td>
@@ -328,7 +342,7 @@
                   <!-- date -->
                   <td>
                     <ngb-highlight
-                      [result]="item.dateStart  | date:'long'"
+                      [result]="item.dateStart  | date:'medium':'Africa/Casablanca'"
                       [term]="searchDateStart.value+searchDateEnd.value"
                     ></ngb-highlight>
                   </td>

@@ -16,6 +16,7 @@ let parseDate = (date: string) => new Date(Date.parse(date))
 export class travauxListComponent {
   breadCrumbItems: Array<{}>;
   ShowSearch: boolean = false;
+  DMSMonthly: boolean;
   causesList = Object.keys(CausesList);
   causesChart;
   typesChart;
@@ -31,6 +32,7 @@ export class travauxListComponent {
     service.loadPs();
     service.loadAppareils();
     service.loadDepartements();
+    this.ReportDMS(true);
 
     service.travauxForm = fb.group({
       "departements.id[]": [''],
@@ -121,10 +123,6 @@ export class travauxListComponent {
           name: "Déclenchement",
           data: [0.31, 0.40, 0.28, 0.51, 0.42, 0.109, 0.100]
         },
-        {
-          name: "Coupeur",
-          data: [0.11, 0.32, 0.45, 0.32, 0.34, 0.52, 0.41]
-        }
       ],
       chart: {
         height: 275,
@@ -156,4 +154,9 @@ export class travauxListComponent {
   // humanReadable(date){
   //   return formatDistanceToNow(parseDate(date), { includeSeconds: true, addSuffix: true });  // "a day ago"
   // }
+
+
+  ReportDMS(DMSMonthly:boolean){
+    this.DMSMonthly = DMSMonthly;
+  }
 }

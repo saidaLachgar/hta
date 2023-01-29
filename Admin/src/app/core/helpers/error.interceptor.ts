@@ -13,6 +13,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         return next.handle(request).pipe(catchError(err => {
             let error = err.error.message || err.statusText;
             if(error == "JWT Token not found" || error == "Expired JWT Token") {
+                alert("La sessions d'authentification expiré. Veuillez vous reconnecter");
                 this.authenticationService.logout();
             }
             if (error == "Forbidden" || err.status === 403){

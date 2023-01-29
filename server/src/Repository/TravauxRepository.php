@@ -38,7 +38,17 @@ class TravauxRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function getDMS(string $period): array
+    {
+        return $this->createQueryBuilder('t')
+        ->select('SUM(t.DMS) as key, '.$period.'(t.dateStart) AS value')
+        ->andWhere('t.dateStart IS NOT NULL')
+        ->andWhere('t.DMS IS NOT NULL')
+        ->groupBy('value')
+        ->getQuery()
+        ->getResult();
 
+    }
 //    /**
 //     * @return Travaux[] Returns an array of Travaux objects
 //     */

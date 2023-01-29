@@ -7,7 +7,7 @@ import {
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Pagination, Team, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -48,6 +48,7 @@ export class UserService extends EntityCollectionServiceBase<User> {
     this.teams$ = concat(
       of(defaultVal), // default items
       this.teamInput$.pipe(
+          debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.teamLoading = true),

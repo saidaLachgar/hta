@@ -7,15 +7,14 @@ import {
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { AppareilCoupeur, Commune, Departement, Pagination, Poste } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
 import { departementService } from "../departements/departement.service";
 
-const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
-
+const formatDate = (date) => new Date(date.year,date.month,date.day).toISOString();
 
 @Injectable({
   providedIn: "root",
@@ -61,6 +60,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     this.communes$ = concat(
       of(defaultVal), // default items
       this.communeInput$.pipe(
+          debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.communeLoading = true),
@@ -75,6 +75,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     this.departements$ = concat(
       of(defaultVal), // default items
       this.departementInput$.pipe(
+          debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.departementLoading = true),
@@ -89,6 +90,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     this.appareils$ = concat(
       of(defaultVal), // default items
       this.appareilInput$.pipe(
+          debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.appareilLoading = true),

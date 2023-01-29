@@ -15,7 +15,7 @@ import { appareilService } from "../appareils/appareil.service";
 import { departementService } from "../departements/departement.service";
 
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
-const DateTimeToString = (date, time) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}T${zeroPad(time.hour)}:${zeroPad(time.minute)}:${zeroPad(time.second)}.110Z`;
+const DateTimeToString = (date, time) => new Date(date.year,date.month,date.day,time.hour,time.minute,time.second).toISOString();
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
 
 @Injectable({
@@ -117,6 +117,7 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
     this.departements$ = concat(
       of(defaultVal), // default items
       this.departementInput$.pipe(
+        debounceTime(500),
         distinctUntilChanged(),
         filter((val) => val != null),
         tap(() => this.departementLoading = true),

@@ -40,11 +40,19 @@
                     </div>
                   </td>
                   <td>
-                    <select class="form-select"
-                      formControlName="user.id" #searchUser>
-                      <option value="" selected>Utilisateur...</option>
-                      <option *ngFor="let user of (users$ | async)" [value]="user.id">{{user.fullName}}</option>
-                    </select>
+                    <ng-select [items]="LogsService.users$ | async"
+                              #searchUser
+                              formControlName="user.id[]"
+                              bindLabel="fullName"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Utilisateur.."
+                              [loading]="LogsService.userLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="LogsService.userInput$">
+                    </ng-select>
                   </td>
                   <td><input type="text" placeholder="IP..." formControlName="extra" #searchExtra class="form-control"></td>
                   <td><input type="text" placeholder="Description..." formControlName="message" class="form-control"></td>
@@ -67,17 +75,14 @@
                   </td>
                   <td>
                     <ngb-highlight
-                      [result]="item.createdAt | date:'long'"
+                      [result]="item.createdAt | date:'medium':'Africa/Casablanca'"
                       [term]="searchDateStart.value+searchDateEnd.value"
                     ></ngb-highlight>
                   </td>
                   <td>
                     <div class="d-flex align-items-center">
                       <div class="header-profile-user bg-transparent me-2"><span class="avatar-title rounded-circle bg-transparent border text-muted small"><i class="fas fa-user"></i></span></div>
-                      <ngb-highlight
-                        [result]="item.user.fullName"
-                        [term]="searchUser.options[searchUser.options.selectedIndex].text"
-                      ></ngb-highlight>
+                      {{item.user.fullName}}
                     </div>
                   </td>
                   <td>

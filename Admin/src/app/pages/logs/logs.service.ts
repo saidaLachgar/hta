@@ -4,10 +4,11 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
-import { Log, Pagination } from "src/app/core/models";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, takeUntil, tap } from "rxjs/operators";
+import { concat, Observable, of, Subject } from "rxjs";
+import { Log, Pagination, User } from "src/app/core/models";
 import { environment } from "src/environments/environment";
+import { UserService } from "../users/user.service";
 
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
@@ -22,9 +23,15 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   lastSearchedParams;
+
+  users$: Observable<User[]>;
+  userLoading = false;
+  userInput$ = new Subject<string>();
+
   public LogsForm: FormGroup;
 
   constructor(
+    public UserService: UserService,
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
   ) {
     super("logs", serviceElementsFactory);
@@ -36,6 +43,22 @@ export class LogsService extends EntityCollectionServiceBase<Log> {
   findAll(): void {
     // console.log("findAll")
     this.findByCriteria({ page: 1 });
+  }
+
+  loadUsers(defaultVal = []) : void{
+    this.users$ = concat(
+      of(defaultVal), // default items
+      this.userInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.userLoading = true),
+          switchMap(term => this.UserService.getWithQuery("properties[]=id&properties[]=fullName&fullName="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.userLoading = false)
+          ))
+      )
+    );
   }
 
   /**

@@ -7,7 +7,7 @@ import {
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { concat, forkJoin, Observable, of, Subject } from "rxjs";
-import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Departement, Pagination, Team } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -55,6 +55,7 @@ export class departementService extends EntityCollectionServiceBase<Departement>
     this.teams$ = concat(
       of(defaultVal), // default items
       this.teamInput$.pipe(
+          debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.teamLoading = true),

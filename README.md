@@ -165,15 +165,13 @@ Obtain a token for API access:
 
 
 👋👋👋 SAIDAAAAAAA 👋👋👋
-YOU ARE WORKING ON
-  Testing the DMS values insertions in all cases
-    U found a Bug
-    i guess i changed some values that are not major
-    am not sur just keep looking why i got a negative value on this shit
-    >CAUSE -> date end smaller than date start
-    > Solution -> if dateend<datestart add one day to dateend
+RESTRICT statistics route on the backend using security yml 
 
 
+am using symfony's api platform and it appears that is extremely slow in dev env
+is there anything i can do to make it faster
+am using it on a windows pc with wamp server PHP 7.4 and symfony 5.4
+is it because am on local endearment, would it be better on real server
 
 
 Global
@@ -197,8 +195,8 @@ Traveaux
   x Coupeur n'apas de Causes ( hide in form + dash in table)
   x prevent update dms on updating interception
   x - Calculate ++ table IFS nb client Coupeur/ nb c total
-  2 - in inturaption could the user selet multiple ps? +++ select multiple ps
-  2 - chart DMS / Mois +++ per year xx remove Coupeur
+  x - in inturaption could the user selet multiple ps? +++ select multiple ps
+  x - chart DMS / Mois +++ per year xx remove Coupeur
   5 - get SUM DMS values of each month of this year then per year
   5 - Total des interruptions (year and month)
   5 - Get avrange interpution time (year and month)
@@ -208,7 +206,7 @@ Traveaux
   0 - travauex column ++ taux de realisation 23/40 anomalies
 --------------------
 
-  3 - on choose depar get only appr of that depar forms
+  3 - forms : on choose depar get only appr of that depar  else shows the depar next to the app
   0 - traveux -> all anomalies of transome -> same date same transome
   0 - visit -> anomalies of that day
 --------------------
@@ -221,7 +219,7 @@ Departement :
 
 
 Logs :
-  1 - log list fill users dropdown
+  x - log list fill users dropdown
 --------------------
 
 

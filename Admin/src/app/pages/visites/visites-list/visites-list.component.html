@@ -216,7 +216,7 @@
                   <!-- date -->
                   <td>
                     <ngb-highlight
-                      [result]="item.date | date:'long'"
+                      [result]="item.date | date:'medium':'Africa/Casablanca'"
                       [term]="searchDateStart.value+searchDateEnd.value"
                     ></ngb-highlight>
                   </td>
