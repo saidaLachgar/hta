@@ -15,24 +15,31 @@ use Doctrine\Common\Collections\Collection;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
+
 /**
  * @ApiResource(
- *  order= {"id" = "DESC"},
  *  normalizationContext={"groups"={"travaux"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'travaux_update')"},
  *      "get"= {"access_control"="is_granted('hasPermission', 'travaux_details')"},
  *      "delete"= {"access_control"="is_granted('hasPermission', 'travaux_delete')"},
+ *      "clone"= {
+ *          "access_control"="is_granted('hasPermission', 'travaux_add')",
+ *          "method"="GET",
+ *          "path"="/travaux/{id}/clone"
+ *      },
  *   },
+ *   
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'travaux_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'travaux_show')"},
+ *      "get"= { "access_control"="is_granted('hasPermission', 'travaux_show')"}
  *   },
  * )
+ * 
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
- *          "departements.id"=SearchFilter::STRATEGY_EXACT,
+ *          "departement.id"=SearchFilter::STRATEGY_EXACT,
  *          "appareil.id"=SearchFilter::STRATEGY_EXACT,
  *          "ps.id"=SearchFilter::STRATEGY_EXACT,
  *          "causes"=SearchFilter::STRATEGY_EXACT,
@@ -41,6 +48,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "type"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
+ * 
  * @ApiFilter(PropertyFilter::class)
  * @ApiFilter(DateFilter::class, properties={"dateStart"})
  * @ORM\Entity(repositoryClass=TravauxRepository::class)
@@ -80,7 +88,8 @@ class Travaux
      *
      * @Groups({"travaux"})
      */
-    private $type;
+    private $type; 
+    // Déclenchement true -- Coupeur / Ouverture false
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
@@ -145,6 +154,10 @@ class Travaux
     public function getId(): ?int
     {
         return $this->id;
+    }
+    public function unsetId()
+    {
+        $this->id = null;
     }
 
     public function getDateStart(): ?\DateTimeInterface

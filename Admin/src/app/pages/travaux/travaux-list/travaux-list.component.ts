@@ -4,7 +4,7 @@ import { NgSelectConfig } from "@ng-select/ng-select";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { travauxService } from "../travaux.service";
 import { CausesList } from "src/app/core/models";
-import { differenceInMilliseconds, format, setDefaultOptions } from 'date-fns';
+import { differenceInMilliseconds, format, isSameDay, setDefaultOptions } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 setDefaultOptions({ locale: fr })
 
@@ -120,13 +120,25 @@ export class travauxListComponent {
     this.DMSChart = {
       series: [
         {
-          name: "Déclenchement",
+          name: "Equpe 1",
           data: [0.31, 0.40, 0.28, 0.51, 0.42, 0.109, 0.100]
         },
+        {
+          name: "Equpe 2",
+          data: [ 0.42, 0.109, 0.31, 0.40, 0.28, 0.51, 0.100]
+        },
+        {
+          name: "Equpe 3",
+          data: [0.51, 0.42, 0.109, 0.31, 0.40, 0.28, 0.100]
+        },
+        // {
+        //   name: "Equpe 4",
+        //   data: [0.28, 0.51, 0.42, 0.31, 0.40, 0.109, 0.100]
+        // },
       ],
       chart: {
         height: 275,
-        type: "area"
+        type: "line"
       },
       dataLabels: {
         enabled: false
@@ -135,10 +147,12 @@ export class travauxListComponent {
         curve: "smooth"
       },
       xaxis: {categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']},
-      colors: [
-        "#FF4560",
-        "#008FFB",
-      ],
+      // colors: [
+      //   // "#FF4560",
+      //   "#008FFB",
+      //   '#F44336', '#E91E63'
+      //   , '#9C27B0'
+      // ],
     };
 
 
@@ -149,6 +163,10 @@ export class travauxListComponent {
       let diff = differenceInMilliseconds(parseDate(date2), parseDate(date1));
       return format(new Date(diff), 'H:mm:ss');
     }
+  }
+
+  isToday(date: string): boolean {
+    return isSameDay(new Date(date), new Date());
   }
 
   // humanReadable(date){

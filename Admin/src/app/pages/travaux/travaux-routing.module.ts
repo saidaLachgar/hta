@@ -8,9 +8,10 @@ import { travauxPersistComponent } from './travaux-persist/travaux-persist.compo
 
 const routes: Routes = [
   {path: '', component: travauxListComponent, canActivate: [RoleGuard], data: {access: 'travaux_show'}},
+  {path: 'details/:id', component: travauxDetailsComponent, canActivate: [RoleGuard], data: {access: 'travaux_details'}},
+  {path: 'persist/:id/:copy', component: travauxPersistComponent, canActivate: [RoleGuard], data: {access: 'travaux_update'}},
   {path: 'persist/:id', component: travauxPersistComponent, canActivate: [RoleGuard], data: {access: 'travaux_update'}},
   {path: 'persist', component: travauxPersistComponent, canActivate: [RoleGuard], data: {access: 'travaux_add'}},
-  {path: 'details/:id', component: travauxDetailsComponent, canActivate: [RoleGuard], data: {access: 'travaux_details'}},
 ];
 
 @NgModule({

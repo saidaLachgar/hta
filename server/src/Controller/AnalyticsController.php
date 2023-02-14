@@ -11,24 +11,48 @@ use App\Entity\Travaux;
 
 class AnalyticsController extends AbstractController
 {
-  
+
   private $em;
 
-  public function __construct( EntityManagerInterface $em) 
+  public function __construct(EntityManagerInterface $em)
   {
     $this->em = $em;
   }
 
-    /**
-     * @Route("/api/analytics/dms-total/{period}", requirements={"period"="year|month"}, name="getDMS", options={"expose"=true})
-     */
-    public function getDMS(Request $request, $period)
-    {
-        /** @var \App\Repository\TravauxRepository $TravauxRepo */
-        $TravauxRepo = $this->em->getRepository(Travaux::class);
+  /**
+   * @Route("/api/test-route", name="testes", options={"expose"=true})
+   */
+  public function testes(Request $request)
+  {
+    /** @var \App\Repository\TravauxRepository $TravauxRepo */
+    $TravauxRepo = $this->em->getRepository(Travaux::class);
 
-        $data = $TravauxRepo->getDMS(strtoupper($period));
+    $data = $TravauxRepo->test();
 
-        return new JsonResponse($data);
-    }
+    return new JsonResponse($data);
+  }
+  /**
+   * @Route("/api/analytics/dms-total", name="getTotalDMS", options={"expose"=true})
+   */
+  public function getTotalDMS(Request $request)
+  {
+    /** @var \App\Repository\TravauxRepository $TravauxRepo */
+    $TravauxRepo = $this->em->getRepository(Travaux::class);
+
+    $data = $TravauxRepo->getTotalDMS();
+
+    return new JsonResponse($data);
+  }
+  /**
+   * @Route("/api/analytics/interruptions-par-type", name="getInterruptionsParType", options={"expose"=true})
+   */
+  public function getInterruptionsParType(Request $request)
+  {
+    /** @var \App\Repository\TravauxRepository $TravauxRepo */
+    $TravauxRepo = $this->em->getRepository(Travaux::class);
+
+    $data = $TravauxRepo->getInterruptionsParType();
+
+    return new JsonResponse($data);
+  }
 }

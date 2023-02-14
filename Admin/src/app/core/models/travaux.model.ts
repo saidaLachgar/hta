@@ -9,6 +9,7 @@ export interface Travaux {
     causes?: number;
     nbClients?: string;
     DMS?: string;
+    rowspan?: number;
     departement?: Departement;
     appareil?: AppareilCoupeur;
     ps?: AppareilCoupeur[];

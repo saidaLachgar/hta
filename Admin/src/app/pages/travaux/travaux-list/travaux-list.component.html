@@ -239,12 +239,14 @@
       <div class="card">
         <div class="card-body">
           <!-- Table -->
+          <!-- {{service.groupData(service.travaux$ | async).length}} -->
           <div class="table-responsive">
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Type</th>
-                  <th>Durée</th>
+                  <th width="117px">Type</th>
+                  <th>Date</th>
+                  <th>Heure</th>
                   <th>Départ</th>
                   <th>Point coupure</th>
                   <th>PS</th>
@@ -253,11 +255,10 @@
                   <th>IFS</th>
                   <th>DMS</th>
                   <th class="font-size-12">Anomalies</th>
-                  <th>Date</th>
                   <th width="50px"></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="table-striped">
                 <!-- table loading || no data -->
                 <tr>
                   <td
@@ -275,121 +276,138 @@
                   Aucune donnée trouvée !
                   </td>
                 </tr>
-                <tr *ngFor="let item of (service.travaux$ | async); let i = index">
-                  
-                  <!-- type -->
-                  <td>
-                    <div 
-                      *ngIf="item.type != null"
-                      [ngClass]="item.type ? 'badge-soft-danger' : 'badge-soft-info'"
-                      class="badge rounded-pill">
-                      {{item.type ? "Déclenchement" : "Coupeur" }}
-                    </div>
-                  </td>
-                  <td>{{getDiff(item.dateStart, item.dateEnd)}}</td>
-                  <!-- departement -->
-                  <td>
-                    <a 
-                      *ngIf="item.departement"
-                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', item.departement.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.departement.titre}}</a>
-                  </td>
-                  <!-- appareil source -->
-                  <td>
-                    <a *ngIf="item.appareil;else NoSource"
-                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.appareil.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.appareil.titre}}</a>
-                    <ng-template #NoSource>LP</ng-template>
-                  </td>
-                  <!-- appareil ps -->
-                  <td>
-                    <div *ngFor="let ps of item.ps">
-                      <a 
-                        [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', ps.id] : null"
-                        target="_blank" rel="noopener noreferrer">- {{ps.titre}}</a>
-                    </div>
-                  </td>
-                  <!-- causes -->
-                  <td>
-                    <ng-container *ngIf="item.type != null && item.type;">
-                      <ngb-highlight
-                        [result]="causesList[item.causes + 3]"
-                        [term]="searchCauses.options[searchCauses.options.selectedIndex].text"
-                      ></ngb-highlight>
-                    </ng-container>
-                    <!-- <ng-template #NoCauses>-</ng-template> -->
-                  </td>
-                  <!-- NB Clients -->
-                  <td>{{item.nbClients}}</td>
-                  <!-- IFS -->
-                  <td><ngb-highlight [result]="item.IFS" [term]="searchIFS.value"></ngb-highlight></td>
-                  <!-- DMS -->
-                  <td><ngb-highlight [result]="item.DMS" [term]="searchDMS.value"></ngb-highlight></td>
-                  <!-- Anomalies -->
-                  <td>
-                    <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
-                      <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
-                      </div>
-                    </ng-container>
-                    <ng-template #NoAnomalies>
-                      <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
-                      </div>
-                    </ng-template>
-                  </td>
-                  
-                  <!-- date -->
-                  <td>
-                    <ngb-highlight
-                      [result]="item.dateStart  | date:'medium':'Africa/Casablanca'"
-                      [term]="searchDateStart.value+searchDateEnd.value"
-                    ></ngb-highlight>
-                  </td>
-                  <!-- actions -->
-                  <td align="center">
-                    <div ngbDropdown 
-                      placement="bottom-left"
-                      *ngIf="authService.isAuthorized('travaux_details') || authService.isAuthorized('travaux_update') || authService.isAuthorized('travaux_delete')"
-                      >
-                      <i
-                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
-                        ngbDropdownToggle
-                        data-toggle="dropdown"
-                        aria-expanded="true"
-                      ></i>
-                      <div
-                        class="dropdown-menu dropdown-menu-end"
-                        ngbDropdownMenu
-                      >
-                        <a class="dropdown-item"
-                          [routerLink]="['details', item.id]"
-                          href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('travaux_details')"
+                  <!-- <ng-container *ngIf="(service.travaux$ | async) as travaux" *ngFor="let row of service.groupData(travaux); let key = index; trackBy: trackByFn">
+                    <tr *ngFor="let item of row; let i = index" valign="middle"> -->
+                    <tr *ngFor="let item of service.travaux$ | async; let i = index" valign="middle">
+                      <!-- type -->
+                      <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
+                        <div 
+                          *ngIf="item.type != null"
+                          [ngClass]="item.type ? 'badge-soft-danger' : 'badge-soft-info'"
+                          class="badge rounded-pill">
+                          {{item.type ? "Déclenchement" : "Coupeur" }}
+                        </div>
+                      </td>
+
+                      <!-- date -->
+                      <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
+                        <ngb-highlight
+                          [result]="item.dateStart  | date:'dd/MM/yy':'Africa/Casablanca'"
+                          [term]="searchDateStart.value+searchDateEnd.value"
+                        ></ngb-highlight>
+                      </td>
+                      <td>
+                        {{item.dateStart  | date:'HH:mm:ss':'Africa/Casablanca'}} → {{item.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca'}}<br>
+                        <small class="text-muted">Durée : {{getDiff(item.dateStart, item.dateEnd)}}</small>
+                      </td>
+    
+                      <!-- departement -->
+                      <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
+                        <a 
+                          *ngIf="item.departement"
+                          [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', item.departement.id] : null"
+                          target="_blank" rel="noopener noreferrer">{{item.departement.titre}}</a>
+                      </td>
+                      <!-- appareil source -->
+                      <td>
+                        <a *ngIf="item.appareil;else NoSource"
+                          [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.appareil.id] : null"
+                          target="_blank" rel="noopener noreferrer">{{item.appareil.titre}}</a>
+                        <ng-template #NoSource>LP</ng-template>
+                      </td>
+                      <!-- appareil ps -->
+                      <td>
+                        <div *ngFor="let ps of item.ps">
+                          <a 
+                            [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', ps.id] : null"
+                            target="_blank" rel="noopener noreferrer">- {{ps.titre}}</a>
+                        </div>
+                      </td>
+                      <!-- causes -->
+                      <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
+                        <ng-container *ngIf="item.type != null && item.type && item.causes;">
+                          <ngb-highlight
+                            [result]="causesList[item.causes + 3]"
+                            [term]="searchCauses.options[searchCauses.options.selectedIndex].text"
+                          ></ngb-highlight>
+                        </ng-container>
+                        <!-- <ng-template #NoCauses>-</ng-template> -->
+                      </td>
+                      <!-- NB Clients -->
+                      <td>{{item.nbClients}}</td>
+                      <!-- IFS -->
+                      <td><ngb-highlight [result]="item.IFS" [term]="searchIFS.value"></ngb-highlight></td>
+                      <!-- DMS -->
+                      <td><ngb-highlight [result]="item.DMS" [term]="searchDMS.value"></ngb-highlight></td>
+                      <!-- Anomalies -->
+                      <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
+                        <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
+                          <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
+                            <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
+                          </div>
+                        </ng-container>
+                        <ng-template #NoAnomalies>
+                          <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+                            <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
+                          </div>
+                        </ng-template>
+                      </td>
+                      
+                      <!-- actions -->
+                      <td align="center">
+                        <div ngbDropdown 
+                          placement="bottom-left"
+                          *ngIf="authService.isAuthorized('travaux_details') || authService.isAuthorized('travaux_update') || authService.isAuthorized('travaux_delete')"
                           >
-                          <i class="fas fa-eye me-2"></i> Voir
-                        </a>
-                        <a
-                          class="dropdown-item"
-                          href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('travaux_update')"
-                          [routerLink]="['persist', item.id]"
+                          <i
+                            class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                            ngbDropdownToggle
+                            data-toggle="dropdown"
+                            aria-expanded="true"
+                          ></i>
+                          <div
+                            class="dropdown-menu dropdown-menu-end"
+                            ngbDropdownMenu
                           >
-                          <!-- skipLocationChange -->
-                          <i class="fas fa-edit me-2"></i> Modifier
-                        </a>
-                        <a
-                          class="dropdown-item text-danger"
-                          href="javascript: void(0);"
-                          *ngIf="authService.isAuthorized('travaux_delete')"
-                          (click)="service.deleteItem(item.id, $event.target)"
-                        >
-                          <i class="fas fa-trash me-2"></i> Supprimer
-                        </a>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
+                            <a
+                              class="dropdown-item bg-success bg-soft"
+                              href="javascript: void(0);"
+                              *ngIf="item.type && isToday(item.dateStart) && authService.isAuthorized('travaux_update')"
+                              [routerLink]="['persist', item.id, true]"
+                              >
+                              <i class="fas fa-play me-2 text-success"></i> Continuer
+                            </a>
+                            <a class="dropdown-item"
+                              [routerLink]="['details', item.id]"
+                              href="javascript: void(0);"
+                              *ngIf="authService.isAuthorized('travaux_details')"
+                              >
+                              <i class="fas fa-eye me-2"></i> Voir
+                            </a>
+                            <a
+                              class="dropdown-item"
+                              href="javascript: void(0);"
+                              *ngIf="authService.isAuthorized('travaux_update')"
+                              [routerLink]="['persist', item.id]"
+                              >
+                              <!-- skipLocationChange -->
+                              <i class="fas fa-edit me-2"></i> Modifier
+                            </a>
+                           
+                            <a
+                              class="dropdown-item text-danger"
+                              href="javascript: void(0);"
+                              *ngIf="authService.isAuthorized('travaux_delete')"
+                              (click)="service.deleteItem(item.id, $event.target)"
+                            >
+                              <i class="fas fa-trash me-2"></i> Supprimer
+                            </a>
+                          </div>
+                        </div>
+                      </td>
+    
+                    </tr>
+                  <!-- </ng-container> -->
               </tbody>
             </table>
           </div>

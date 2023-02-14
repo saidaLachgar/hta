@@ -7,7 +7,7 @@ import {
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, take, tap } from "rxjs/operators";
 import { Pagination, Travaux, Departement, AppareilCoupeur } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -15,7 +15,7 @@ import { appareilService } from "../appareils/appareil.service";
 import { departementService } from "../departements/departement.service";
 
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
-const DateTimeToString = (date, time) => new Date(date.year,date.month,date.day,time.hour,time.minute,time.second).toISOString();
+const DateTimeToString = (date, time) => new Date(date.year, date.month-1, date.day, time.hour, time.minute, time.second).toISOString();
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
 
 @Injectable({
@@ -180,16 +180,16 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
     this.submitted = action == 'EDIT';
 
     let form = this.travauxForm.value;
-    let _this= this;
+    let _this = this;
     let toast = this.toast;
     let travaux = {
       dateStart: DateTimeToString(form.date, form.dateStart),
-      dateEnd : form.dateEnd ? DateTimeToString(form.date, form.dateEnd) : null,
-      type : form.type != null ? JSON.parse(form.type) : null,
-      causes : form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
-      departement : form.departement ? form.departement : null,
-      appareil : form.appareil ? form.appareil : null,
-      ps : form.ps.length && form.source !== 0 ? form.ps: []
+      dateEnd: form.dateEnd ? DateTimeToString(form.date, form.dateEnd) : null,
+      type: form.type != null ? JSON.parse(form.type) : null,
+      causes: form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
+      departement: form.departement ? form.departement : null,
+      appareil: form.appareil ? form.appareil : null,
+      ps: form.ps.length && form.source !== 0 ? form.ps : []
     } as Travaux;
 
     // console.log(form);
@@ -252,17 +252,53 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
     this.travaux$ = of([]); // clear table
 
     // format date
-    if(Object.keys(obj).length > 1){
+    if (Object.keys(obj).length > 1) {
       // console.log(obj);
-      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["dateStart["+key+"]"]: DateToString(obj[key]) })[key];
-      updateObj("before");updateObj("after");
+      const updateObj = (key: string) => obj[key] && delete Object.assign(obj, { ["dateStart[" + key + "]"]: DateToString(obj[key]) })[key];
+      updateObj("before"); updateObj("after");
     }
 
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
-    this.travaux$ = this.getWithQuery(queryParams);
+    this.travaux$ = this.getWithQuery(queryParams)
+    .pipe(
+      map((data)=>{
+
+        let tempObj={}; // temporary object to group data
+        data.forEach((v:Travaux, index) => { 
+          // create an id by same date and departement
+          // only if type is true (Déclenchement)
+          let key = v.type && v.departement && v.dateStart ?
+            v.departement.id + "-" + new Date(v.dateStart).toLocaleDateString() :
+            v.id
+            ;
+          // set when to concatenate same rows based on the same id
+          if(tempObj[key]) { // if already exists (same date/depar)
+            tempObj[key].push(v); // group same rows
+            
+            // Find index of 1st row has same id    
+            let objIndex = data.findIndex(obj => obj.id === tempObj[key][0].id);
+            // add new property to tell whether to merge next rows or not
+            // property value is the amount of rows should be merged
+
+            let firstRow = Object.assign({}, data[objIndex]); //assign = merge (old, new) )
+            firstRow.rowspan = tempObj[key].length;
+            data[objIndex] = firstRow;
+
+            // set rowspan to -1 to tell that this row should be merged with the above
+            let currentRow = Object.assign({}, v);
+            currentRow.rowspan = -1;
+            data[index] = currentRow;
+
+          } else {
+            tempObj[key] = [v]; // push new array
+          }
+        });
+        return data;
+      })
+    );
     this.getPagination();
   }
 
@@ -273,4 +309,5 @@ export class travauxService extends EntityCollectionServiceBase<Travaux> {
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
   }
+
 }

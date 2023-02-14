@@ -87,24 +87,7 @@ Obtain a token for API access:
 
 <BR>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## TASKS
-
-
-🧶 Checklist
+## 🧶 Checklist
   Dev. Backend
       - Create entity
       - __string + constant vars
@@ -115,124 +98,6 @@ Obtain a token for API access:
       - access.ts (access value ex : logs_show)
       - pages-routing.module.ts (model)
       - entity-metadata.ts (entity name)
-
-
-🧵 A fixer
-    ? Departement CRUD should have multiple team to choose
-    - Token session refresh?!
-    - Communes toggle form text (edit/add)
-    - wrong password error
-    - toggle password show -> login
-    - check breadcrumbs + form titles + authService.isAuthorized links
-
-
-🎈 A FAIR
-    x authorized menu items
-    x users
-    x history
-    ~ Departement
-      - Long aérien / LP ( original ) + total of each post length
-    x teams
-    x Commune
-    x poste de distribution
-    x Appareils coupeur 
-    x visites au sol
-    - anomalies
-    x travaux/inteription
-    
-
-🎁 A AMÉLIORER 
-  - add update && delete actions in view (details)
-  - password toggle -> user update/add
-  - disable submit buttons while it's loading
-  - add symfony index to entities
-  - permissions list to a table 
-  - save form searched values
-
-
-⚽ FAST TODOs
-
-  x traveux details
-  - inté anomalies
-  - log list fill users dropdown
-  - tester log traveux name to string
-  - fix profile user permistions
-
-
-
-
-
-
-
-👋👋👋 SAIDAAAAAAA 👋👋👋
-RESTRICT statistics route on the backend using security yml 
-
-
-am using symfony's api platform and it appears that is extremely slow in dev env
-is there anything i can do to make it faster
-am using it on a windows pc with wamp server PHP 7.4 and symfony 5.4
-is it because am on local endearment, would it be better on real server
-
-
-Global
-  x Département -> Départ  
---------------------
-
-
-
-visites:
-  x Distance parcourue ++ per Month tracking 
-  x Change source -> point coupure  - ps -> PS
-  5 - Get total kms of a transom -> show it in the table (Nb Support)
-  5 - Get count of visites for each commune of the current year ++ add this in communes list
-  5 - Get count of Distance parcourue for this year and this month
-  5 - Get total visites of this year
---------------------
-
-
-
-Traveaux
-  x Coupeur n'apas de Causes ( hide in form + dash in table)
-  x prevent update dms on updating interception
-  x - Calculate ++ table IFS nb client Coupeur/ nb c total
-  x - in inturaption could the user selet multiple ps? +++ select multiple ps
-  x - chart DMS / Mois +++ per year xx remove Coupeur
-  5 - get SUM DMS values of each month of this year then per year
-  5 - Total des interruptions (year and month)
-  5 - Get avrange interpution time (year and month)
-  5 - get count of interpution foreach cause (year and month)
-  5 - get total in interpution foreach type (year and month)
-  0 - Total anomalies show only undone
-  0 - travauex column ++ taux de realisation 23/40 anomalies
---------------------
-
-  3 - forms : on choose depar get only appr of that depar  else shows the depar next to the app
-  0 - traveux -> all anomalies of transome -> same date same transome
-  0 - visit -> anomalies of that day
---------------------
-
-
-Departement : 
-  3 - Long aérien / LP ( original ) + total of each post length
-  x Communes toggle form text (edit/add)
---------------------
-
-
-Logs :
-  x - log list fill users dropdown
---------------------
-
-
-Users
- 5 - Mot de passe oublié 
- 5 - Remember me
- 3 - remove unautherized links from menu
- 3 - user returnUrl when logged out to back to page
- x toggle password show -> login
- x - wrong password error
- x - Token session refresh
-
-
 
 
 
@@ -529,3 +394,111 @@ It's important to note that you should use secure communication channels such as
 Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
 
 Please note that this is just an example, you should adjust it to fit your specific use case, and it might not be complete and may require additional steps.
+
+
+
+## Global
+- [ ] Département -> Départ
+    - menu
+- [ ] declenchment -> incident
+- [ ] source -> point coupure - ps -> PS
+
+<br>
+
+## Statistics
+- [x] RESTRICT statistics route on the backend using security yml
+
+<br>**wanted data:**
+ - nombre inturuption
+
+<br>
+
+## Suivi de realisation 
+- Visite au sol   (Km)          -> all visites of this year
+- Visite montée   (Support)     -> all visites with anomlies all complated
+- other data can get from the traveux which is how many time were selected from form
+    - add all items in XLS as checkboxes in traveux  form
+
+<br>
+
+## Visites:
+- [ ] 5 Get total kms of a transom -> show it in the table (Nb Support)
+- [ ] 5 Get count of visites for each commune of the current year ++ add this in communes list
+- [ ] 5 Get count of Distance parcourue for this year and this month
+- [ ] 5 Get total visites of this year
+
+<br>
+
+## Traveaux
+- [x] **Coupeur n'apas de Causes** ( hide in form + dash in table)
+- Statistics :
+    - [x] get **SUM DMS** values of each month of this year then per year (**incidents only**)
+        - [x] DMS for each team
+        - [x] super admin can see all curves
+        - [x] users see thier curve only
+        - [x] yearlly DMS total one value -> super admin only
+    - [ ] <ins>2</ins>  Total des interruptions (year and month)
+    - [ ] <ins>3</ins> Get avrange interpution time (year and month)
+    - [ ] <ins>2</ins> Get count of interpution foreach cause (year and month)
+    - [ ] <ins>2</ins> Get total in interpution foreach type (year and month)
+    - [ ] <ins>0</ins> Total anomalies show only undone
+    - [ ] <ins>0</ins> Travauex column ++ taux de realisation 23/40 anomalies
+- [ ] <ins>1</ins> Reorder table Type - date + heure - depar - ..
+- [ ] <ins>2</ins> merge same celles declenchment in the same date and inter
+- [ ] <ins>4</ins> intuription add new column type partial or complete 
+    - detect automaticlly if the ps inter is equal iY (y is the electricity source)
+    - issue -> it can be iY but it ends somewhere becouse we have another electricity source as a fallback
+    - my idea is to detect automaticlly but allow user to change it
+
+<br>
+
+## Traveaux + visites
+- [ ] <ins>3</ins> forms : on choose depar get only appr of that depar else shows the depar next to the app
+    - [ ] add this concept in all data that can have it possibly 
+- [ ] <ins>0</ins> traveux -> all anomalies of transome -> same date same transome
+- [ ] <ins>0</ins> visit -> anomalies of that day
+- [ ] <ins>4</ins> Get travaux anomalies from visit with the same transome
+    -   Q:
+    if i went to a visit am gonna add anomalies from i1 -> i3
+        if i created a new interruption in deffrent inter  i2->i4
+        how am supposed to know which anomalies to get?
+        in another word, how to get anomalies in i2->i3?
+    - A:
+    in visit instead of selecting ps->source we gonna chose a transome from the table of transomes that we have added
+    in travaux we choose transomes we wants
+
+<br>
+
+## Departement 
+- [ ] <ins>3</ins>  Long aérien / LP ( original ) + total of each post length
+
+<br>
+
+## Logs 
+- [x]  log list fill users dropdown
+
+<br>
+
+## Users
+- [ ] add password generator 
+- [ ] copy login info 
+- [ ] password toggle -> user update/add
+- [ ] 5 Remember me
+- [ ] 3 remove unautherized links from menu
+- [ ] 3 user returnUrl when logged out to back to page
+
+<br>
+
+🧵 A fixer
+-  check breadcrumbs + form titles + authService.isAuthorized links
+- tester log traveux name to string
+- fix profile? checkbox user permistions
+
+<br>
+
+🎁 A AMÉLIORER 
+  - add update && delete actions in view (details)
+  - disable submit buttons while it's loading
+  - permissions list to a table 
+  - save form searched values
+
