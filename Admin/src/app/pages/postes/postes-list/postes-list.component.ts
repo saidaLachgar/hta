@@ -20,7 +20,7 @@ export class postesListComponent {
   ) {
     posteService.findAll();
     posteService.loadCommunes();
-    posteService.loadDepartements();
+    posteService.loadDepartments();
 
     posteService.posteForm = fb.group({
       titre: [""],
@@ -30,7 +30,7 @@ export class postesListComponent {
       nb_clients: [""],
       before: [""],
       after: [""],
-      "departement.id[]": [''],
+      "node.department.id[]": [''],
       "commune.id[]": [''],
     });
 

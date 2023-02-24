@@ -11,21 +11,23 @@ export class teamUpdateComponent {
   breadCrumbItems: Array<{}>;
   id: number;
 
-  constructor(private route: ActivatedRoute, private fb: FormBuilder, public teamService: teamService) { 
-    this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Mettre à jour l\'utilisateur', active: true }];
+  constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: teamService) { 
+    this.breadCrumbItems = [{ label: 'Équipes' }, { label: 'Mise à jour de l\'équipe', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    teamService.teamForm = this.fb.group({
+    service.loadMembers();
+    service.loadDepartments();
+    service.teamForm = this.fb.group({
       titre: ["", Validators.required],
-      departements: [[]],
+      departments: [[]],
       membres: [[]],
     });
-    this.teamService.getByKey(this.id).subscribe((obj) => {
-      teamService.loadMembers(obj.departements);
-      teamService.loadDepartements(obj.membres);
-      teamService.teamForm.setValue({
+    this.service.getByKey(this.id).subscribe((obj) => {
+      service.loadDepartments(obj.departments ? obj.departments : []);
+      service.loadMembers(obj.membres ? obj.membres : []);
+      service.teamForm.setValue({
         titre : obj.titre,
-        departements : obj.departements.map((e)=>e["@id"]),
-        membres : obj.membres.map((e)=>e["@id"]),
+        departments : obj.departments.length ? obj.departments.map((e)=>e["@id"]) : [],
+        membres : obj.membres.length ? obj.membres.map((e)=>e["@id"]) : [],
       });
     });
   }

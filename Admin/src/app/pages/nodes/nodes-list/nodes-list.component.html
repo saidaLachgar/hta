@@ -1,0 +1,180 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Les appareils de coupeur"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <a routerLink="/nodes/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('nodes_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.nodeForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th width="100px">ID</th>
+                  <th>Appareil de coupeur</th>
+                  <th>Départ</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="ID..." formControlName="id" #searchId class="form-control"></td>
+                  <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
+                  <td>
+                    <ng-select [items]="service.departments$ | async"
+                              #searchDepar
+                              formControlName="departments.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Départ.."
+                              [loading]="service.departmentLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.departmentInput$">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="4"
+                    *ngIf="!(service.nodes$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="4"
+                    *ngIf="(service.nodes$ | async) && (service.nodes$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let node of (service.nodes$ | async); let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="node.id"
+                      [term]="searchId.value"
+                    ></ngb-highlight>
+                  </td>
+                   <td>
+                    <ngb-highlight
+                      [result]="node.titre"
+                      [term]="searchTitre.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <a 
+                      *ngIf="node.department"
+                      [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', node.department.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{node.department.titre}}</a>
+                  </td>
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('nodes_details') || authService.isAuthorized('nodes_update') || authService.isAuthorized('nodes_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', node.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('nodes_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('nodes_update')"
+                          [routerLink]="['update', node.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('nodes_delete')"
+                          (click)="service.deleteItem(node.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

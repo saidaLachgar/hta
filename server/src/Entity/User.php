@@ -44,14 +44,14 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  */
 class User implements UserInterface
 {
-    public static $ROUTE_NAME = "users/details/:id";
+    
     public static $TRANSLATED_NAME = "utilisateur";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"users","logs","teams"})
+     * @Groups({"users","logs","teams","anomalies"})
      */
     private $id;
 
@@ -65,7 +65,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"users","logs","teams"})
+     * @Groups({"users","logs","teams","anomalies"})
      */
     private $fullName;
 

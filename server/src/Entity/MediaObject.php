@@ -49,14 +49,14 @@ class MediaObject
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"media_object=read","depar:read"})
+     * @Groups({"media_object=read","depar"})
      */
     private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"media_object=read", "depar:read"})
+     * @Groups({"media_object=read", "depar"})
      */
     public ?string $contentUrl = null;
     

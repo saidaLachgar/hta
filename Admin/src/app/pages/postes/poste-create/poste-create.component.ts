@@ -7,21 +7,22 @@ import { posteService } from "../poste.service";
 })
 export class posteCreateComponent {
   breadCrumbItems: Array<{}>;
+  showError: boolean = false;
   
   constructor(private fb: FormBuilder, public posteService: posteService) {
     this.breadCrumbItems = [{ label: 'Postes' }, { label: 'Nouveau poste', active: true }];
     posteService.loadCommunes();
-    posteService.loadDepartements();
-    // posteService.loadAppareils();
+    posteService.loadDepartments();
+    posteService.loadNodes();
     posteService.posteForm = this.fb.group({
       designation: ["", Validators.required],
       MLE: [""],
       PKVA: [null],
       nbClients: [null],
       dateMst: [null],
-      departement: [""],
+      department: [""],
       commune: [""],
-      // appareils: [[]],
+      node: ["", Validators.required],
     });
   }
 }

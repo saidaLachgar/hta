@@ -83,18 +83,20 @@ Obtain a token for API access:
 
     Error : Error: x EntityAction guard for "[x] ...": payload has a missing or invalid entity key 
     Fix : add group annotations
+        each entity should able to access it own attrs to do that, u add the it group to the field
 
 
 <BR>
 
 ## 🧶 Checklist
   Dev. Backend
-      - Create entity
+      - Create entity + repo
       - __string + constant vars
       - grant access of REST methods + api filter
   Inté Frontend
-      - HTML, component, service, routing, model
-      - menu.ts (url)
+      - HTML, component, service, routing 
+      - model models\index.ts
+      - menu.ts (menu label)
       - access.ts (access value ex : logs_show)
       - pages-routing.module.ts (model)
       - entity-metadata.ts (entity name)
@@ -287,6 +289,7 @@ AND p2.id NOT IN (
 
 
 ## ROLES management
+https://dev.to/sebastiandg7/how-do-you-handle-role-permissions-updates-with-jwt-3778
 
 How to grant access in front?
     on login get user role from token which can be only (super_admin,admin,user)
@@ -396,109 +399,218 @@ Also, you can use Symfony's security component to secure your webhook endpoint a
 Please note that this is just an example, you should adjust it to fit your specific use case, and it might not be complete and may require additional steps.
 
 
+import export 
 
-## Global
-- [ ] Département -> Départ
-    - menu
-- [ ] declenchment -> incident
-- [ ] source -> point coupure - ps -> PS
+[https://ghaidabouchala.medium.com/import-excel-data-in-the-database-symfony-back-end-e14efea51cd2](https://ghaidabouchala.medium.com/import-excel-data-in-the-database-symfony-back-end-e14efea51cd2)
 
-<br>
+programme de l’annee 5jrs
 
-## Statistics
-- [x] RESTRICT statistics route on the backend using security yml
+History tracking user changes 5jrs
 
-<br>**wanted data:**
- - nombre inturuption
+PWA ( working offline ) 5jrs
 
-<br>
+[Convert Application to a Native Mobile App](https://betterprogramming.pub/how-to-convert-your-angular-application-to-a-native-mobile-app-android-and-ios-c212b38976df)
 
-## Suivi de realisation 
-- Visite au sol   (Km)          -> all visites of this year
-- Visite montée   (Support)     -> all visites with anomlies all complated
-- other data can get from the traveux which is how many time were selected from form
-    - add all items in XLS as checkboxes in traveux  form
+gestion des errors 404 500
 
-<br>
 
-## Visites:
-- [ ] 5 Get total kms of a transom -> show it in the table (Nb Support)
-- [ ] 5 Get count of visites for each commune of the current year ++ add this in communes list
-- [ ] 5 Get count of Distance parcourue for this year and this month
-- [ ] 5 Get total visites of this year
+## TODAY'S Goal
 
-<br>
+* [ ] 3 Fix bug date order travaux
+* [ ] 1 Create and add new not working
+* [ ] find a way to combine edit of all travaux of that day
+* [ ] 1 Nb Support km table?
+    * get total of kilometers based on the selected transome
+* [ ] 4 Resticture schema
 
-## Traveaux
-- [x] **Coupeur n'apas de Causes** ( hide in form + dash in table)
-- Statistics :
-    - [x] get **SUM DMS** values of each month of this year then per year (**incidents only**)
-        - [x] DMS for each team
-        - [x] super admin can see all curves
-        - [x] users see thier curve only
-        - [x] yearlly DMS total one value -> super admin only
-    - [ ] <ins>2</ins>  Total des interruptions (year and month)
-    - [ ] <ins>3</ins> Get avrange interpution time (year and month)
-    - [ ] <ins>2</ins> Get count of interpution foreach cause (year and month)
-    - [ ] <ins>2</ins> Get total in interpution foreach type (year and month)
-    - [ ] <ins>0</ins> Total anomalies show only undone
-    - [ ] <ins>0</ins> Travauex column ++ taux de realisation 23/40 anomalies
-- [ ] <ins>1</ins> Reorder table Type - date + heure - depar - ..
-- [ ] <ins>2</ins> merge same celles declenchment in the same date and inter
-- [ ] <ins>4</ins> intuription add new column type partial or complete 
-    - detect automaticlly if the ps inter is equal iY (y is the electricity source)
-    - issue -> it can be iY but it ends somewhere becouse we have another electricity source as a fallback
-    - my idea is to detect automaticlly but allow user to change it
+***
 
-<br>
+## Traveaux 🔧
 
-## Traveaux + visites
-- [ ] <ins>3</ins> forms : on choose depar get only appr of that depar else shows the depar next to the app
-    - [ ] add this concept in all data that can have it possibly 
-- [ ] <ins>0</ins> traveux -> all anomalies of transome -> same date same transome
-- [ ] <ins>0</ins> visit -> anomalies of that day
-- [ ] <ins>4</ins> Get travaux anomalies from visit with the same transome
-    -   Q:
-    if i went to a visit am gonna add anomalies from i1 -> i3
-        if i created a new interruption in deffrent inter  i2->i4
-        how am supposed to know which anomalies to get?
-        in another word, how to get anomalies in i2->i3?
-    - A:
-    in visit instead of selecting ps->source we gonna chose a transome from the table of transomes that we have added
-    in travaux we choose transomes we wants
+* [ ] 🐞 order by date > depar > time
+* [ ] 🐞 Create and add new not working
+* [ ] 0 total des anomalies of that trancon
+* [ ] 3 filter inters by depar
+* [ ] 3 remove departement from entity and get it from app>tronçon>depar
+    * [ ] remove them from depar entity too
 
-<br>
+***
 
-## Departement 
-- [ ] <ins>3</ins>  Long aérien / LP ( original ) + total of each post length
+## Visites 🧢
 
-<br>
+* [ ] 1 Nb Support km table?
+* [ ] 3 filter visit teams by chosen depar
+* [ ] 0 total anomalies of that date only
+* [ ] 3 filter inters by depar
+* [ ] 3 remove departement from entity and get it from app>tronçon>depar
+    * [ ] remove them from depar entity too
 
-## Logs 
-- [x]  log list fill users dropdown
+***
 
-<br>
+## Anomalies💥
 
-## Users
-- [ ] add password generator 
-- [ ] copy login info 
-- [ ] password toggle -> user update/add
-- [ ] 5 Remember me
-- [ ] 3 remove unautherized links from menu
-- [ ] 3 user returnUrl when logged out to back to page
+* [ ] CRUD
+    * select transome
+* [ ] Add to visites && traveaux (inspiration ACF)
 
-<br>
+***
+
+## Departement 📍
+
+* [ ] 3 Long aérien / LP ( original ) + total of each post length
+
+***
+
+## Trançones ⚡
+
+* [ ] 3 Add columns depr AppareilCoupeur (source - destination)
+
+***
+
+## Appareil Coupeur 💈
+
+* [ ] 3 remove departement from entity and get it from tronçon>depar
+    * [ ] remove them from depar entity too
+    * [ ] associate it with troncon instead
+
+***
+
+## Poste distribution 📮
+
+* [ ] 3 remove departement from entity and get it from app>tronçon>depar
+    * [ ] remove them from depar entity too
+
+***
+
+## Suivi de realisation - objectives 🎯
+
+* Visite au sol (Km) -> all visites of this year
+* Visite montée (Support) -> all visites with anomlies all complated
+* other data can get from the traveux which is how many time were selected from form
+    * add all items in XLS as checkboxes in traveux form
+
+***
+
+## Statistiques🧮
+
+#### home
+
+* [ ] 5 nombre inturuption
+
+#### visites
+
+* [ ] 5 Get total kms of a transom -> show it in the table (Nb Support)
+* [ ] 5 Get count of visites for each commune of the current year ++ add this in communes list
+* [ ] 5 Get count of Distance parcourue for this year and this month
+* [ ] 5 Get total visites of this year
+
+#### Traveaux
+
+* [ ] 2 Total des interruptions (year and month)
+* [ ] 3 Get avrange interpution time (year and month)
+* [ ] 2 Get count of interpution foreach cause (year and month)
+* [ ] 2 Get total in interpution foreach type (year and month)
+* [ ] 0 Total anomalies show only undone
+* [ ] 0 Travauex column ++ taux de realisation 23/40 anomalies
+* [x] get **SUM DMS** values of each month of this year then per year (<strong>incidents only</strong>)
+    * [x] DMS for each team
+    * [x] super admin can see all curves
+    * [x] users see thier curve only
+    * [x] yearlly DMS total one value -> super admin only
+
+***
+
+## Users permissions 🔑
+
+* [ ] menu
+* [ ] actions
+* [ ] charts
+
+***
+
+## Logs 📣
+
+* [x] log list fill users dropdown
+
+***
+
+## Users 👷🏻‍♂️
+
+* [ ] add password generator
+* [ ] copy login info
+* [ ] password toggle -> user update/add
+* [ ] 5 Remember me
+* [ ] 3 remove unautherized links from menu
+* [ ] 3 user returnUrl when logged out to back to page
+
+***
 
 🧵 A fixer
--  check breadcrumbs + form titles + authService.isAuthorized links
-- tester log traveux name to string
-- fix profile? checkbox user permistions
+
+* check breadcrumbs + form titles + authService.isAuthorized links
+* tester log traveux name to string
+* fix profile? checkbox user permistions
+
+🎁 A AMÉLIORER
+
+* add update && delete actions in view (details)
+* disable submit buttons while it's loading
+* permissions list to a table
+* save form searched values
+* logo mobile + tables
+
+***
 
 <br>
+## Today's achievements ✨
 
-🎁 A AMÉLIORER 
-  - add update && delete actions in view (details)
-  - disable submit buttons while it's loading
-  - permissions list to a table 
-  - save form searched values
+| day 1 | day 2 | day 3 | day N | day 13 |
+| ----- | ----- | ----- | ----- | ------ |
+| reorder rows | clone item( inte ) | dive into search graph |  |  |
+| merge cells | trançones crud | updating tasks foreach schema update |  |  |
+| clone item (dev) | restruct schema |  |  |  |
 
+***
+
+## Priority
+
+```
+CRUD (anomalies - objectives - transomes - missing fields - background process (merge) )
+import / export
+analitics
+les améliorations (fixes, users, a améliorer)
+```
+
+***
+
+## ARCHIVES
+
+```
+RESTRICT statistics route on the backend using security yml
+Département → Départ —— declenchment → incident —— source → point coupure —— ps → PS
+Coupeur n'apas des Causes
+travaux → all anomalies of transome -> same date same transome ??!
+visit -> anomalies of that day
+```
+
+$towers = array(
+    (object)array('id' => 'tower1', 'name' => 'Tower 1'),
+    (object)array('id' => 'tower2', 'name' => 'Tower 2'),
+    (object)array('id' => 'tower3', 'name' => 'Tower 3'),
+    (object)array('id' => 'tower4', 'name' => 'Tower 4'),
+    (object)array('id' => 'tower5', 'name' => 'Tower 5'),
+    (object)array('id' => 'tower6', 'name' => 'Tower 6'),
+    (object)array('id' => 'tower7', 'name' => 'Tower 7'),
+);
+
+$fragments = array(
+    (object)array('from_tower' => 'tower1', 'to_tower' => 'tower2', 'distance' => 5),
+    (object)array('from_tower' => 'tower2', 'to_tower' => 'tower3', 'distance' => 10),
+    (object)array('from_tower' => 'tower3', 'to_tower' => 'tower4', 'distance' => 8),
+    (object)array('from_tower' => 'tower2', 'to_tower' => 'tower5', 'distance' => 7),
+    (object)array('from_tower' => 'tower3', 'to_tower' => 'tower5', 'distance' => 6),
+    (object)array('from_tower' => 'tower5', 'to_tower' => 'tower6', 'distance' => 3),
+    (object)array('from_tower' => 'tower6', 'to_tower' => 'tower7', 'distance' => 4),
+    (object)array('from_tower' => 'tower7', 'to_tower' => 'tower8', 'distance' => 4),
+    (object)array('from_tower' => 'tower8', 'to_tower' => 'tower9', 'distance' => 4),
+);

@@ -8,11 +8,12 @@ import {
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { AppareilCoupeur, Departement, Pagination, Team, Visite } from "src/app/core/models";
+import { Node, Department, Pagination, Team, Visite } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
-import { departementService } from "../departements/departement.service";
+import { departmentService } from "../departments/department.service";
+import { nodeService } from "../nodes/node.service";
 
 const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
 
@@ -25,17 +26,17 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   private server = environment.serverURL;
   visites$: Observable<Visite[]>;
   
-  departements$: Observable<Departement[]>;
-  departementLoading = false;
-  departementInput$ = new Subject<string>();
+  departments$: Observable<Department[]>;
+  departmentLoading = false;
+  departmentInput$ = new Subject<string>();
 
-  destinations$: Observable<AppareilCoupeur[]>;
-  destinationLoading = false;
-  destinationInput$ = new Subject<string>();
+  ANode$: Observable<any[] | Node[]>;
+  ANodeLoading = false;
+  ANodeInput$ = new Subject<string>();
   
-  sources$: Observable<AppareilCoupeur[]>;
-  sourceLoading = false;
-  sourceInput$ = new Subject<string>();
+  BNode$: Observable<any[] | Node[]>;
+  BNodeLoading = false;
+  BNodeInput$ = new Subject<string>();
 
   teams$: Observable<Team[]>;
   teamLoading = false;
@@ -50,7 +51,8 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartementService: departementService,
+    public DepartmentService: departmentService,
+    public NodeService: nodeService,
     public communeService: communeService,
     private http: HttpClient,
     private toast: HotToastService
@@ -84,56 +86,55 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
       )
     );
   }
-  loadDepartements(defaultVal = []) : void{
-    this.departements$ = concat(
+  loadDepartments(defaultVal = []) : void{
+    this.departments$ = concat(
       of(defaultVal), // default items
-      this.departementInput$.pipe(
+      this.departmentInput$.pipe(
           debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
-          tap(() => this.departementLoading = true),
-          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+          tap(() => this.departmentLoading = true),
+          switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
               catchError(() => of([])), // empty list on error
-              tap(() => this.departementLoading = false)
+              tap(() => this.departmentLoading = false)
           ))
       )
     );
   }
-  loadSources(defaultVal = []) : void{
-    this.sources$ = concat(
+  loadANodes(defaultVal = []) : void {
+    this.ANode$ = concat(
       of(defaultVal), // default items
-      this.sourceInput$.pipe(
+      this.ANodeInput$.pipe(
           debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
-          tap(() => this.sourceLoading = true),
-          switchMap(term => 
-            this.http.get<AppareilCoupeur[]>(`${this.server}/api/appareil_coupeurs?properties[]=id&properties[]=titre&titre=`+term)
-            .pipe(
-              map(response => response["hydra:member"]),
-              catchError(() => of([])), // empty list on error
-              tap(() => this.sourceLoading = false)
-            )
-          )
+          tap(() => this.ANodeLoading = true),
+          switchMap(term => this.NodeService.getWithQuery(
+            "properties[]=id&properties[]=titre&titre=" + term +
+            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
+            ).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.ANodeLoading = false)
+          ))
       )
     );
   }
-  loadDestinations(defaultVal = []) : void{
-    this.destinations$ = concat(
+  
+  loadBNodes(defaultVal = []) : void {
+    this.BNode$ = concat(
       of(defaultVal), // default items
-      this.destinationInput$.pipe(
+      this.BNodeInput$.pipe(
           debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
-          tap(() => this.destinationLoading = true),
-          switchMap(term => 
-            this.http.get<AppareilCoupeur[]>(`${this.server}/api/appareil_coupeurs?properties[]=id&properties[]=titre&titre=`+term)
-            .pipe(
-              map(response => response["hydra:member"]),
-              catchError(() => of([])), // empty list on error
-              tap(() => this.destinationLoading = false)
-            )
-          )
+          tap(() => this.BNodeLoading = true),
+          switchMap(term => this.NodeService.getWithQuery(
+            "properties[]=id&properties[]=titre&titre=" + term +
+            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
+            ).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.BNodeLoading = false)
+          ))
       )
     );
   }
@@ -262,5 +263,14 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   }
   get designation() {
     return this.visiteForm.get("designation");
+  }
+  get department() {
+    return this.visiteForm.get("department");
+  }
+  get BNode() {
+    return this.visiteForm.get("nodeB");
+  }
+  get ANode() {
+    return this.visiteForm.get("nodeA");
   }
 }

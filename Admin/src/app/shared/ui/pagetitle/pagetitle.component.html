@@ -2,7 +2,10 @@
 <div class="row">
   <div class="col-12">
     <div class="page-title-box d-flex align-items-center justify-content-between">
-      <h4 class="mb-0 font-size-18">{{ title }}</h4>
+      <h4 class="mb-0 font-size-18">
+        {{ title }}
+        <div role="status" class="spinner-grow ms-1 spinner-grow-sm text-primary" *ngIf="Loading"><span class="sr-only">Loading...</span></div>
+      </h4>
       <div class="page-title-right">
         <ol class="breadcrumb m-0">
           <ng-container *ngFor="let item of breadcrumbItems">

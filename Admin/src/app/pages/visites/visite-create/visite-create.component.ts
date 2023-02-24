@@ -8,21 +8,24 @@ import { visiteService } from "../visite.service";
 })
 export class visiteCreateComponent{
   breadCrumbItems: Array<{}>;
+  showError: boolean = false;
   
   constructor(private fb: FormBuilder, public service: visiteService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Nouveau visite', active: true }];
-    service.loadDepartements();
-    service.loadSources();
-    service.loadDestinations();
+    service.loadDepartments();
+    service.loadANodes();
+    service.loadBNodes();
     service.loadTeams();
     service.visiteForm = this.fb.group({
       date: [""],
-      departement: ["", Validators.required],
-      source: [""],
-      destination: [""],
-      nbSupport: [null],
       team: [""],
+      nbSupport: [null],
+      department: ["", Validators.required],
+      nodeA: ["", Validators.required],
+      nodeB: [[]],
+
     });
   }
 
 }
+

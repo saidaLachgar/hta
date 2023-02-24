@@ -23,7 +23,6 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  */
 class UserPermissions
 {
-    public static $ROUTE_NAME = "autorisation";
     public static $TRANSLATED_NAME = "autorisation";
 
     /**

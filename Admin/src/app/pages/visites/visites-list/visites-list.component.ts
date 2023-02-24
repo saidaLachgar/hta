@@ -50,15 +50,17 @@ export class visitesListComponent {
   ) {
     service.findAll();
     service.loadTeams();
+    service.loadANodes();
+    service.loadBNodes();
 
 
     service.visiteForm = fb.group({
       nbSupport: [null],
       before: [""],
       after: [""],
-      "departements.id[]": [""],
-      "source.id[]": [""],
-      "destination.id[]": [""],
+      "departments.id[]": [""],
+      "nodeA.id[]": [''],
+      "nodeB.id[]": [''],
       "team.id[]": [""],
     });
 

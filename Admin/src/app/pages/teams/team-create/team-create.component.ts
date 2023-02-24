@@ -9,12 +9,12 @@ export class teamCreateComponent {
   breadCrumbItems: Array<{}>;
   
   constructor(private fb: FormBuilder, public teamService: teamService) {
-    this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Nouvel utilisateur', active: true }];
+    this.breadCrumbItems = [{ label: 'Équipes' }, { label: 'Nouvelle équipe', active: true }];
     teamService.loadMembers();
-    teamService.loadDepartements();
+    teamService.loadDepartments();
     teamService.teamForm = this.fb.group({
       titre: ["", Validators.required],
-      departements: [[]],
+      departments: [[]],
       membres: [[]],
     });
   }

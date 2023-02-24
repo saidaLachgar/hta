@@ -7,8 +7,8 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: -1
     },
     {
-        name: 'Travaux',
-        value: 'travaux',
+        name: 'Mission',
+        value: 'missions',
         permissions: -1
     },
 
@@ -43,8 +43,8 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: [0, 1, 2, 3, 4]
     },
     {
-        name: 'Départements',
-        value: 'departements',
+        name: 'Départ',
+        value: 'departments',
         permissions: [0, 1, 2, 3, 4]
     },
     {
@@ -53,14 +53,19 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: [0, 1, 2, 3, 4]
     },
     {
+        name: 'Tronçon',
+        value: 'edges',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
         name: 'Appareils coupeur',
-        value: 'appareils',
+        value: 'nodes',
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Members',
         value: 'users',
-        permissions: [0, 1, 2, 3, 4, 7]
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Autorisation',
@@ -87,5 +92,5 @@ export const PermissionsIndex = [ // has all checkboxes -> -1
     {name:'Afficher', value: 'show'}, // -> 4
     {name:'Exporter', value: 'export'}, // -> 5
     {name:'Importer', value: 'import'}, // -> 6
-    {name:'Profile', value: 'profile'}, // -> 7
+    // {name:'Profile', value: 'profile'}, // -> 7
 ]

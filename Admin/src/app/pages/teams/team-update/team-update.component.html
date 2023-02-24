@@ -6,8 +6,8 @@
     ></app-page-title>
     <!-- end page title -->
   
-    <form class="row mt-4" [formGroup]="teamService.teamForm" (ngSubmit)="teamService.onUpdate(id)">
-      <fieldset class="col-12" [disabled]="teamService.loading$ | async">
+    <form class="row mt-4" [formGroup]="service.teamForm" (ngSubmit)="service.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="service.loading$ | async">
         <div class="card">
           <div class="card-body">
            
@@ -17,45 +17,45 @@
               <div class="col-md-10">
                 <input
                   formControlName="titre"
-                  [ngClass]="{'is-invalid':teamService.titre.invalid && teamService.submitted}"
+                  [ngClass]="{'is-invalid':service.titre.invalid && service.submitted}"
                   class="form-control"
                   type="text"
                   id="name-input"
                 />
                 <div
-                  *ngIf="teamService.submitted && teamService.titre.errors"
+                  *ngIf="service.submitted && service.titre.errors"
                   class="invalid-feedback">
-                  <span *ngIf="teamService.titre.errors.required">Ce champ est obligatoire.</span>
+                  <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
                 </div>
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Départements</label>
+              <label for="name-input" class="col-md-2 col-form-label">Départ</label>
               <div class="col-md-10">
-                <ng-select [items]="teamService.departements$ | async"
-                          formControlName="departement"
+                <ng-select [items]="service.departments$ | async"
+                          formControlName="departments"
                           bindLabel="titre"
                           bindValue="@id"
                           [multiple]="true"
                           [minTermLength]="2"
-                          [loading]="teamService.departementLoading"
+                          [loading]="service.departmentLoading"
                           typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                          [typeahead]="teamService.departementInput$">
+                          [typeahead]="service.departmentInput$">
                 </ng-select>
               </div>
             </div>
             <div class="mb-3 row">
               <label for="name-input" class="col-md-2 col-form-label">Membres</label>
               <div class="col-md-10">
-                <ng-select [items]="teamService.membres$ | async"
+                <ng-select [items]="service.membres$ | async"
                           formControlName="membres"
                           bindLabel="fullName"
                           bindValue="@id"
                           [multiple]="true"
                           [minTermLength]="2"
-                          [loading]="teamService.membreLoading"
+                          [loading]="service.membreLoading"
                           typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                          [typeahead]="teamService.membreInput$">
+                          [typeahead]="service.membreInput$">
                 </ng-select>
               </div>
             </div>
@@ -63,7 +63,7 @@
             <div class="row justify-content-end">
               <div class="col-auto">
                 <button class="btn btn-light me-2" routerLink="/teams"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
-                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="teamService.submitted && (teamService.loading$ | async)"></i> Sauvegarder</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
               </div>
             </div>
           </div>

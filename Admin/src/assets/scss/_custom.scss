@@ -41,34 +41,10 @@
     position: static;
 }
 
-.month-picker {
-    .dropdown-toggle {
-        border: 1px solid #ccc !important;
-    }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        /* display: none; <- Crashes Chrome on hover */
-        -webkit-appearance: none;
-        margin: 0;
-        /* <-- Apparently some margin are still there even though it's hidden */
-    }
-
-    input[type=number] {
-        -moz-appearance: textfield;
-        /* Firefox */
-        background: #fff;
-        border: 0;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .sr-only:checked+.btn {
-        color: #fff !important;
-        background-color: #50a5f1 !important;
-        border-color: #50a5f1 !important;
-    }
+.border-deem,
+.border-deem th,
+.border-deem td {
+    border: 1px solid #ddd;
 }
 
 
@@ -83,4 +59,8 @@
 
 .ngb-dp-month:last-child .ngb-dp-week {
     padding-right: 0.85rem !important;
+}
+
+fieldset:disabled {
+    opacity: 0.5;
 }

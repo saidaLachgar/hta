@@ -1,8 +1,8 @@
-import { User, Departement } from ".";
+import { User, Department } from ".";
 
 export interface Team {
     id?: number;
     titre: string;
-    departements: Departement[];
+    departments: Department[];
     membres: User[];
 }

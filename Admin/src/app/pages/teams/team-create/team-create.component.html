@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <!-- start page title -->
   <app-page-title
-    title="Nouvel utilisateur"
+    title="Nouvelle équipe"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->
@@ -29,17 +29,17 @@
             </div>
           </div>
           <div class="mb-3 row">
-            <label for="name-input" class="col-md-2 col-form-label">Départements</label>
+            <label for="name-input" class="col-md-2 col-form-label">Départ</label>
             <div class="col-md-10">
-              <ng-select [items]="teamService.departements$ | async"
-                        formControlName="departements"
+              <ng-select [items]="teamService.departments$ | async"
+                        formControlName="departments"
                         bindLabel="titre"
                         bindValue="@id"
                         [multiple]="true"
                         [minTermLength]="2"
-                        [loading]="teamService.departementLoading"
+                        [loading]="teamService.departmentLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="teamService.departementInput$">
+                        [typeahead]="teamService.departmentInput$">
               </ng-select>
             </div>
           </div>

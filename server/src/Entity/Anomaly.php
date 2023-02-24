@@ -1,0 +1,187 @@
+<?php
+
+namespace App\Entity;
+use DateTime;
+
+use App\Repository\AnomalyRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+/**
+ * @ApiResource(
+ *   order= {"id" = "DESC"},
+ *   normalizationContext={"groups"={"anomalies"}},
+ *  itemOperations={
+ *      "put"= {"access_control"="is_granted('hasPermission', 'anomalies_update')"},
+ *      "get"= {"access_control"="is_granted('hasPermission', 'anomalies_details')"},
+ *      "delete"= {"access_control"="is_granted('hasPermission', 'anomalies_delete')"},
+ *   },
+ *   collectionOperations={
+ *      "post"= {"access_control"="is_granted('hasPermission', 'anomalies_add')"},
+ *      "get"= { "access_control"="is_granted('hasPermission', 'anomalies_show')"},
+ *   },
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "title"=SearchFilter::STRATEGY_PARTIAL,
+ *          "severity"=SearchFilter::STRATEGY_EXACT,
+ *          "status"=SearchFilter::STRATEGY_EXACT,
+ *          "edge.department.id"=SearchFilter::STRATEGY_EXACT
+ *      }
+ * )
+ * @ApiFilter(PropertyFilter::class)
+ * @ApiFilter(DateFilter::class, properties={"createdAt"})
+ * @ORM\Entity(repositoryClass=AnomalyRepository::class)
+ * @ORM\HasLifecycleCallbacks
+ */
+
+class Anomaly
+{
+    public static $TRANSLATED_NAME = "anomalie";
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     * @Groups({"anomalies"})
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"anomalies"})
+     */
+    private $status; // done, undone
+
+    /**
+     * @ORM\Column(type="string", length=25, nullable=true)
+     * @Groups({"anomalies"})
+     */
+    private $severity; // ELEVE, FAIBLE OU NORMAL
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"anomalies"})
+     */
+    private $title;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"anomalies"})
+     */
+    private $createdBy;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Edge::class, inversedBy="anomalies")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"anomalies"})
+     */
+    private $edge;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     * @Groups({"anomalies"})
+     */
+
+     private $createdAt;
+
+
+     public function __toString()
+    {
+        return (string)$this->title;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(bool $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getSeverity(): ?string
+    {
+        return $this->severity;
+    }
+
+    public function setSeverity(?string $severity): self
+    {
+        $this->severity = $severity;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getEdge(): ?Edge
+    {
+        return $this->edge;
+    }
+
+    public function setEdge(?Edge $edge): self
+    {
+        $this->edge = $edge;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+     /**
+     * @ORM\PrePersist
+     *
+     * @return void
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new DateTime();
+    }
+}

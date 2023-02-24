@@ -13,14 +13,14 @@ export const MENU: MenuItem[] = [
     },
     {
         id:3,
-        label: 'Travaux',
+        label: 'Mission',
         icon: 'fas fa-hard-hat',
-        link: '/travaux',
+        link: '/mission',
     },
     {
         id:4,
         label: 'Anomalies',
-        link: '/tasks/list',
+        link: '/anomalies',
         icon: 'bx bx-task',
     },
     {
@@ -29,12 +29,6 @@ export const MENU: MenuItem[] = [
         link: '/visites',
         icon: 'bx bx-walk',
         parentId: 3
-    },
-    {
-        id:6,
-        label: 'Calendrier',
-        icon: 'bx bx-calendar',
-        link: '/calendar',
     },
     {
         id:7,
@@ -95,16 +89,23 @@ export const MENU: MenuItem[] = [
         subItems: [
             {
                 id:16,
-                label: 'Départements',
-                link: '/departements',
-                checkPermissions: 'departements',
+                label: 'Départ',
+                link: '/departments',
+                checkPermissions: 'departments',
                 parentId: 15
             },
             {
                 id:17,
                 label: 'Appareils coupeur',
-                link: '/appareils',
-                checkPermissions: 'appareils',
+                link: '/nodes',
+                checkPermissions: 'nodes',
+                parentId: 15
+            },
+            {
+                id:18,
+                label: 'Tronçons',
+                link: '/edges',
+                checkPermissions: 'edges',
                 parentId: 15
             },
             {

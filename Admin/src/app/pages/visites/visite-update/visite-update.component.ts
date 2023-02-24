@@ -10,38 +10,44 @@ import { visiteService } from '../visite.service';
 })
 export class visiteUpdateComponent  {
   breadCrumbItems: Array<{}>;
+  showError: boolean = false;
   id: number;
 
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: visiteService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Mise à jour de visite', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    service.loadDepartements();
-    service.loadSources();
-    service.loadDestinations();
+    service.loadDepartments();
+    service.loadANodes();
+    service.loadBNodes();
     service.loadTeams();
     service.visiteForm = fb.group({
       date: [""],
-      departement: ["", Validators.required],
-      source: [""],
-      destination: [""],
+      department: ["", Validators.required],
+      nodeA: ["", Validators.required],
+      nodeB: [[]],
       nbSupport: [null],
       team: [""],
     });
     service.getByKey(this.id).subscribe((obj) => {
-      service.loadDepartements(obj.departement ? [obj.departement] : []);
-      service.loadSources(obj.source ? [obj.source] : []);
-      service.loadDestinations(obj.destination ? [obj.destination] : []);
+      service.loadDepartments(obj.node_a.department ? [obj.node_a.department] : []);
       service.loadTeams(obj.team ? [obj.team] : []);
+
+      service.loadANodes(obj.node_a ? [obj.node_a] : []);
+      service.loadBNodes(obj.node_b ? obj.node_b : []);
 
       service.visiteForm.setValue({
         date: obj.date,
         nbSupport: obj.nbSupport,
-        destination: obj.destination ? obj.destination["@id"] : null,
-        departement: obj.departement ? obj.departement["@id"] : null,
-        source: obj.source ? obj.source["@id"] : null,
         team: obj.team ? obj.team["@id"] : null,
+
+        department: obj.node_a.department ? obj.node_a.department["@id"] : null,
+        nodeA :obj.node_a ? obj.node_a["@id"] : null,
+        nodeB : obj.node_b.length ? obj.node_b.map((e)=>e["@id"]) : [],
       });
     });
   }
 
 }
+
+
+

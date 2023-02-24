@@ -1,13 +1,12 @@
-import { AppareilCoupeur, Departement, Team } from ".";
+import { Node, Team } from ".";
 
 export interface Visite {
     id?: number;
     date?: string;
-    departement?: Departement;
-    source?: AppareilCoupeur;
-    destination?: AppareilCoupeur;
     nbSupport?: number;
     team?:Team
     nbAnomalies?:number;
+    node_a?: Node;
+    node_b?: Node[];
 }
 

@@ -1,0 +1,285 @@
+<div class="container-fluid mb-5">
+  
+  <!-- actions -->
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Liste des anomalies"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    
+    <div class="col-auto">
+      <button class="btn bg-light text-primary ms-2" 
+        data-toggle="collapse" *ngIf="authService.isAuthorized('anomalies_export')"
+        (click)="hideExport = !hideExport"
+        title="Exporter">
+        <i class="fas fa-upload"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Importer" 
+        *ngIf="authService.isAuthorized('anomalies_import')">
+        <i class="fas fa-download"></i>
+      </button>
+      <a routerLink="/anomalies/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('anomalies_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <!-- data -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.anomalyForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th width="10%">Statut</th>
+                  <th width="10%">Priorité</th>
+                  <th>Anomalie</th>
+                  <th width="15%">Créé par</th>
+                  <th width="15%">Départ</th>
+                  <th width="15%">Date</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- search -->
+                <tr valign="middle">
+
+                  <!-- severity -->
+                  <td>
+                    <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
+                      <ng-option *ngFor="let option of service.severityOptions" [value]="option.value">
+                        {{ option.label }}
+                      </ng-option>
+                    </ng-select>
+                  </td>
+                  
+                  <!-- Status -->
+                  <td>
+                  <ng-select [searchable]="false" formControlName="status" placeholder="Statut..">
+                    <ng-option value="true">Terminé</ng-option>
+                    <ng-option value="false">En attente</ng-option>
+                  </ng-select>
+                  </td>
+                  <!-- title -->
+                  <td><input type="text" placeholder="Anomalie..." formControlName="title" #searchTitle class="form-control"></td>
+                  <!-- Created by -->
+                  <td>
+                    <ng-select [items]="service.users$ | async"
+                              formControlName="users.id[]"
+                              bindLabel="fullName"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Utilisateurs.."
+                              [loading]="service.usersLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.usersInput$">
+                    </ng-select>
+                  </td>
+                  <!-- Départ -->
+                  <td>
+                    <ng-select [items]="service.departments$ | async"
+                              #searchDepar
+                              formControlName="edge.department.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Départ.."
+                              [loading]="service.departmentLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.departmentInput$">
+                    </ng-select>
+                  </td>
+                  <!-- date -->
+                  <td>
+                    <div class="d-flex gap-2">
+                    <div class="input-group clockpicker">
+                      <input #searchDateStart ngbDatepicker formControlName="after" class="form-control" (click)="ds.open()" placeholder="De..." #ds="ngbDatepicker">
+                    </div>
+                    <div class="input-group clockpicker">
+                      <input #searchDateEnd ngbDatepicker formControlName="before" class="form-control" (click)="de.open()" placeholder="À..." #de="ngbDatepicker">
+                    </div>
+                    </div>
+                  </td>
+                  
+                 <!-- Actions -->
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <!-- state -->
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="8"
+                    *ngIf="!(service.anomalies$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="8"
+                    *ngIf="(service.anomalies$ | async) && (service.anomalies$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <!-- data -->
+                <tr *ngFor="let item of (service.anomalies$ | async); let i = index" valign="middle">
+                  <!-- status -->
+                  <!-- Terminé / En attente-->
+                  <td>
+                    <ui-switch 
+                        [checked]="item.status" 
+                        [disabled]="!authService.isAuthorized('anomalies_update')" 
+                        (changeEvent)="service.updateStatus($event, item.id)"
+                        [loading]="service.statusLoading"
+                        uncheckedLabel="En attente"
+                        checkedLabel="Terminé"
+                        checkedTextColor="#fff"
+                    >
+                    <i class="fa fa-spinner fa-pulse" *ngIf="service.statusLoading"></i>
+                  </ui-switch>
+                  </td>
+                  <!-- severity -->
+                  <!-- élevé, faible ou normal -->
+                  <td>
+                    <span class="badge badge-pill font-size-11 badge-soft-{{item.severity === 'NORMAL' ? 'success' : (item.severity === 'ELEVE' ? 'danger' : 'warning')}}">
+                      {{item.severity === "NORMAL" ? "Normal": (item.severity === "ELEVE" ? "Élevé" : "Faible")}}
+                    </span>
+                  </td>
+                  <!-- title -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.title"
+                      [term]="searchTitle.value"
+                    ></ngb-highlight>
+                  </td>
+                  <!-- Créé par -->
+                  <td>
+                    <a 
+                      *ngIf="item.createdBy"
+                      [routerLink]="authService.isAuthorized('users_details') ? ['/users/details', item.createdBy.id] : null"
+                      target="_blank" class="d-flex align-items-center">
+                      <div class="header-profile-user bg-transparent me-2"><span class="avatar-title rounded-circle bg-transparent border text-muted small"><i class="fas fa-user"></i></span></div>
+                      {{item.createdBy.fullName}}
+                    </a>
+                  </td>
+                  <!-- department -->
+                  <td>
+                    <ng-container *ngIf="item.edge"> 
+                      <a 
+                        *ngIf="item.edge.departments"
+                        [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.edge.departments.id] : null"
+                        target="_blank">{{item.edge.departments.titre}}</a>
+                      - <a 
+                        [routerLink]="authService.isAuthorized('edges_details') ? ['/edges/details', item.edge.id] : null"
+                        target="_blank">{{item.edge.titre}}</a>
+                    </ng-container>
+                  </td>
+                   <!-- date -->
+                   <td>
+                    <ngb-highlight
+                      [result]="item.createdAt | date:'medium':'Africa/Casablanca'"
+                      [term]="searchDateStart.value+searchDateEnd.value"
+                    ></ngb-highlight>
+                  </td>
+
+                  <!-- actions -->
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('anomalies_details') || authService.isAuthorized('anomalies_update') || authService.isAuthorized('anomalies_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_update')"
+                          [routerLink]="['update', item.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_delete')"
+                          (click)="service.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

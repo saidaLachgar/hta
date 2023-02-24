@@ -5,13 +5,15 @@ const entityMetadata: EntityMetadataMap = {
   user_permissions: {},
   logs: {},
   teams: {},
-  departements: {},
+  departments: {},
   media_objects: {},
   communes: {},
+  edges: {},
   postes: {},
-  travauxes: {},
+  missions: {},
+  anomalies: {},
   visites: {},
-  appareil_coupeurs: {},
+  nodes: {},
 };
 
 const pluralNames = { 
@@ -19,13 +21,15 @@ const pluralNames = {
   user_permissions: 'user_permissions',
   logs: 'logs',
   teams: 'teams',
-  departements: 'departements',
+  departments: 'departments',
   media_objects: 'media_objects',
   communes: 'communes',
+  edges: 'edges',
   postes: 'postes',
-  travauxes: 'travauxes',
+  missions: 'missions',
+  anomalies: 'anomalies',
   visites: 'visites',
-  appareil_coupeurs: 'appareil_coupeurs',
+  nodes: 'nodes',
  };
 
 export const entityConfig: EntityDataModuleConfig = { 

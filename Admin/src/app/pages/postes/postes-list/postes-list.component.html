@@ -74,7 +74,7 @@
               <thead>
                 <tr>
                   <th width="13%">Designation</th>
-                  <th width="16%">Départements</th>
+                  <th width="16%">Départ</th>
                   <th width="9%">MLE</th>
                   <th width="9%">P KVA</th>
                   <th width="9%">Nb de clients</th>
@@ -89,17 +89,17 @@
                 >
                   <td><input type="text" placeholder="Designation..." formControlName="designation" #searchDesignation class="form-control"></td>
                   <td>
-                    <ng-select [items]="posteService.departements$ | async"
+                    <ng-select [items]="posteService.departments$ | async"
                               #searchDepar
-                              formControlName="departement.id[]"
+                              formControlName="node.department.id[]"
                               bindLabel="titre"
                               bindValue="id"
                               [multiple]="true"
                               [minTermLength]="2"
-                              placeholder="Départements.."
-                              [loading]="posteService.departementLoading"
+                              placeholder="Départ.."
+                              [loading]="posteService.departmentLoading"
                               typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="posteService.departementInput$">
+                              [typeahead]="posteService.departmentInput$">
                     </ng-select>
                   </td>
                   <td><input type="text" placeholder="MLE..." formControlName="MLE" #searchMLE class="form-control"></td>
@@ -170,9 +170,9 @@
 
                   <td>
                     <a 
-                      *ngIf="poste.departement"
-                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', poste.departement.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{poste.departement.titre}}</a>
+                      *ngIf="poste.node.department"
+                      [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', poste.node.department.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{poste.node.department.titre}}</a>
                   </td>
 
                   <td>

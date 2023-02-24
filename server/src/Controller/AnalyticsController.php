@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Travaux;
+use App\Entity\Mission;
 
 class AnalyticsController extends AbstractController
 {
@@ -24,10 +24,10 @@ class AnalyticsController extends AbstractController
    */
   public function testes(Request $request)
   {
-    /** @var \App\Repository\TravauxRepository $TravauxRepo */
-    $TravauxRepo = $this->em->getRepository(Travaux::class);
+    /** @var \App\Repository\MissionRepository $MissionRepo */
+    $MissionRepo = $this->em->getRepository(Mission::class);
 
-    $data = $TravauxRepo->test();
+    $data = $MissionRepo->test();
 
     return new JsonResponse($data);
   }
@@ -36,10 +36,10 @@ class AnalyticsController extends AbstractController
    */
   public function getTotalDMS(Request $request)
   {
-    /** @var \App\Repository\TravauxRepository $TravauxRepo */
-    $TravauxRepo = $this->em->getRepository(Travaux::class);
+    /** @var \App\Repository\MissionRepository $MissionRepo */
+    $MissionRepo = $this->em->getRepository(Mission::class);
 
-    $data = $TravauxRepo->getTotalDMS();
+    $data = $MissionRepo->getTotalDMS();
 
     return new JsonResponse($data);
   }
@@ -48,10 +48,10 @@ class AnalyticsController extends AbstractController
    */
   public function getInterruptionsParType(Request $request)
   {
-    /** @var \App\Repository\TravauxRepository $TravauxRepo */
-    $TravauxRepo = $this->em->getRepository(Travaux::class);
+    /** @var \App\Repository\MissionRepository $MissionRepo */
+    $MissionRepo = $this->em->getRepository(Mission::class);
 
-    $data = $TravauxRepo->getInterruptionsParType();
+    $data = $MissionRepo->getInterruptionsParType();
 
     return new JsonResponse($data);
   }

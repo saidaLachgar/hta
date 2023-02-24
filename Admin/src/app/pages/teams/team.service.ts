@@ -7,10 +7,10 @@ import {
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Pagination, Team, Departement, User } from "src/app/core/models";
+import { Pagination, Team, Department, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
-import { departementService } from "../departements/departement.service";
+import { departmentService } from "../departments/department.service";
 import { UserService } from "../users/user.service";
 
 @Injectable({
@@ -25,9 +25,9 @@ export class teamService extends EntityCollectionServiceBase<Team> {
   membreInput$ = new Subject<string>();
 
 
-  departements$: Observable<Departement[]>;
-  departementLoading = false;
-  departementInput$ = new Subject<string>();
+  departments$: Observable<Department[]>;
+  departmentLoading = false;
+  departmentInput$ = new Subject<string>();
 
 
 
@@ -40,7 +40,7 @@ export class teamService extends EntityCollectionServiceBase<Team> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartementService: departementService,
+    public DepartmentService: departmentService,
     public UserService: UserService,
     private toast: HotToastService
   ) {
@@ -54,33 +54,33 @@ export class teamService extends EntityCollectionServiceBase<Team> {
     this.findByCriteria({ page: 1 });
   }
   
-  loadMembers(defaultVal = []) : void{
+  loadMembers(defaultVal = []): void {
     this.membres$ = concat(
       of(defaultVal), // default items
       this.membreInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.membreLoading = true),
-          switchMap(term => this.UserService.getWithQuery("properties[]=id&properties[]=fullName&fullName="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.membreLoading = false)
-          ))
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.membreLoading = true),
+        switchMap(term => this.UserService.getWithQuery("properties[]=id&properties[]=fullName&fullName="+term).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.membreLoading = false)
+        ))
       )
     );
   }
-  loadDepartements(defaultVal = []) : void{
-    this.departements$ = concat(
+  loadDepartments(defaultVal = []): void {
+    this.departments$ = concat(
       of(defaultVal), // default items
-      this.departementInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.departementLoading = true),
-          switchMap(term => this.DepartementService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.departementLoading = false)
-          ))
+      this.departmentInput$.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.departmentLoading = true),
+        switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.departmentLoading = false)
+        ))
       )
     );
   }
@@ -170,8 +170,8 @@ export class teamService extends EntityCollectionServiceBase<Team> {
   get membres() {
     return this.teamForm.get("membres");
   }
-  get departements() {
-    return this.teamForm.get("departements");
+  get departments() {
+    return this.teamForm.get("departments");
   }
 
   /**

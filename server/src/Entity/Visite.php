@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\VisiteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,7 +13,6 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
-
 
 
 /**
@@ -31,10 +32,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
- *          "departements.id"=SearchFilter::STRATEGY_EXACT,
  *          "team.id"=SearchFilter::STRATEGY_EXACT,
- *          "source.id"=SearchFilter::STRATEGY_EXACT,
- *          "destination.id"=SearchFilter::STRATEGY_EXACT,
  *          "nbSupport"=SearchFilter::STRATEGY_EXACT,
  *      }
  * )
@@ -42,9 +40,9 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  * @ApiFilter(DateFilter::class, properties={"date"})
  * @ORM\Entity(repositoryClass=VisiteRepository::class)
  */
+
 class Visite
 {
-    public static $ROUTE_NAME = "visites/details/:id";
     public static $TRANSLATED_NAME = "visite";
     /**
      * @ORM\Id
@@ -61,25 +59,6 @@ class Visite
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Departement::class)
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"visite"})
-     */
-    private $departement;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=AppareilCoupeur::class)
-     * @Groups({"visite"})
-     */
-    private $source;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=AppareilCoupeur::class)
-     * @Groups({"visite"})
-     */
-    private $destination;
-
-    /**
      * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"visite"})
      */
@@ -90,6 +69,24 @@ class Visite
      * @Groups({"visite"})
      */
     private $team;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="a_visites")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"visite"})
+     */
+    private $node_a;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Node::class, inversedBy="b_visites")
+     * @Groups({"visite"})
+     */
+    private $node_b;
+
+    public function __construct()
+    {
+        $this->node_b = new ArrayCollection();
+    }
     
     public function __toString()
     {
@@ -109,42 +106,6 @@ class Visite
     public function setDate(?\DateTimeInterface $date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getDepartement(): ?Departement
-    {
-        return $this->departement;
-    }
-
-    public function setDepartement(?Departement $departement): self
-    {
-        $this->departement = $departement;
-
-        return $this;
-    }
-
-    public function getSource(): ?AppareilCoupeur
-    {
-        return $this->source;
-    }
-
-    public function setSource(?AppareilCoupeur $source): self
-    {
-        $this->source = $source;
-
-        return $this;
-    }
-
-    public function getDestination(): ?AppareilCoupeur
-    {
-        return $this->destination;
-    }
-
-    public function setDestination(?AppareilCoupeur $destination): self
-    {
-        $this->destination = $destination;
 
         return $this;
     }
@@ -169,6 +130,42 @@ class Visite
     public function setTeam(?Team $team): self
     {
         $this->team = $team;
+
+        return $this;
+    }
+
+    public function getNodeA(): ?Node
+    {
+        return $this->node_a;
+    }
+
+    public function setNodeA(?Node $node_a): self
+    {
+        $this->node_a = $node_a;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Node>
+     */
+    public function getNodeB(): Collection
+    {
+        return $this->node_b;
+    }
+
+    public function addNodeB(Node $nodeB): self
+    {
+        if (!$this->node_b->contains($nodeB)) {
+            $this->node_b[] = $nodeB;
+        }
+
+        return $this;
+    }
+
+    public function removeNodeB(Node $nodeB): self
+    {
+        $this->node_b->removeElement($nodeB);
 
         return $this;
     }

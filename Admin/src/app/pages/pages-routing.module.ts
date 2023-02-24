@@ -16,9 +16,9 @@ const routes: Routes = [
       import("./teams/team.module").then((m) => m.teamModule),
   },
   {
-    path: "departements",
+    path: "departments",
     loadChildren: () =>
-      import("./departements/departement.module").then((m) => m.departementModule),
+      import("./departments/department.module").then((m) => m.departmentModule),
   },
   {
     path: "postes",
@@ -26,9 +26,9 @@ const routes: Routes = [
       import("./postes/poste.module").then((m) => m.posteModule),
   },
   {
-    path: "appareils",
+    path: "nodes",
     loadChildren: () =>
-      import("./appareils/appareil.module").then((m) => m.appareilModule),
+      import("./nodes/node.module").then((m) => m.nodeModule),
   },
   {
     path: "communes",
@@ -36,14 +36,24 @@ const routes: Routes = [
       import("./communes/commune.module").then((m) => m.communeModule),
   },
   {
+    path: "edges",
+    loadChildren: () =>
+      import("./edges/edge.module").then((m) => m.edgeModule),
+  },
+  {
+    path: "anomalies",
+    loadChildren: () =>
+      import("./anomalies/anomaly.module").then((m) => m.anomalyModule),
+  },
+  {
     path: "visites",
     loadChildren: () =>
       import("./visites/visite.module").then((m) => m.visiteModule),
   },
   {
-    path: "travaux",
+    path: "mission",
     loadChildren: () =>
-      import("./travaux/travaux.module").then((m) => m.travauxModule),
+      import("./mission/mission.module").then((m) => m.missionModule),
   },
   {
     path: "autorisation",

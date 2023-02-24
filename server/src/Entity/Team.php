@@ -34,7 +34,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      properties={
  *          "titre"=SearchFilter::STRATEGY_PARTIAL,
  *          "membres.id"=SearchFilter::STRATEGY_EXACT,
- *          "departements.id"=SearchFilter::STRATEGY_EXACT
+ *          "departments.id"=SearchFilter::STRATEGY_EXACT
  *      }
  *    )
  * @ApiFilter(PropertyFilter::class)
@@ -42,38 +42,42 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  */
 class Team
 {
-    public static $ROUTE_NAME = "teams/details/:id";
     public static $TRANSLATED_NAME = "équipe";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @Groups({"teams","users", "visite", "depar:read"})
      * @ORM\Column(type="integer")
+     * 
+     * @Groups({"teams", "users"})
      */
     private $id;
 
     /**
-     * @Groups({"teams","users", "visite", "depar:read"})
      * @ORM\Column(type="string", length=255, nullable=true)
+     * 
+     * @Groups({"teams", "depar", "users"})
      */
     private $titre;
 
     /**
-     * @Groups({"teams"})
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="team")
+     * 
+     * @Groups({"teams"})
      */
     private $membres;
 
+
     /**
+     * @ORM\OneToMany(targetEntity=Department::class, mappedBy="team")
+     * 
      * @Groups({"teams"})
-     * @ORM\OneToMany(targetEntity=Departement::class, mappedBy="team")
      */
-    private $departements;
+    private $departments;
 
     public function __construct()
     {
         $this->membres = new ArrayCollection();
-        $this->departements = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
     public function __toString()
     {
@@ -127,29 +131,29 @@ class Team
     }
 
     /**
-     * @return Collection<int, Departement>
+     * @return Collection<int, Department>
      */
-    public function getDepartements(): Collection
+    public function getDepartments(): Collection
     {
-        return $this->departements;
+        return $this->departments;
     }
 
-    public function addDepartement(Departement $departement): self
+    public function addDepartment(Department $department): self
     {
-        if (!$this->departements->contains($departement)) {
-            $this->departements[] = $departement;
-            $departement->setTeam($this);
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+            $department->setTeam($this);
         }
 
         return $this;
     }
 
-    public function removeDepartement(Departement $departement): self
+    public function removeDepartment(Department $department): self
     {
-        if ($this->departements->removeElement($departement)) {
+        if ($this->departments->removeElement($department)) {
             // set the owning side to null (unless already changed)
-            if ($departement->getTeam() === $this) {
-                $departement->setTeam(null);
+            if ($department->getTeam() === $this) {
+                $department->setTeam(null);
             }
         }
 

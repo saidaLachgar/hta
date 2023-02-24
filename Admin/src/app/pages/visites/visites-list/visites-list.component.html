@@ -119,48 +119,47 @@
                   </td>
                   <!-- Départ -->
                   <td>
-                    <ng-select [items]="service.departements$ | async"
+                    <ng-select [items]="service.departments$ | async"
                               #searchDepar
-                              formControlName="departements.id[]"
+                              formControlName="nodeA.departments.id[]"
                               bindLabel="titre"
                               bindValue="id"
                               [multiple]="true"
-                              
                               [minTermLength]="2"
-                              placeholder="Départements.."
-                              [loading]="service.departementLoading"
+                              placeholder="Départ.."
+                              [loading]="service.departmentLoading"
                               typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="service.departementInput$">
+                              [typeahead]="service.departmentInput$">
                     </ng-select>
                   </td>
-                  <!-- source -->
-                  <td>
-                    <ng-select [items]="service.sources$ | async"
-                        #searchSources
-                        formControlName="source.id[]"
+                   <!-- nodeA -->
+                   <td>
+                    <ng-select [items]="service.ANode$ | async"
+                        #searchANode
+                        formControlName="nodeA.id[]"
                         bindLabel="titre"
                         bindValue="id"
                         [multiple]="true"
                         [minTermLength]="2"
-                        placeholder="Source.."
-                        [loading]="service.sourceLoading"
+                        placeholder="De.."
+                        [loading]="service.ANodeLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="service.sourceInput$">
+                        [typeahead]="service.ANodeInput$">
                     </ng-select>
                   </td>
-                  <!-- destination -->
+                  <!-- nodeB -->
                   <td>
-                    <ng-select [items]="service.destinations$ | async"
-                        #searchDestinations
-                        formControlName="destination.id[]"
+                    <ng-select [items]="service.BNode$ | async"
+                        #searchBNode
+                        formControlName="nodeA.id[]"
                         bindLabel="titre"
                         bindValue="id"
                         [multiple]="true"
                         [minTermLength]="2"
-                        placeholder="destination.."
-                        [loading]="service.destinationLoading"
+                        placeholder="De.."
+                        [loading]="service.BNodeLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="service.destinationInput$">
+                        [typeahead]="service.BNodeInput$">
                     </ng-select>
                   </td>
                   <!-- Nb Support -->
@@ -191,7 +190,7 @@
                       <i class="bx bx-x me-1"></i>Réinitialiser
                     </button>
                   </td>
-                  <!-- anomalies -->
+                  <!-- visites -->
                   <td></td>
                 </tr>
                 <!-- state -->
@@ -220,27 +219,28 @@
                       [term]="searchDateStart.value+searchDateEnd.value"
                     ></ngb-highlight>
                   </td>
-                  <!-- departement -->
+                  <!-- department -->
                   <td>
                     <a 
-                      *ngIf="item.departement"
-                      [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', item.departement.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.departement.titre}}</a>
+                      *ngIf="item.nodeA.departments"
+                      [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.nodeA.departments.id] : null"
+                      target="_blank">{{item.nodeA.departments.titre}}</a>
                   </td>
-                  <!-- source -->
+                  <!-- nodeA -->
                   <td>
                     <a 
-                      *ngIf="item.source"
-                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.source.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.source.titre}}</a>
+                      *ngIf="item.nodeA"
+                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.nodeA.id] : null"
+                      target="_blank">{{item.nodeA.titre}}</a>
                   </td>
                   
-                  <!-- designation -->
+                  <!-- nodeB -->
                   <td>
-                    <a 
-                      *ngIf="item.destination"
-                      [routerLink]="authService.isAuthorized('appareils_details') ? ['/appareils/details', item.destination.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.destination.titre}}</a>
+                    <div *ngFor="let nodeB of item.nodeB">
+                      <a 
+                        [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', nodeB.id] : null"
+                        target="_blank">- {{nodeB.titre}}</a>
+                    </div>
                   </td>
                   
                   <!-- Nb Support -->
@@ -256,7 +256,7 @@
                     <a 
                       *ngIf="item.team"
                       [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', item.team.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{item.team.titre}}</a>
+                      target="_blank">{{item.team.titre}}</a>
                   </td>
 
 

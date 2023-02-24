@@ -1,25 +1,26 @@
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title
-      title="Mettre à jour l'équipe"
+      title="Mettre à jour le poste"
+      [Loading]="posteService.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
   
     <form class="row mt-4" [formGroup]="posteService.posteForm" (ngSubmit)="posteService.onUpdate(id)">
-      <fieldset class="col-12" [disabled]="posteService.loading$ | async">
-        <div class="card">
-          <div class="card-body">
+      <div class="col-12">
+        <div class="card card-body">
+          <!-- <fieldset [disabled]="(posteService.loading$ | async) && !posteService.submitted"> -->
             
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Designation *</label>
+              <label for="input-3" class="col-md-2 col-form-label">Designation</label>
               <div class="col-md-10">
                 <input
                   formControlName="designation"
+                  id="input-3" 
                   [ngClass]="{'is-invalid':posteService.designation.invalid && posteService.submitted}"
                   class="form-control"
                   type="text"
-                  id="name-input"
                 />
                 <div
                   *ngIf="posteService.submitted && posteService.designation.errors"
@@ -29,58 +30,85 @@
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Départements</label>
-              <div class="col-md-10">
-              <ng-select [items]="posteService.departements$ | async"
-                        formControlName="departement"
+              <label for="input-2" class="col-md-2 col-form-label">Départ</label>
+              <div class="col-md-10" id="input-2" >
+              <ng-select [items]="posteService.departments$ | async"
+                        formControlName="department"
                         bindLabel="titre"
                         bindValue="@id"
                         [minTermLength]="2"
-                        [loading]="posteService.departementLoading"
+                        [loading]="posteService.departmentLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="posteService.departementInput$">
+                        [typeahead]="posteService.departmentInput$">
               </ng-select>
+              <div #postfeedback *ngIf="showError && !posteService.department.value"
+                  class="invalid-feedback d-block">Ce champ est obligatoire.</div>
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">MLE</label>
+              <label for="input-1" class="col-md-2 col-form-label">Appareils coupeur</label>
+              <div class="col-md-10" (click)="showError = true" id="input-1">
+                  <ng-select [items]="posteService.nodes$ | async"
+                            formControlName="node"
+                            bindLabel="titre"
+                            bindValue="@id"
+                            [minTermLength]="2"
+                            [readonly]="!posteService.department.value"
+                            [loading]="posteService.nodeLoading"
+                            [ngClass]="{'is-invalid':posteService.node.invalid && posteService.submitted}"
+                            typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                            [typeahead]="posteService.nodeInput$">
+                  </ng-select>
+                  <div
+                    *ngIf="posteService.submitted && posteService.node.errors"
+                    class="invalid-feedback">
+                    <span *ngIf="posteService.node.errors.required">Ce champ est obligatoire.</span>
+                  </div>
+              </div>
+            </div>
+  
+            <div class="mb-3 row">
+              <label for="input-4" class="col-md-2 col-form-label">MLE</label>
               <div class="col-md-10">
                 <input
                   formControlName="MLE"
+                  id="input-4" 
                   class="form-control"
                   type="text"
-                  id="name-input"
+                  
                 />
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">P KVA</label>
+              <label for="input-5" class="col-md-2 col-form-label">P KVA</label>
               <div class="col-md-10">
                 <input
                   formControlName="PKVA"
+                  id="input-5" 
                   class="form-control"
                   type="text"
                   type="number"
                   step="1" 
-                  id="name-input"
+                  
                 />
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Nb de clients</label>
+              <label for="input-6" class="col-md-2 col-form-label">Nb de clients</label>
               <div class="col-md-10">
                 <input
                   formControlName="nbClients"
+                  id="input-6" 
                   class="form-control"
                   type="number"
                   step="1" 
-                  id="name-input"
+                  
                 />
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Commune</label>
-              <div class="col-md-10">
+              <label for="input-7" class="col-md-2 col-form-label">Commune</label>
+              <div class="col-md-10" id="input-7" >
                 <ng-select [items]="posteService.communes$ | async"
                         formControlName="commune"
                         bindLabel="titre"
@@ -93,40 +121,25 @@
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Date MST</label>
+              <label for="input-8" class="col-md-2 col-form-label">Date MST</label>
               <div class="col-md-10">
                 <div class="input-group clockpicker">
-                  <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="dateMst" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
+                  <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" id="input-8" formControlName="dateMst" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
                 </div>
               </div>
             </div>
-            <!-- <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Appareils coupeur</label>
-              <div class="col-md-10">
-                <ng-select [items]="posteService.appareils$ | async"
-                          formControlName="appareils"
-                          bindLabel="titre"
-                          bindValue="@id"
-                          [multiple]="true"
-                          [minTermLength]="2"
-                          [loading]="posteService.appareilLoading"
-                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                          [typeahead]="posteService.appareilInput$">
-                </ng-select>
-              </div>
-            </div> -->
-  
+            
             <div class="row justify-content-end">
               <div class="col-auto">
                 <button class="btn btn-light me-2" routerLink="/postes"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
-                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="posteService.submitted && (posteService.loading$ | async)"></i> Sauvegarder</button>
+                <button type="submit" [disabled]="posteService.loading$ | async" class="btn btn-primary">Sauvegarder</button>
               </div>
             </div>
-          </div>
+        <!-- </fieldset> -->
         </div>
-      </fieldset>
+      </div>
       <!-- end col -->
     </form>
     <!-- end row -->
-  </div>
+</div>
   

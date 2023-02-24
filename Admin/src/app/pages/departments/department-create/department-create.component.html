@@ -1,0 +1,89 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <app-page-title
+    title="Nouveau Départ"
+    [breadcrumbItems]="breadCrumbItems"
+  ></app-page-title>
+  <!-- end page title -->
+
+  <form class="row mt-4" [formGroup]="service.departmentForm" (ngSubmit)="service.onCreate()">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+
+
+          <div class="mb-3 row">
+            <label for="name-input" class="col-md-2 col-form-label">Nom</label>
+            <div class="col-md-10">
+              <input
+                formControlName="titre"
+                [ngClass]="{'is-invalid':service.titre.invalid && service.submitted}"
+                class="form-control"
+                type="text"
+                id="name-input"
+              />
+              <div
+                *ngIf="service.submitted && service.titre.errors"
+                class="invalid-feedback">
+                <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="name-input" class="col-md-2 col-form-label">Équipe</label>
+            <div class="col-md-10">
+              <ng-select [items]="service.teams$ | async"
+                        formControlName="team"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="service.teamLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.teamInput$">
+              </ng-select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="longueur-input" class="col-md-2 col-form-label">Longueur</label>
+            <div class="col-md-10">
+              <input
+                formControlName="longueur"
+                class="form-control"
+                type="number"
+                step="0.01" 
+                id="longueur-input"
+              />
+            </div>
+          </div>
+          <div class="mb-4 row form-group">
+            <label class="col-lg-2 col-form-label text-lg-right">Shémas LHTA :</label>
+            <div class="col-lg-10">
+                <!--begin::Dropzone-->
+                <button type="button" class="btn btn-sm btn-info" (click)="upload.click()">
+                  Joindre un visuel
+                </button>
+                <button type="button" class="btn bg-soft btn-sm bg-info text-info ms-2" *ngIf="service.selectedFile" (click)="upload.value = ''; service.selectedFile=null">Réinitialiser</button>
+                <input type="file" accept="image/*" #upload (change)="service.selectedFile = upload.files" style="opacity: 0;"/>
+                <div class="bg-light d-flex p-2 text-muted rounded mt-2" *ngFor="let file of service.selectedFile">
+                  <b class="font-size-10">{{ file.name }} ({{(file.size / (1024*1024)).toFixed(2) + 'MB'}})</b>
+                </div>
+                <!--begin::Hint-->
+                <div *ngIf="!service.selectedFile" class="form-text text-muted mt-2">Seuls les fichiers de type images sont acceptés.</div>
+                <!--end::Hint-->
+            </div>
+            <!--end::Col-->
+          </div>
+          
+          <div class="row justify-content-end">
+            <div class="col-auto">
+              <button class="btn btn-light me-2" routerLink="/departments"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.isLoading"></i> Ajouter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end col -->
+  </form>
+  <!-- end row -->
+</div>

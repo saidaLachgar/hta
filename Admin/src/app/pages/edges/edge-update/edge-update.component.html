@@ -1,0 +1,104 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <app-page-title
+      title="Mettre à jour le tronçon"
+      [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+  
+    <form class="row mt-4" [formGroup]="service.edgeForm" (ngSubmit)="service.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="service.loading$ | async">
+        <div class="card">
+          <div class="card-body">
+           
+
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Titre</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="titre"
+                  [ngClass]="{'is-invalid':service.titre.invalid && service.submitted}"
+                  class="form-control"
+                  type="text"
+                  id="name-input"
+                />
+                <div
+                  *ngIf="service.submitted && service.titre.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="input-2" class="col-md-2 col-form-label">Départ</label>
+              <div class="col-md-10" id="input-2" >
+              <ng-select [items]="service.departments$ | async"
+                        formControlName="department"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="service.departmentLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.departmentInput$">
+              </ng-select>
+              <div #postfeedback *ngIf="showError && !service.department.value"
+                  class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="input-1" class="col-md-2 col-form-label">De</label>
+              <div class="col-md-10" (click)="showError = true" id="input-1">
+                  <ng-select [items]="service.ANode$ | async"
+                            formControlName="node_a"
+                            bindLabel="titre"
+                            bindValue="@id"
+                            [minTermLength]="2"
+                            [readonly]="!service.department.value"
+                            [loading]="service.ANodeLoading"
+                            [ngClass]="{'is-invalid':service.ANode.invalid && service.submitted}"
+                            typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                            [typeahead]="service.ANodeInput$">
+                  </ng-select>
+                  <div
+                    *ngIf="service.submitted && service.ANode.errors"
+                    class="invalid-feedback">
+                    <span *ngIf="service.ANode.errors.required">Ce champ est obligatoire.</span>
+                  </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="input-1" class="col-md-2 col-form-label">À</label>
+              <div class="col-md-10" (click)="showError = true" id="input-1">
+                  <ng-select [items]="service.BNode$ | async"
+                            formControlName="node_b"
+                            bindLabel="titre"
+                            bindValue="@id"
+                            [minTermLength]="2"
+                            [readonly]="!service.department.value"
+                            [loading]="service.BNodeLoading"
+                            [ngClass]="{'is-invalid':service.BNode.invalid && service.submitted}"
+                            typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                            [typeahead]="service.BNodeInput$">
+                  </ng-select>
+                  <div
+                    *ngIf="service.submitted && service.BNode.errors"
+                    class="invalid-feedback">
+                    <span *ngIf="service.BNode.errors.required">Ce champ est obligatoire.</span>
+                  </div>
+              </div>
+            </div>
+  
+            <div class="row justify-content-end">
+              <div class="col-auto">
+                <button class="btn btn-light me-2" routerLink="/edges"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <!-- end col -->
+    </form>
+    <!-- end row -->
+  </div>
+  

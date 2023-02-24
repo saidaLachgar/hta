@@ -16,6 +16,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 /**
  * @ApiResource(
  *   order= {"id" = "DESC"},
+ *   normalizationContext={"groups"={"commune"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'communes_update')"},
  *      "get"= {"access_control"="is_granted('hasPermission', 'communes_details')"},
@@ -31,12 +32,12 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      properties={
  *          "titre"=SearchFilter::STRATEGY_PARTIAL,
  *      }
- * )@ApiFilter(PropertyFilter::class)
+ * )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=CommuneRepository::class)
  */
 class Commune
 {
-    public static $ROUTE_NAME = "communes/details/:id";
     public static $TRANSLATED_NAME = "commune";
 
     /**
@@ -44,14 +45,14 @@ class Commune
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"postes"})
+     * @Groups({"commune","postes"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"postes"})
+     * @Groups({"commune","postes"})
      */
     private $titre;
 

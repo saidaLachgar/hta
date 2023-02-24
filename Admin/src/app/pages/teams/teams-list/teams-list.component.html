@@ -24,7 +24,7 @@
               <thead>
                 <tr>
                   <th>Titre</th>
-                  <th width="30%">Départements</th>
+                  <th width="30%">Départ</th>
                   <th width="30%">Membres</th>
                   <th width="123px"></th>
                 </tr>
@@ -34,18 +34,18 @@
                 >
                   <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
                   <td>
-                    <ng-select [items]="teamService.departements$ | async"
+                    <ng-select [items]="teamService.departments$ | async"
                               #searchDepar
-                              formControlName="departements.id[]"
+                              formControlName="departments.id[]"
                               bindLabel="titre"
                               bindValue="id"
                               [multiple]="true"
                               
                               [minTermLength]="2"
-                              placeholder="Départements.."
-                              [loading]="teamService.departementLoading"
+                              placeholder="Départ.."
+                              [loading]="teamService.departmentLoading"
                               typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="teamService.departementInput$">
+                              [typeahead]="teamService.departmentInput$">
                     </ng-select>
                   </td>
                   <td>
@@ -98,9 +98,9 @@
                   
                   
                   <td>
-                    <div *ngFor="let depar of team.departements">
+                    <div *ngFor="let depar of team.departments">
                       <a 
-                        [routerLink]="authService.isAuthorized('departements_details') ? ['/departements/details', depar.id] : null"
+                        [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', depar.id] : null"
                         target="_blank" rel="noopener noreferrer">- {{depar.titre}}</a>
                     </div>
                   </td>

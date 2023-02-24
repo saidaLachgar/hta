@@ -59,15 +59,14 @@ class DoctrineSubscriber implements EventSubscriber
         if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject)) {
             $objectString = (string)$object; // ex : fullName
             $className = get_class($object); // returns fully-qualified class name
+            $classBasename = strtolower(basename(str_replace('\\', '/', $className))); // Get the class "basename" of the given object / class
             $instance = new $className(); // Creating class instance
             $translatedName = $instance::$TRANSLATED_NAME; // ex: utilisateur
             if( $eventType !== self::DELETE ){
-                $routeName = $instance::$ROUTE_NAME; // ex : users
-                if(strpos($routeName, ":id") !== false){
-                    $objectId = $object->getId(); // ex : 190
-                    $routeName = str_replace(":id",$objectId,$routeName);
-                }
-                $url =  $_ENV['FRONTEND_URL'].$routeName; // ex : /users/details/:id
+                $objectId = $object->getId(); // ex : 190
+                $url = $_ENV['FRONTEND_URL']."/". // ex : "http://localhost/"
+                    ($classBasename == "UserPermissions" ? "autorisation" :
+                    $classBasename."\/details\/".$objectId); // ex : "users/details/:id"
                 $urlHtml =  '<p class="mb-1">URL : <b><a href="'.$url.'">'.$url.'</a></b></p>';
             } else  $urlHtml="";
 
@@ -94,3 +93,13 @@ class DoctrineSubscriber implements EventSubscriber
         }
     }
 }
+// User "users"
+// Team "teams"
+// Department "departments"
+// Edge "edges"
+// Node "nodes"
+// Poste "postes"
+// Commune "communes"
+// Missio "mission"
+// Visite "visites"
+// UserPermissions = "autorisation";

@@ -1,0 +1,102 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <app-page-title
+    title="Nouveau anomaly"
+    [breadcrumbItems]="breadCrumbItems"
+  ></app-page-title>
+  <!-- end page title -->
+
+  <form class="row mt-4" [formGroup]="service.anomalyForm" (ngSubmit)="service.onCreate()">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="mb-3 row">
+            <div class="col-6">
+              <label>Priorité</label>
+              <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
+                <ng-option *ngFor="let option of service.severityOptions" [value]="option.value">
+                  {{ option.label }}
+                </ng-option>
+              </ng-select>
+            </div>
+            <div class="col-6">
+              <label>Statut</label>
+              <ng-select [searchable]="false" formControlName="status" placeholder="Statut..">
+                <ng-option [value]="true">Terminé</ng-option>
+                <ng-option [value]="false">En attente</ng-option>
+              </ng-select>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <div class="col-6">
+              <label>Départ</label>
+              <ng-select [items]="service.departments$ | async"
+                        formControlName="department"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="service.departmentLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.departmentInput$">
+              </ng-select>
+              <div #postfeedback *ngIf="showError && !service.department.value"
+                  class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+            </div>
+
+            <div class="col-6">
+              <label>Tronçon</label>
+              <ng-select [items]="service.edges$ | async"
+                        formControlName="edge"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        (click)="showError = true"
+                        [minTermLength]="2"
+                        [readonly]="!service.department.value"
+                        [loading]="service.edgesLoading"
+                        [ngClass]="{'is-invalid':service.edge.invalid && service.submitted}"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.edgesInput$">
+              </ng-select>
+              <div
+                *ngIf="service.submitted && service.edge.errors"
+                class="invalid-feedback">
+                <span *ngIf="service.edge.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <div class="col-12">
+              <label for="input-3">Anomalie</label>
+              <textarea
+                formControlName="title"
+                id="input-3" 
+                [ngClass]="{'is-invalid':service.title.invalid && service.submitted}"
+                class="form-control"
+                type="text"
+              ></textarea>
+              <div
+                *ngIf="service.submitted && service.title.errors"
+                class="invalid-feedback">
+                <span *ngIf="service.title.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="row justify-content-end">
+            <div class="col-auto">
+              <button class="btn btn-light me-2" routerLink="/anomalies"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.loading$ | async"></i> Ajouter</button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <!-- end col -->
+  </form>
+  <!-- end row -->
+</div>

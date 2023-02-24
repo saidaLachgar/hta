@@ -19,11 +19,11 @@ export class teamsListComponent {
   ) {
     teamService.findAll();
     teamService.loadMembers();
-    teamService.loadDepartements();
+    teamService.loadDepartments();
 
     teamService.teamForm = fb.group({
       titre: [''],
-      "departements.id[]": [''],
+      "departments.id[]": [''],
       "membres.id[]": [''],
     });
 
