@@ -15,7 +15,7 @@ export class edgeUpdateComponent {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: edgeService) { 
     this.breadCrumbItems = [{ label: 'Tronçons' }, { label: 'Mettre à jour l\'tronçon', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    service.loadDepartments();
+    service.loadDepartments(false);
     service.loadANodes();
     service.loadBNodes();
 
@@ -27,7 +27,6 @@ export class edgeUpdateComponent {
     });
 
     service.getByKey(this.id).subscribe((obj) => {
-      service.loadDepartments(obj.department ? [obj.department] : []);
       service.loadANodes(obj.node_a ? [obj.node_a] : []);
       service.loadBNodes(obj.node_b ? [obj.node_b] : []);
       service.edgeForm.patchValue({

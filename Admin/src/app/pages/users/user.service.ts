@@ -115,10 +115,9 @@ export class UserService extends EntityCollectionServiceBase<User> {
     if (userForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let obj = userForm.value;
-    let user = Object.keys(obj)
-      .filter((k) => obj[k] != "" && obj[k] != null)
-      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as User;
+    let obj = Object.entries(userForm.value as User);
+    // remove empty values
+    const user = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
     user.roles = [user.roles.toString()];
     this.add(user).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),

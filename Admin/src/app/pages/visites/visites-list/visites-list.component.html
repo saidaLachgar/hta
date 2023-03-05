@@ -136,7 +136,7 @@
                    <td>
                     <ng-select [items]="service.ANode$ | async"
                         #searchANode
-                        formControlName="nodeA.id[]"
+                        formControlName="node_a.id[]"
                         bindLabel="titre"
                         bindValue="id"
                         [multiple]="true"
@@ -151,7 +151,7 @@
                   <td>
                     <ng-select [items]="service.BNode$ | async"
                         #searchBNode
-                        formControlName="nodeA.id[]"
+                        formControlName="node_b.id[]"
                         bindLabel="titre"
                         bindValue="id"
                         [multiple]="true"

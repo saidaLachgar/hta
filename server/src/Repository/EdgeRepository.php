@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Edge;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Service\GraphSearch;
 
 /**
  * @extends ServiceEntityRepository<Edge>
@@ -16,9 +17,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class EdgeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $GraphSearch;
+
+    public function __construct(ManagerRegistry $registry, GraphSearch $GraphSearch)
     {
         parent::__construct($registry, Edge::class);
+        $this->GraphSearch = $GraphSearch;
     }
 
     public function add(Edge $entity, bool $flush = false): void
@@ -37,6 +41,29 @@ class EdgeRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getEdgesByRange($depar,$node_a, $node_b = null)
+    {
+        if ($node_b !== null) {
+            // or use ';' if you used that delimiter
+            $node_b = array_map('intval', explode(',', $node_b));
+            // use $node_b_array as an array of integers
+        }
+
+        $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
+
+        $results =  $this->createQueryBuilder('e')
+            ->select("e.id")
+            ->andWhere('n.id IN (:nodes)')
+            ->setParameter('nodes', $nodesInRange)
+            ->innerJoin('e.node_a', 'n')
+            ->getQuery()
+            ->getResult()
+        ;
+        $edges = array_map('current', $results);
+
+        return $edges;
     }
 
 //    /**

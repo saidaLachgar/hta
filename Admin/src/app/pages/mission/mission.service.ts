@@ -5,15 +5,15 @@ import { Router } from "@angular/router";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
-  EntityCollectionServiceElementsFactory,
+  EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, take, tap } from "rxjs/operators";
-import { Pagination, Mission, Department, Node } from "src/app/core/models";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { Department, Mission, Node, Pagination, MISSION_ACTIONS } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
-import { nodeService } from "../nodes/node.service";
 import { departmentService } from "../departments/department.service";
+import { nodeService } from "../nodes/node.service";
 
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
 const DateTimeToString = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second).toISOString();
@@ -25,6 +25,7 @@ const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(da
 export class missionService extends EntityCollectionServiceBase<Mission> {
   readonly server = environment.serverURL;
   readonly pageSize = environment.pageSize;
+  readonly MISSION_ACTIONS = MISSION_ACTIONS;
   mission$: Observable<Mission[]>;
   interruption: Mission | boolean = false;
 
@@ -53,8 +54,8 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartmentService: departmentService,
-    public NodeService: nodeService,
+    public departmentService: departmentService,
+    public nodeService: nodeService,
     private toast: HotToastService,
     private http: HttpClient,
     private router: Router
@@ -77,9 +78,9 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
         distinctUntilChanged(),
         filter((val) => val != null),
         tap(() => this.ANodeLoading = true),
-        switchMap(term => this.NodeService.getWithQuery(
+        switchMap(term => this.nodeService.getWithQuery(
           "properties[]=id&properties[]=titre&titre=" + term +
-          (this.department.value ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
         ).pipe(
           catchError(() => of([])), // empty list on error
           tap(() => this.ANodeLoading = false)
@@ -96,9 +97,9 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
         distinctUntilChanged(),
         filter((val) => val != null),
         tap(() => this.BNodeLoading = true),
-        switchMap(term => this.NodeService.getWithQuery(
+        switchMap(term => this.nodeService.getWithQuery(
           "properties[]=id&properties[]=titre&titre=" + term +
-          (this.department.value ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
         ).pipe(
           catchError(() => of([])), // empty list on error
           tap(() => this.BNodeLoading = false)
@@ -106,20 +107,24 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       )
     );
   }
-  loadDepartments(defaultVal = []): void {
-    this.departments$ = concat(
-      of(defaultVal), // default items
-      this.departmentInput$.pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        filter((val) => val != null),
-        tap(() => this.departmentLoading = true),
-        switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
-          catchError(() => of([])), // empty list on error
-          tap(() => this.departmentLoading = false)
-        ))
-      )
-    );
+  loadDepartments(byTerm = true): void {
+    if(byTerm){
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departmentLoading = true),
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
+          ))
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
   }
 
   clone(key: string): Observable<Mission> {
@@ -185,18 +190,18 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       type: form.type != null ? JSON.parse(form.type) : null,
       causes: form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
       // department: form.department ? form.department : null,
-      nodeA: form.nodeA ? form.nodeA : null,
-      nodeB: form.nodeB.length ? form.nodeB : null,
-    } as Mission;
+      nodeA: form.node_a ? form.node_a : null,
+      nodeB: form.node_b.length ? form.node_b : null,
+      actions: form.actions.length ? form.actions : null,
+    };
 
     // console.log(form);
-    console.log(mission);
     // return;
     // compare last query with the new one to avoid unnecessary requests
     if (JSON.stringify(this.lastFormData) === JSON.stringify(mission)) return;
     this.lastFormData = mission;
     if (id) {
-      mission.id = id;
+      mission["id"] = id;
       this.update(mission).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
         complete() {
@@ -291,10 +296,10 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     return this.missionForm.get("department");
   }
   get BNode() {
-    return this.missionForm.get("BNode");
+    return this.missionForm.get("node_b");
   }
   get ANode() {
-    return this.missionForm.get("ANode");
+    return this.missionForm.get("node_a");
   }
 
   get type() {

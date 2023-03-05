@@ -123,6 +123,12 @@ class Mission
      */
     private $node_b;
 
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     * @Groups({"missions"})
+     */
+    private $actions = [];
+
 
     public function __construct()
     {
@@ -256,6 +262,18 @@ class Mission
     public function removeNodeB(Node $nodeB): self
     {
         $this->node_b->removeElement($nodeB);
+
+        return $this;
+    }
+
+    public function getActions(): ?array
+    {
+        return $this->actions;
+    }
+
+    public function setActions(?array $actions): self
+    {
+        $this->actions = $actions;
 
         return $this;
     }

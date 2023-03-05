@@ -47,7 +47,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartmentService: departmentService,
+    public departmentService: departmentService,
     public communeService: communeService,
     private http: HttpClient,
     private toast: HotToastService
@@ -77,20 +77,24 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
       )
     );
   }
-  loadDepartments(defaultVal = []) : void{
-    this.departments$ = concat(
-      of(defaultVal), // default items
-      this.departmentInput$.pipe(
+  loadDepartments(byTerm = true): void {
+    if(byTerm){
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
           debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.departmentLoading = true),
-          switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.departmentLoading = false)
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
           ))
-      )
-    );
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
   }
   loadNodes(defaultVal = []) : void{
     this.nodes$ = concat(
@@ -101,7 +105,9 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
           filter((val) => val != null),
           tap(() => this.nodeLoading = true),
           switchMap(term => 
-            this.http.get<Node[]>(`${this.server}/api/nodes?properties[]=id&properties[]=titre&titre=${term}&department.id=`+this.department.value)
+            this.http.get<Node[]>(`${this.server}/api/nodes?properties[]=id&properties[]=titre&titre=${term}`+
+            (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
+            )
             .pipe(
               map(response => response["hydra:member"]),
               catchError(() => of([])), // empty list on error
@@ -160,15 +166,11 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     let posteForm = this.posteForm;
     this.submitted = true;    
     if (posteForm.invalid) return;
-    
     let toast = this.toast;
-    let obj = posteForm.value;
-    // console.log(obj);
-    // return;
+    let obj = Object.entries(posteForm.value as Poste);
     // remove empty values
-    let poste = Object.keys(obj)
-      .filter((k) => obj[k] != "" && obj[k] != null)
-      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Poste;
+    const poste = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
+    
     poste["dateMst"] && (poste["dateMst"] = formatDate(poste["dateMst"]));
 
     this.add(poste).subscribe({

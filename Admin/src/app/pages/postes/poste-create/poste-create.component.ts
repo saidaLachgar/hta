@@ -12,7 +12,7 @@ export class posteCreateComponent {
   constructor(private fb: FormBuilder, public posteService: posteService) {
     this.breadCrumbItems = [{ label: 'Postes' }, { label: 'Nouveau poste', active: true }];
     posteService.loadCommunes();
-    posteService.loadDepartments();
+    posteService.loadDepartments(false);
     posteService.loadNodes();
     posteService.posteForm = this.fb.group({
       designation: ["", Validators.required],

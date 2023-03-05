@@ -34,20 +34,20 @@ class MissionProvider implements ContextAwareCollectionDataProviderInterface, De
         $repository = $this->em->getRepository(Mission::class);
         $Mission = $repository->find($id["id"]);
         // implement logic for cloning the existing data and persisting the new data
-        // if ("clone" === $operationName) {
-        //     // retrieve the existing data to clone
-        //     $clonedData = new Mission();
-        //     $clonedData->setDateStart($Mission->getDateEnd());
-        //     $clonedData->setType($Mission->isType());
-        //     $clonedData->setCauses($Mission->getCauses());
-        //     $clonedData->setDepartment($Mission->getDepartment());
-        //     // dd($clonedData);
+        if ("clone" === $operationName) {
+            // retrieve the existing data to clone
+            $clonedData = new Mission();
+            $clonedData->setDateStart($Mission->getDateEnd());
+            $clonedData->setType($Mission->isType());
+            $clonedData->setCauses($Mission->getCauses());
+            // $clonedData->setDepartment($Mission->getDepartment());
+            // dd($clonedData);
 
-        //     $this->em->persist($clonedData);
-        //     $this->em->flush();
+            $this->em->persist($clonedData);
+            $this->em->flush();
 
-        //     return $clonedData;
-        // }
+            return $clonedData;
+        }
         return $Mission;
     }
 
@@ -55,17 +55,18 @@ class MissionProvider implements ContextAwareCollectionDataProviderInterface, De
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         $repository = $this->em->getRepository(Mission::class);
-        // if ('get' === $operationName) {
-        //     $query = $repository->createQueryBuilder('t')
-        //         ->leftJoin('t.department', "d")
-        //         // ->orderBy('DATE_FORMAT(t.dateStart, \'%d-%m-%Y\')', 'DESC');
-        //         ->orderBy('DATE(t.dateStart)', 'DESC')
-        //         ->addOrderBy("d.id", 'DESC')
-        //         ->addOrderBy("t.type", 'DESC')
-        //         ->addOrderBy("TIME(t.dateStart)", 'ASC'); 
-        //         // ->addOrderBy('DATE_FORMAT(t.dateStart, \'%H:%i:%s\')', 'DESC');
-        //     return $query->getQuery()->getResult();
-        // } 
+        if ('get' === $operationName) {
+            $query = $repository->createQueryBuilder('t')
+                ->innerJoin('t.node_a', "n")
+                ->leftJoin('n.department', "d")
+                // ->orderBy('DATE_FORMAT(t.dateStart, \'%d-%m-%Y\')', 'DESC');
+                ->orderBy('DATE(t.dateStart)', 'DESC')
+                ->addOrderBy("d.id", 'DESC')
+                ->addOrderBy("t.type", 'DESC')
+                ->addOrderBy("TIME(t.dateStart)", 'ASC'); 
+                // ->addOrderBy('DATE_FORMAT(t.dateStart, \'%H:%i:%s\')', 'DESC');
+            return $query->getQuery()->getResult();
+        } 
         return $repository->findAll();
     }
 }

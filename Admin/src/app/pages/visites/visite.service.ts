@@ -51,8 +51,8 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartmentService: departmentService,
-    public NodeService: nodeService,
+    public departmentService: departmentService,
+    public nodeService: nodeService,
     public communeService: communeService,
     private http: HttpClient,
     private toast: HotToastService
@@ -86,20 +86,24 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
       )
     );
   }
-  loadDepartments(defaultVal = []) : void{
-    this.departments$ = concat(
-      of(defaultVal), // default items
-      this.departmentInput$.pipe(
+  loadDepartments(byTerm = true): void {
+    if(byTerm){
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
           debounceTime(500),
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.departmentLoading = true),
-          switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.departmentLoading = false)
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
           ))
-      )
-    );
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
   }
   loadANodes(defaultVal = []) : void {
     this.ANode$ = concat(
@@ -109,9 +113,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.ANodeLoading = true),
-          switchMap(term => this.NodeService.getWithQuery(
+          switchMap(term => this.nodeService.getWithQuery(
             "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
+            (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
             ).pipe(
             catchError(() => of([])), // empty list on error
             tap(() => this.ANodeLoading = false)
@@ -128,9 +132,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.BNodeLoading = true),
-          switchMap(term => this.NodeService.getWithQuery(
+          switchMap(term => this.nodeService.getWithQuery(
             "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
+            (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
             ).pipe(
             catchError(() => of([])), // empty list on error
             tap(() => this.BNodeLoading = false)
@@ -189,13 +193,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     if (visiteForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let obj = visiteForm.value;
-    // console.log(obj);
-    // return;
+    let obj = Object.entries(visiteForm.value as Visite);
     // remove empty values
-    let visite = Object.keys(obj)
-      .filter((k) => obj[k] != "" && obj[k] != null)
-      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Visite;
+    const visite = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
     visite["date"] && (visite["date"] = formatDate(visite["date"]));
 
     this.add(visite).subscribe({
@@ -215,12 +215,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     if (visiteForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let obj = visiteForm.value;
-
+    let obj = Object.entries(visiteForm.value as Visite);
     // remove empty values
-    let visite = Object.keys(obj)
-      .filter((k) => obj[k] != "" && obj[k] != null)
-      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Visite;
+    const visite = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
     visite["date"] && (visite["date"] = formatDate(visite["date"]));
     visite.id = id;
 

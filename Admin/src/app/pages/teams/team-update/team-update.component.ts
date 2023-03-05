@@ -15,14 +15,13 @@ export class teamUpdateComponent {
     this.breadCrumbItems = [{ label: 'Équipes' }, { label: 'Mise à jour de l\'équipe', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     service.loadMembers();
-    service.loadDepartments();
+    service.loadDepartments(false);
     service.teamForm = this.fb.group({
       titre: ["", Validators.required],
       departments: [[]],
       membres: [[]],
     });
     this.service.getByKey(this.id).subscribe((obj) => {
-      service.loadDepartments(obj.departments ? obj.departments : []);
       service.loadMembers(obj.membres ? obj.membres : []);
       service.teamForm.setValue({
         titre : obj.titre,

@@ -32,7 +32,7 @@ export class nodeService extends EntityCollectionServiceBase<Node> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartmentService: departmentService,
+    public departmentService: departmentService,
     private toast: HotToastService
   ) {
     super("nodes", serviceElementsFactory);
@@ -45,20 +45,24 @@ export class nodeService extends EntityCollectionServiceBase<Node> {
     this.findByCriteria({ page: 1 });
   }
 
-  loadDepartments(defaultVal = []): void {
-    this.departments$ = concat(
-      of(defaultVal), // default items
-      this.departmentInput$.pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        filter((val) => val != null),
-        tap(() => this.departmentLoading = true),
-        switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
-          catchError(() => of([])), // empty list on error
-          tap(() => this.departmentLoading = false)
-        ))
-      )
-    );
+  loadDepartments(byTerm = true): void {
+    if(byTerm){
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departmentLoading = true),
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
+          ))
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
   }
 
 

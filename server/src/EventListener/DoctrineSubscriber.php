@@ -64,9 +64,9 @@ class DoctrineSubscriber implements EventSubscriber
             $translatedName = $instance::$TRANSLATED_NAME; // ex: utilisateur
             if( $eventType !== self::DELETE ){
                 $objectId = $object->getId(); // ex : 190
-                $url = $_ENV['FRONTEND_URL']."/". // ex : "http://localhost/"
+                $url = $_ENV['FRONTEND_URL']. // ex : "http://localhost/"
                     ($classBasename == "UserPermissions" ? "autorisation" :
-                    $classBasename."\/details\/".$objectId); // ex : "users/details/:id"
+                    $classBasename."/details/".$objectId); // ex : "users/details/:id"
                 $urlHtml =  '<p class="mb-1">URL : <b><a href="'.$url.'">'.$url.'</a></b></p>';
             } else  $urlHtml="";
 

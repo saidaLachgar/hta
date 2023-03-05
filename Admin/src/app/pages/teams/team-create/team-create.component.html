@@ -31,15 +31,8 @@
           <div class="mb-3 row">
             <label for="name-input" class="col-md-2 col-form-label">Départ</label>
             <div class="col-md-10">
-              <ng-select [items]="teamService.departments$ | async"
-                        formControlName="departments"
-                        bindLabel="titre"
-                        bindValue="@id"
-                        [multiple]="true"
-                        [minTermLength]="2"
-                        [loading]="teamService.departmentLoading"
-                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="teamService.departmentInput$">
+              <ng-select formControlName="departments" [multiple]="true" placeholder="Dépar..">
+                <ng-option *ngFor="let depar of (teamService.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
               </ng-select>
             </div>
           </div>

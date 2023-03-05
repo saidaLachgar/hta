@@ -12,7 +12,7 @@ export class anomalyCreateComponent{
   
   constructor(private fb: FormBuilder, public service: anomalyService) {
     this.breadCrumbItems = [{ label: 'Anomalies' }, { label: 'Nouveau anomaly', active: true }];
-    service.loadDepartments();
+    service.loadDepartments(false);
     service.loadEdges();
     service.anomalyForm = this.fb.group({
       severity: [""],

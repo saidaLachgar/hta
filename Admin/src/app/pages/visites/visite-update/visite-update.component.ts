@@ -16,7 +16,7 @@ export class visiteUpdateComponent  {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: visiteService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Mise à jour de visite', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    service.loadDepartments();
+    service.loadDepartments(false);
     service.loadANodes();
     service.loadBNodes();
     service.loadTeams();
@@ -29,7 +29,6 @@ export class visiteUpdateComponent  {
       team: [""],
     });
     service.getByKey(this.id).subscribe((obj) => {
-      service.loadDepartments(obj.node_a.department ? [obj.node_a.department] : []);
       service.loadTeams(obj.team ? [obj.team] : []);
 
       service.loadANodes(obj.node_a ? [obj.node_a] : []);

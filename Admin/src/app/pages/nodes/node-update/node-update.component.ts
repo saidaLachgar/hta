@@ -15,6 +15,7 @@ export class nodeUpdateComponent {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public nodeService: nodeService) { 
     this.breadCrumbItems = [{ label: 'Appareils' }, { label: 'Mettre à jour l\'appareil', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
+    nodeService.loadDepartments();
       
     nodeService.nodeForm = this.fb.group({
       titre: ["", Validators.required],
@@ -22,7 +23,6 @@ export class nodeUpdateComponent {
       postes: [[]],
     });
     nodeService.getByKey(this.id).subscribe((obj) => {
-      nodeService.loadDepartments([obj.department]);
       nodeService.nodeForm.patchValue({
         titre : obj.titre,
         department :obj.department ? obj.department["@id"] : null,

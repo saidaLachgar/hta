@@ -31,14 +31,8 @@
           <div class="mb-3 row">
             <label for="input-2" class="col-md-2 col-form-label">Départ</label>
             <div class="col-md-10" id="input-2" >
-            <ng-select [items]="service.departments$ | async"
-                      formControlName="department"
-                      bindLabel="titre"
-                      bindValue="@id"
-                      [minTermLength]="2"
-                      [loading]="service.departmentLoading"
-                      typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                      [typeahead]="service.departmentInput$">
+            <ng-select formControlName="department" placeholder="Dépar..">
+              <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
             </ng-select>
             <div #postfeedback *ngIf="showError && !service.department.value"
                 class="invalid-feedback d-block">Ce champ est obligatoire.</div>
@@ -48,7 +42,7 @@
             <label for="input-1" class="col-md-2 col-form-label">De</label>
             <div class="col-md-10" (click)="showError = true" id="input-1">
                 <ng-select [items]="service.ANode$ | async"
-                          formControlName="nodeA"
+                          formControlName="node_a"
                           bindLabel="titre"
                           bindValue="@id"
                           [minTermLength]="2"
@@ -69,7 +63,7 @@
             <label for="input-1" class="col-md-2 col-form-label">À</label>
             <div class="col-md-10" (click)="showError = true" id="input-1">
                 <ng-select [items]="service.BNode$ | async"
-                          formControlName="nodeB"
+                          formControlName="node_b"
                           bindLabel="titre"
                           bindValue="@id"
                           [minTermLength]="2"

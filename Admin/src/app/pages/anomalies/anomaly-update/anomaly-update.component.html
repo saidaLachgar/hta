@@ -32,14 +32,8 @@
             <div class="mb-3 row">
               <div class="col-6">
                 <label>Départ</label>
-                <ng-select [items]="service.departments$ | async"
-                          formControlName="department"
-                          bindLabel="titre"
-                          bindValue="@id"
-                          [minTermLength]="2"
-                          [loading]="service.departmentLoading"
-                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                          [typeahead]="service.departmentInput$">
+                <ng-select formControlName="department" placeholder="Dépar..">
+                  <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
                 </ng-select>
                 <div #postfeedback *ngIf="showError && !service.department.value"
                     class="invalid-feedback d-block">Ce champ est obligatoire.</div>

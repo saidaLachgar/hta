@@ -18,12 +18,12 @@ export class nodesListComponent {
     private config: NgSelectConfig
   ) {
     service.findAll();
-    service.loadDepartments();
+    service.loadDepartments(false);
 
     service.nodeForm = fb.group({
       id: [""],
       titre: [''],
-      "departments.id[]": [''],
+      "department.id[]": [''],
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';

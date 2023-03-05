@@ -13,7 +13,7 @@ export const MENU: MenuItem[] = [
     },
     {
         id:3,
-        label: 'Mission',
+        label: 'Travaux',
         icon: 'fas fa-hard-hat',
         link: '/mission',
     },

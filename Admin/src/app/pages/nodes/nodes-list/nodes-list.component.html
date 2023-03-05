@@ -37,11 +37,10 @@
                   <td>
                     <ng-select [items]="service.departments$ | async"
                               #searchDepar
-                              formControlName="departments.id[]"
+                              formControlName="department.id[]"
                               bindLabel="titre"
                               bindValue="id"
                               [multiple]="true"
-                              
                               [minTermLength]="2"
                               placeholder="Départ.."
                               [loading]="service.departmentLoading"

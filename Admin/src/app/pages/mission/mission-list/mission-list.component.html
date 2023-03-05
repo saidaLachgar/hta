@@ -1,6 +1,6 @@
 <style>
   td:empty::after{
-    content: "——";
+    content: "—";
     color: #5f6168;
     text-align: center;
   }
@@ -105,7 +105,7 @@
   <div class="row align-items-center justify-content-between mb-4">
     <div class="col-auto">
       <app-page-title
-        title="Liste des mission"
+        title="Liste des travaux"
         [breadcrumbItems]="breadCrumbItems"
       ></app-page-title>
     </div>
@@ -157,7 +157,7 @@
             <label>Départ</label>
             <ng-select [items]="service.departments$ | async"
                       #searchDepar
-                      formControlName="departments.id[]"
+                      formControlName="department.id[]"
                       bindLabel="titre"
                       bindValue="id"
                       [multiple]="true"
@@ -172,7 +172,7 @@
             <label>Point coupure</label>
             <ng-select [items]="service.ANode$ | async"
                 #searchANode
-                formControlName="nodeA.id[]"
+                formControlName="node_a.id[]"
                 bindLabel="titre"
                 bindValue="id"
                 [multiple]="true"
@@ -187,7 +187,7 @@
             <label>Ps</label>
             <ng-select [items]="service.BNode$ | async"
                 #searchBNode
-                formControlName="nodeB.id[]"
+                formControlName="node_b.id[]"
                 bindLabel="titre"
                 bindValue="id"
                 [multiple]="true"

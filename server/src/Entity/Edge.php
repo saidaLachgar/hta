@@ -25,13 +25,50 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'edges_add')"},
  *      "get"= { "access_control"="is_granted('hasPermission', 'edges_show')"},
+ *      "by_range"= {
+ *          "access_control"="is_granted('hasPermission', 'edges_show')",
+ *          "method"="GET",
+ *          "path"="/edges/by-range",
+ *          "openapi_context"={
+ *              "summary"="Get edges within a range",
+ *              "parameters"={
+ *                {
+ *                  "in"="query",
+ *                  "name"="depar",
+ *                  "required"=true,
+ *                  "schema"={
+ *                    "type"="string"
+ *                  }
+ *                },
+ *                {
+ *                  "in"="query",
+ *                  "name"="node_a",
+ *                  "required"=true,
+ *                  "schema"={
+ *                    "type"="string"
+ *                  }
+ *                },
+ *                {
+ *                  "in"="query",
+ *                  "name"="node_b",
+ *                  "required"=false,
+ *                  "schema"={
+ *                    "type"="string"
+ *                  }
+ *                }
+ *              }
+ *            }
+ *      },
  *   },
  * )
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
+ *          "id"=SearchFilter::STRATEGY_EXACT,
  *          "titre"=SearchFilter::STRATEGY_PARTIAL,
  *          "department.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
  *      }
  * )
  * @ApiFilter(PropertyFilter::class)

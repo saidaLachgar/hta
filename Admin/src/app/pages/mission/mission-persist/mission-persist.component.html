@@ -1,72 +1,49 @@
-
-<div class="container-fluid pb-5 mb-5">
+<form class="container-fluid pb-5 mb-5" [formGroup]="service.missionForm">
   <!-- start page title -->
   <app-page-title
-    title=""
+    title="Fiche d'incident / coupeur"
+    [Loading]="service.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->
 
+  <div *ngFor="let alert of alerts">
+    <ngb-alert 
+    type="{{alert.type}}" 
+    (closed)="removeAlert(alert)" 
+    class="custom-alert glow mt-3"
+    >
+      {{alert.message}}
+    </ngb-alert>
+  </div>
+
   <div class="row mt-4">
-    <form class="col-12" [formGroup]="service.missionForm">
-      <div class="card">
-        <div class="card-body">
-
-        <button
-          (click)="Submit('EDIT')"
-          [disabled]="(service.loading$ | async)"
-         class="btn btn-primary float-end"
-        ><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
-
-        <button
-          (click)="Submit('NEW')"
-          [disabled]="(service.loading$ | async)"
-          *ngIf="!EditeMode"
-          class="btn btn-light me-2 float-end text-primary"
-          >Créer et ajouter un nouveau</button>
-
-        <button
-          [disabled]="(service.loading$ | async)"
-          (click)="Submit('LIST')"
-          class="btn btn-light me-2 float-end text-primary"
-          ><i class="fas fa-arrow-circle-left me-1"></i> Sauvegarder et retourner à la liste</button>
-
-        <button 
-          [disabled]="(service.loading$ | async)"
-          [class.d-none]="!EditeMode || !service.interruption" 
-          (click)="service.deleteItem()"
-          type="button" class="btn text-danger float-end me-2 fw-medium btn-light">
-          <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
-        </button>
-
-          <div class="card-title mb-5">
-            Formulaire d'interruption 
-            <div role="status" class="spinner-grow ms-1 spinner-grow-sm text-primary" *ngIf="service.loading$ | async"><span class="sr-only">Loading...</span></div>
-          </div>
+    <!-- missions -->
+    <div class="col-12">
+      <div class="card card-body">
           <div class="row">
             <div class="col-6">
 
                 <!-- Départ -->
               <label>Départ</label>
-              <ng-select [items]="service.departments$ | async"
-                      formControlName="department"
-                      bindLabel="titre"
-                      bindValue="@id"
-                      [minTermLength]="2"
-                      [loading]="service.departmentLoading"
-                      typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                      [typeahead]="service.departmentInput$">
+              <ng-select 
+                  formControlName="department"
+                  placeholder="Dépar.."
+                  (open)="service.department.value && AlertDeparChange()"
+                >
+                <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
               </ng-select>
               <div #postfeedback *ngIf="showError && !service.department.value" class="invalid-feedback d-block">Ce champ est obligatoire.</div>
 
-              <!-- nodeA -->
+              <!-- node_a -->
               <label class="mt-3">Point coupure</label>
               <ng-select [items]="service.ANode$ | async"
-                        formControlName="nodeA"
+                        formControlName="node_a"
                         bindLabel="titre"
                         bindValue="@id"
                         [minTermLength]="2" (click)="showError = true"
                         [readonly]="!service.department.value"
+                        (open)="service.ANode.value && AlertANodeChange()"
                         [loading]="service.ANodeLoading"
                         [ngClass]="{'is-invalid':service.ANode.invalid && service.submitted}"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
@@ -78,10 +55,10 @@
                 <span *ngIf="service.ANode.errors.required">Ce champ est obligatoire.</span>
               </div>
 
-              <!-- nodeB -->
+              <!-- node_b -->
               <label class="mt-3">PS</label>
               <ng-select [items]="service.BNode$ | async"
-                      formControlName="nodeB"
+                      formControlName="node_b"
                       bindLabel="titre"
                       bindValue="@id"
                       [minTermLength]="2"
@@ -101,25 +78,19 @@
                 <input ngbDatepicker formControlName="date" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
               </div>
               <div class="mt-3 row">
-                <div class="col-6">
+                <div class="col-auto">
                   <label>De</label>
-                  <ng-template #dateStartTemplate>
-                    <ngb-timepicker formControlName="dateStart" seconds="true"></ngb-timepicker>
-                  </ng-template>
-                  <input class="form-control bg-white" [value]="dateStart" readonly [ngbPopover]="dateStartTemplate" [autoClose]="'outside'" placement="bottom" />
+                  <ngb-timepicker [spinners]="false" seconds="true"  formControlName="dateStart"></ngb-timepicker>
                 </div>
-                <div class="col-6">
+                <div class="col-auto">
                   <label>à</label>
-                  <ng-template #dateEndTemplate>
-                    <ngb-timepicker formControlName="dateEnd" seconds="true"></ngb-timepicker>
-                  </ng-template>
-                  <input class="form-control bg-white" [value]="dateEnd" readonly [ngbPopover]="dateEndTemplate" [autoClose]="'outside'" placement="bottom" />
+                  <ngb-timepicker [spinners]="false" seconds="true"  formControlName="dateEnd"></ngb-timepicker>
                 </div>
               </div>
 
               <!-- Type -->
-              <label class="mt-3">Type</label>
-              <div class="form-check">
+              <label class="mt-3 d-block">Type</label>
+              <div class="form-check form-check-inline">
                 <input
                   class="form-check-input"
                   type="radio"
@@ -131,7 +102,7 @@
                   Incident
                 </label>
               </div>
-              <div class="form-check">
+              <div class="form-check form-check-inline">
                 <input
                   class="form-check-input"
                   type="radio"
@@ -143,112 +114,365 @@
                   Coupeur / Ouverture
                 </label>
               </div>
-              
-              <!-- Causes -->
-              <ng-container *ngIf="service.type.value!='false'">
-                <label class="mt-3">Causes</label>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    formControlName="causes"
-                    id="causes-1"
-                    value="1"
-                  />
-                  <label class="form-check-label" for="causes-1">
-                    Défauts matériels
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    formControlName="causes"
-                    id="causes-2"
-                    value="2"
-                  />
-                  <label class="form-check-label" for="causes-2">
-                    Telescopare
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    formControlName="causes"
-                    id="causes-3"
-                    value="3"
-                  />
-                  <label class="form-check-label" for="causes-3">
-                    Intenpaire 
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    formControlName="causes"
-                    id="causes-4"
-                    value="4"
-                  />
-                  <label class="form-check-label" for="causes-4">
-                    Cause inconnue
-                  </label>
-                </div>
-              </ng-container>
-
             </div>
           </div>
-        </div>
-      </div>
-    </form>
-    <!-- end col -->
 
-    <form class="col-12" (ngSubmit)="addAnomaly(anomalyInput.value); anomalyInput.value = ''">
-      <div class="card card-body">
-        <h4 class="card-title mb-4">Anomalies</h4>
-        <div class="input-group">
-          <input type="text" name="description" class="form-control bg-light border-0" #anomalyInput placeholder='Nouvelle anomalie' aria-describedby="basic-addon1">
-          <div class="input-group-prepend">
-              <span class="input-group-text bg-light rounded-lg border-0 shadow-none" id="basic-addon1"><button type="submit" class="btn btn-link p-0 text-primary" style="outline:none;">Ajouter</button></span>
+          <div class="collapse-cta mt-4 mb-3 text-primary">
+            <span class="c-pointer" (click)="showAdvanced =! showAdvanced">
+              <i class="fas fa-chevron-down text-body font-size-10 me-1"></i>
+              {{showAdvanced ? "Masquer" : "Afficher"}} les options avancées
+            </span>
           </div>
-        </div>
+          <div class="row mt-3" [hidden]="!showAdvanced">
 
+            <div class="col-md-4 d-flex flex-column" *ngFor="let action of service.MISSION_ACTIONS">
+              <div class="card flex-fill">
+                <div class="card-header">{{action.group}}</div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between" *ngFor="let option of action.values">
+                      <label class="form-check-label" for="actions-{{option.id}}">
+                        {{option.label}}
+                      </label>
+                      <div class="form-check font-size-16">
+                        <input type="checkbox" id="actions-{{option.id}}" value="{{option.id}}" class="form-check-input" (change)="onActionsChange($event)">
+                      </div>
+                    </li>
+                  </ul>
+              </div> 
+            </div>
+
+            <div class="col-md-4 d-flex flex-column" *ngIf="service.type.value!='false'">
+              <div class="card flex-fill">
+                <div class="card-header bg-danger text-danger text-white">Causes</div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                      <label class="form-check-label" for="causes-1">
+                        Défauts matériels
+                      </label>
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="causes"
+                        id="causes-1"
+                        value="1"
+                      />
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                      <label class="form-check-label" for="causes-2">
+                        Telescopare
+                      </label>
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="causes"
+                        id="causes-2"
+                        value="2"
+                      />
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                      <label class="form-check-label" for="causes-3">
+                        Intenpaire 
+                      </label>
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="causes"
+                        id="causes-3"
+                        value="3"
+                      />
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                      <label class="form-check-label" for="causes-4">
+                        Cause inconnue
+                      </label>
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="causes"
+                        id="causes-4"
+                        value="4"
+                      />
+                    </li>
+                  </ul>
+              </div> 
+            </div>
+
+          </div>
+      </div>
+    </div>
+    
+    <!-- list des anomalies -->
+    <div class="col-12">
+      <div class="card card-body">
+        <p class="card-title mb-3">Anomalies liées</p>
         <div class="table-responsive">
-          <table class="table table-nowrap align-middle mb-0">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th width="10%">Statut</th>
+                <th width="10%">Priorité</th>
+                <th>Anomalie</th>
+                <th width="15%">Créé par</th>
+                <th width="15%">Tronçon</th>
+                <th width="15%">Date</th>
+                <th width="50px"></th>
+              </tr>
+            </thead>
             <tbody>
-              <tr *ngFor="let list of anomalies; let i = index">
-                <td style="width: 40px;" class="pe-0">
-                  <div class="form-check font-size-16">
-                    <input type="checkbox" class="form-check-input" #test{{i}} id="customCheck{{i}}" (click)="checkAnomaly(!list.checked,i)"
-                      [checked]="list.checked">
-                    <label class="form-check-label" for="customCheck{{i}}"></label>
-                  </div>
+              <!-- state -->
+              <tr>
+                <td
+                  class="text-center"
+                  colspan="8"
+                  *ngIf="service.ANode.value && !(anomalyService.anomalies$ | async) && anomalyService.loading$ | async"
+                >
+                  Chargement...
                 </td>
-                <td class="ps-0">
-                  <p class="text-truncate font-size-14 m-0 text-dark" [class.line-through]="list.checked">{{list.title}}</p>
-                </td>
-                <td style="width: 61px;">
-                  <div class="avatar-group">
-                    <div class="avatar-group-item">
-                      <a href="javascript: void(0);" class="d-inline-block">
-                        <img src="https://avatars.dicebear.com/api/initials/{{list.username}}.svg" title="{{list.username}}" alt="" class="rounded-circle avatar-xs">
-                      </a>
-                    </div>
-                  </div>
-                </td>
-                <td style="width: 34px;">
-                  <div class="text-end">
-                    <i class="fas fa-times c-pointer text-primary" (click)="removeAnomaly(i)"></i>
-                  </div>
+                <td
+                  class="text-center"
+                  colspan="8"
+                  *ngIf="!service.ANode.value || ((anomalyService.anomalies$ | async) && (anomalyService.anomalies$ | async).length === 0 && anomalyService.loaded$ | async)"
+                >
+                Aucune donnée trouvée !
                 </td>
               </tr>
+              <!-- data -->
+              <ng-container *ngIf="service.ANode.value">
+                <tr *ngFor="let item of (anomalyService.anomalies$ | async); let i = index" valign="middle">
+                  <!-- status -->
+                  <!-- Terminé / En attente-->
+                  <td>
+                    <ui-switch 
+                        [checked]="item.status" 
+                        [disabled]="!authService.isAuthorized('anomalies_update')" 
+                        (changeEvent)="anomalyService.updateStatus($event, item.id)"
+                        [loading]="anomalyService.statusLoading"
+                        uncheckedLabel="En attente"
+                        checkedLabel="Terminé"
+                        checkedTextColor="#fff"
+                    >
+                    <i class="fa fa-spinner fa-pulse" *ngIf="anomalyService.statusLoading"></i>
+                  </ui-switch>
+                  </td>
+                  <!-- severity -->
+                  <!-- élevé, faible ou normal -->
+                  <td>
+                    <span class="badge badge-pill font-size-11 badge-soft-{{item.severity === 'NORMAL' ? 'success' : (item.severity === 'ELEVE' ? 'danger' : 'warning')}}">
+                      {{item.severity === "NORMAL" ? "Normal": (item.severity === "ELEVE" ? "Élevé" : "Faible")}}
+                    </span>
+                  </td>
+                  <!-- title -->
+                  <td>{{item.title}}</td>
+                  <!-- Créé par -->
+                  <td>
+                    <a 
+                      *ngIf="item.createdBy"
+                      [routerLink]="authService.isAuthorized('users_details') ? ['/users/details', item.createdBy.id] : null"
+                      target="_blank" class="d-flex align-items-center">
+                      <div class="header-profile-user bg-transparent me-2"><span class="avatar-title rounded-circle bg-transparent border text-muted small"><i class="fas fa-user"></i></span></div>
+                      {{item.createdBy.fullName}}
+                    </a>
+                  </td>
+                  <!-- tronçon -->
+                  <td>
+                    <a  *ngIf="item.edge"
+                      [routerLink]="authService.isAuthorized('edges_details') ? ['/edges/details', item.edge.id] : null"
+                      target="_blank">{{item.edge.titre}}</a>
+                  </td>
+                   <!-- date -->
+                   <td>{{item.createdAt | date:'medium':'Africa/Casablanca'}}</td>
+  
+                  <!-- actions -->
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('anomalies_details') || authService.isAuthorized('anomalies_update') || authService.isAuthorized('anomalies_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['/anomalies/details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_update')"
+                          [routerLink]="['/anomalies/update', item.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('anomalies_delete')"
+                          (click)="anomalyService.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+  
+                </tr>
+              </ng-container>
             </tbody>
           </table>
         </div>
+        <!-- Pagination -->
+        <ng-container *ngIf="(anomalyService.pagination$ | async) as pagination">
+          <div
+            *ngIf="pagination.totalRecords > anomalyService.pageSize"
+            class="row justify-content-md-between align-items-md-center mt-2"
+          >
+            <div class="col-sm-12 col-md-5">
+              <div
+                class="dataTables_info mb-2"
+                id="tickets-table_info"
+                role="status"
+                aria-live="polite"
+              >
+              Affichage de {{pagination.startIndex}} 
+              à {{pagination.endIndex}} 
+              de {{pagination.totalRecords}} entrées
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-5">
+              <div class="text-md-right float-md-end pagination-rounded">
+                <ngb-pagination
+                  [collectionSize]="pagination.totalRecords"
+                  [(page)]="anomalyService.page"
+                  [pageSize]="anomalyService.pageSize"
+                  (pageChange)="anomalyService.onPaginate($event)"
+                >
+                </ngb-pagination>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
       </div>
-    </form>
+    </div>
+
+    <!-- ajouter anomalies (juste pour les incidents) -->
+    <div class="col-12" *ngIf="service.type.value!='false'">
+      <div class="card card-body">
+        <table class="table table-bordered table-striped mb-0" formArrayName="anomalies">  
+          <tr>  
+            <th colspan="2"><div>Ajouter des anomalies</div></th>  
+            <td width="100px">
+              <div class="text-end">
+                <button type="button" (click)="addAnomaly()" class="btn btn-primary">Ajouter</button>
+              </div>
+            </td>  
+          </tr>  
+          <tr *ngFor="let anomaly of anomalies.controls; let i=index" [formGroupName]="i">  
+            <td width="40%">  
+              <div class="row">  
+                <div class="col-6">
+                  <label>Statut</label>
+                  <ng-select [searchable]="false" formControlName="status" placeholder="Statut..">
+                    <ng-option [value]="true">Terminé</ng-option>
+                    <ng-option [value]="false">En attente</ng-option>
+                  </ng-select>
+                </div>  
+                <div class="col-6">
+                  <label>Priorité</label>
+                  <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
+                    <ng-option *ngFor="let option of anomalyService.severityOptions" [value]="option.value">
+                      {{ option.label }}
+                    </ng-option>
+                  </ng-select>
+                </div>
+                <div class="col-12 mt-2">
+                  <label>Tronçon</label>
+                  <ng-select 
+                      formControlName="edge" 
+                      placeholder="Tronçon.."
+                      (open)="!service.department.value && AlertEdgeChange()"
+                      [readonly]="!service.department.value"
+                      >
+                    <ng-option *ngFor="let edge of (anomalyService.edgesInRange$ | async)" [value]="'/api/edges/'+edge.id">{{edge.titre}}</ng-option>
+                  </ng-select>
+                  <div
+                    *ngIf="anomalyService.submitted && anomalyService.edge.errors"
+                    class="invalid-feedback">
+                    <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+                  </div>
+                </div>
+              </div>
+            </td>  
+            <td>  
+              <div>  
+              <label for="input-3">Anomalie</label>
+              <textarea
+                formControlName="title"
+                id="input-3" 
+                class="form-control"
+                type="text"
+                style="height: 115px;"
+              ></textarea>
+              <div
+                *ngIf="anomalyService.submitted && anomalyService.edge.errors"
+                class="invalid-feedback">
+                <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+              </div>
+              </div>  
+            </td>  
+            <td>  
+              <div>  
+              <div class="text-center">
+                <button (click)="removeAnomaly(i)" class="btn btn-danger">Suppr.</button>  
+              </div>
+              </div>  
+            </td>  
+          </tr>  
+        </table>
+
+      </div>
+    </div>
   </div>
   <!-- end row -->
-</div>
+
+  <div class="sticky-actions">
+    <button
+        (click)="Submit('EDIT')"
+      [disabled]="(service.loading$ | async)"
+      class="btn btn-primary float-end"
+    ><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
+
+    <button
+      (click)="Submit('NEW')"
+      [disabled]="(service.loading$ | async)"
+      *ngIf="!EditeMode"
+      class="btn btn-light me-2 float-end text-primary"
+      >Créer et ajouter un nouveau</button>
+
+    <button
+      [disabled]="(service.loading$ | async)"
+      (click)="Submit('LIST')"
+      class="btn btn-light me-2 float-end text-primary"
+      ><i class="fas fa-arrow-circle-left me-1"></i> Sauvegarder et retourner à la liste</button>
+
+    <button 
+      [disabled]="(service.loading$ | async)"
+      [class.d-none]="!EditeMode || !service.interruption" 
+      (click)="service.deleteItem()"
+      type="button" class="btn text-danger float-end me-2 fw-medium btn-light">
+      <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
+    </button>
+  </div>
+</form>
 

@@ -1,3 +1,4 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
@@ -18,6 +19,7 @@ import { nodeService } from "../nodes/node.service";
 })
 export class edgeService extends EntityCollectionServiceBase<Edge> {
   readonly pageSize = environment.pageSize;
+  private server = environment.serverURL;
   edges$: Observable<Edge[]>;
 
   departments$: Observable<Department[]>;
@@ -27,7 +29,7 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
   ANode$: Observable<any[] | Node[]>;
   ANodeLoading = false;
   ANodeInput$ = new Subject<string>();
-  
+
   BNode$: Observable<any[] | Node[]>;
   BNodeLoading = false;
   BNodeInput$ = new Subject<string>();
@@ -41,8 +43,9 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
-    public DepartmentService: departmentService,
-    public NodeService: nodeService,
+    public departmentService: departmentService,
+    public nodeService: nodeService,
+    private http: HttpClient,
     private toast: HotToastService
   ) {
     super("edges", serviceElementsFactory);
@@ -55,57 +58,68 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     this.findByCriteria({ page: 1 });
   }
 
-  loadDepartments(defaultVal = []): void {
-    this.departments$ = concat(
+  loadDepartments(byTerm = true): void {
+    if (byTerm) {
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departmentLoading = true),
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
+          ))
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
+  }
+
+  loadANodes(defaultVal = []): void {
+    this.ANode$ = concat(
       of(defaultVal), // default items
-      this.departmentInput$.pipe(
+      this.ANodeInput$.pipe(
         debounceTime(500),
         distinctUntilChanged(),
         filter((val) => val != null),
-        tap(() => this.departmentLoading = true),
-        switchMap(term => this.DepartmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+        tap(() => this.ANodeLoading = true),
+        switchMap(term => this.nodeService.getWithQuery(
+          "properties[]=id&properties[]=titre&titre=" + term +
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+        ).pipe(
           catchError(() => of([])), // empty list on error
-          tap(() => this.departmentLoading = false)
+          tap(() => this.ANodeLoading = false)
         ))
       )
     );
   }
 
-  loadANodes(defaultVal = []) : void {
-    this.ANode$ = concat(
-      of(defaultVal), // default items
-      this.ANodeInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.ANodeLoading = true),
-          switchMap(term => this.NodeService.getWithQuery(
-            "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
-            ).pipe(
-            catchError(() => of([])), // empty list on error
-            tap(() => this.ANodeLoading = false)
-          ))
-      )
-    );
-  }
-  
-  loadBNodes(defaultVal = []) : void {
+  loadBNodes(defaultVal = []): void {
     this.BNode$ = concat(
       of(defaultVal), // default items
       this.BNodeInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.BNodeLoading = true),
-          switchMap(term => this.NodeService.getWithQuery(
-            "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department.value ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
-            ).pipe(
-            catchError(() => of([])), // empty list on error
-            tap(() => this.BNodeLoading = false)
-          ))
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.BNodeLoading = true),
+        switchMap(term => this.nodeService.getWithQuery(
+          "properties[]=id&properties[]=titre&titre=" + term +
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+        ).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.BNodeLoading = false)
+        ))
       )
+    );
+  }
+
+  getEdgesInRange(depar: string, node_a: string, node_b: string[] | null = []): Observable<string[]> {
+    return this.http.get<string[]>(`${this.server}/api/edges/by-range?depar=${depar}&node_a=${node_a}${node_b ? "&node_b="+node_b : ""}`)
+    .pipe(
+      map(response => response["hydra:member"])
     );
   }
 
@@ -191,7 +205,7 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     });
   }
 
- 
+
   get titre() {
     return this.edgeForm.get("titre");
   }

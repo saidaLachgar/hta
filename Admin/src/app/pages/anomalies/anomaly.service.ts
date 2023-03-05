@@ -7,8 +7,8 @@ import {
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Anomaly, Department, Edge, Pagination, SEVERITY_OPTIONS, User } from "src/app/core/models";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, timeout } from "rxjs/operators";
+import { Anomaly, Department, Edge, Node, Pagination, SEVERITY_OPTIONS, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
@@ -34,7 +34,8 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
   users$: Observable<User[]>;
   usersLoading = false;
   usersInput$ = new Subject<string>();
-  
+
+  edgesInRange$: Observable<Edge[]>;
   edges$: Observable<Edge[]>;
   edgesLoading = false;
   edgesInput$ = new Subject<string>();
@@ -66,52 +67,76 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     this.findByCriteria({ page: 1 });
   }
 
-  loadDepartments(defaultVal = []): void {
-    this.departments$ = concat(
+  loadDepartments(byTerm = true): void {
+    if (byTerm) {
+      this.departments$ = concat(
+        of([]), // default items
+        this.departmentInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.departmentLoading = true),
+          switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+            catchError(() => of([])), // empty list on error
+            tap(() => this.departmentLoading = false)
+          ))
+        )
+      );
+    } else {
+      this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
+    }
+  }
+
+  loadUsers(defaultVal = []): void {
+    this.users$ = concat(
       of(defaultVal), // default items
-      this.departmentInput$.pipe(
+      this.usersInput$.pipe(
         debounceTime(500),
         distinctUntilChanged(),
         filter((val) => val != null),
-        tap(() => this.departmentLoading = true),
-        switchMap(term => this.departmentService.getWithQuery("properties[]=id&properties[]=titre&titre=" + term).pipe(
+        tap(() => this.usersLoading = true),
+        switchMap(term => this.userService.getWithQuery("properties[]=id&properties[]=fullName&fullName=" + term).pipe(
           catchError(() => of([])), // empty list on error
-          tap(() => this.departmentLoading = false)
+          tap(() => this.usersLoading = false)
         ))
       )
     );
   }
 
-  loadUsers(defaultVal = []) : void{
-    this.users$ = concat(
-      of(defaultVal), // default items
-      this.usersInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.usersLoading = true),
-          switchMap(term => this.userService.getWithQuery("properties[]=id&properties[]=fullName&fullName="+term).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.usersLoading = false)
-          ))
-      )
+  loadEdgesInRange(range, edgesInRange): void {
+    let obj = { ...range };
+    obj["id[]"] = edgesInRange;
+    obj["properties[]"] = ["id", "titre"];
+    delete obj.node_a;
+    obj.node_b && delete obj.node_b;
+
+    this.edgesInRange$ = this.edgeService.getWithQuery(obj);
+
+    this.edgesInRange$ = this.edgesInRange$.pipe(
+      shareReplay() // Use shareReplay to make the observable hot
     );
+
+
+
   }
 
-  loadEdges(defaultVal = []) : void{
+  loadEdges(defaultVal = []): void {
     this.edges$ = concat(
       of(defaultVal), // default items
       this.edgesInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.edgesLoading = true),
-          switchMap(term => this.edgeService.getWithQuery(`properties[]=id&properties[]=titre&titre=${term}&department.id=`+this.department.value).pipe(
-              catchError(() => of([])), // empty list on error
-              tap(() => this.edgesLoading = false)
-          ))
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.edgesLoading = true),
+        switchMap(term => this.edgeService.getWithQuery(`properties[]=id&properties[]=titre&titre=${term}` +
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+        ).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.edgesLoading = false)
+        ))
       )
     );
+
   }
 
   /**
@@ -199,13 +224,13 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     });
   }
 
-  updateStatus($event:MouseEvent, id: number){
+  updateStatus($event: MouseEvent, id: number) {
     $event.stopPropagation();
     let _this = this;
     let checked = !($event.target as HTMLTextAreaElement).classList.contains("checked");
-    let anomaly = {id:id, status: checked} as Anomaly;
+    let anomaly = { id: id, status: checked } as Anomaly;
     this.statusLoading = true;
-    
+
     this.update(anomaly).subscribe({
       error: () => _this.toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
@@ -219,15 +244,28 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
    * find By Criteria
    * @param obj query parameters
    */
-  findByCriteria(obj): void {
+  async findByCriteria(obj): Promise<void> {
     this.anomalies$ = of([]); // clear table
 
-    // format date
     if (Object.keys(obj).length > 1) {
-      // console.log(obj);
+      // format date
       const updateObj = (key: string) => obj[key] && delete Object.assign(obj, { ["createdAt[" + key + "]"]: formatDate(obj[key]) })[key];
       updateObj("before"); updateObj("after");
+
+
+      // get anomalies of node range
+      if (obj.node_a) {
+        // get edges as an array then add edge.id[] to the object
+        let edgesInRange = await this.edgeService.getEdgesInRange(obj.depar, obj.node_a, obj.node_b ? obj.node_b : null).toPromise();
+        // get edges of current mission range
+        this.loadEdgesInRange(obj, edgesInRange);
+
+        obj["edge.id[]"] = edgesInRange;
+        delete obj.node_a;
+        obj.node_b && delete obj.node_b;
+      }
     }
+
 
     // remove empty values
     let queryParams = Object.keys(obj)

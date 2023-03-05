@@ -18,14 +18,15 @@ export class edgesListComponent {
     private config: NgSelectConfig
   ) {
     service.findAll();
+    service.loadDepartments();
     service.loadANodes();
     service.loadBNodes();
 
     service.edgeForm = fb.group({
       titre: [''],
-      "departments.id[]": [''],
-      "nodeA.id[]": [''],
-      "nodeB.id[]": [''],
+      "department.id[]": [''],
+      "node_a.id[]": [''],
+      "node_b.id[]": [''],
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';

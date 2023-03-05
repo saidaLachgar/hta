@@ -181,9 +181,9 @@
                   <td>
                     <ng-container *ngIf="item.edge"> 
                       <a 
-                        *ngIf="item.edge.departments"
-                        [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.edge.departments.id] : null"
-                        target="_blank">{{item.edge.departments.titre}}</a>
+                        *ngIf="item.edge.department"
+                        [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.edge.department.id] : null"
+                        target="_blank">{{item.edge.department.titre}}</a>
                       - <a 
                         [routerLink]="authService.isAuthorized('edges_details') ? ['/edges/details', item.edge.id] : null"
                         target="_blank">{{item.edge.titre}}</a>

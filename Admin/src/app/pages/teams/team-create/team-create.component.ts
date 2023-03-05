@@ -11,7 +11,7 @@ export class teamCreateComponent {
   constructor(private fb: FormBuilder, public teamService: teamService) {
     this.breadCrumbItems = [{ label: 'Équipes' }, { label: 'Nouvelle équipe', active: true }];
     teamService.loadMembers();
-    teamService.loadDepartments();
+    teamService.loadDepartments(false);
     teamService.teamForm = this.fb.group({
       titre: ["", Validators.required],
       departments: [[]],

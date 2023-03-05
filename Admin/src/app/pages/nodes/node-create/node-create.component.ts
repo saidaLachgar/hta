@@ -10,7 +10,7 @@ export class nodeCreateComponent {
   
   constructor(private fb: FormBuilder, public nodeService: nodeService) {
     this.breadCrumbItems = [{ label: 'Appareils' }, { label: 'Nouvel appareil', active: true }];
-    nodeService.loadDepartments();
+    nodeService.loadDepartments(false);
     nodeService.nodeForm = this.fb.group({
       titre: ["", Validators.required],
       department: [""],

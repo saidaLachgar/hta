@@ -8,6 +8,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { missionDetailsComponent } from './mission-details/mission-details.component';
 import { missionListComponent } from './mission-list/mission-list.component';
 import { missionPersistComponent } from './mission-persist/mission-persist.component';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { UiSwitchModule } from 'ngx-ui-switch';
 import { NgApexchartsModule } from 'ng-apexcharts';
 @NgModule({
   imports: [
@@ -17,7 +19,11 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     NgbTimepickerModule,
     NgbPopoverModule,
     NgApexchartsModule,
-    NgbTooltipModule
+    NgbTooltipModule,
+    NgbAlertModule,
+    UiSwitchModule.forRoot({
+      size: 'small',
+    }),
   ],
   declarations: [
     missionListComponent,

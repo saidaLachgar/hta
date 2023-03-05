@@ -12,7 +12,7 @@ export class visiteCreateComponent{
   
   constructor(private fb: FormBuilder, public service: visiteService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Nouveau visite', active: true }];
-    service.loadDepartments();
+    service.loadDepartments(false);
     service.loadANodes();
     service.loadBNodes();
     service.loadTeams();

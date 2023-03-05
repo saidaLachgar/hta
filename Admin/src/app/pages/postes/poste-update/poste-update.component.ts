@@ -17,7 +17,7 @@ export class posteUpdateComponent {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     posteService.loadNodes();
     posteService.loadCommunes();
-    posteService.loadDepartments();
+    posteService.loadDepartments(false);
     posteService.posteForm = this.fb.group({
       designation: ["", Validators.required],
       MLE: [""],
@@ -31,7 +31,6 @@ export class posteUpdateComponent {
     this.posteService.getByKey(this.id).subscribe((obj) => {
       
       let date = obj.date_mst?  new Date(obj.date_mst) : null;
-      posteService.loadDepartments(obj.node.department ? [obj.node.department] : []);
       posteService.loadCommunes(obj.commune ? [obj.commune] : []);
       posteService.loadNodes(obj.node ? [obj.node] : []);
 

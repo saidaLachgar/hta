@@ -12,7 +12,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
-
+use App\Dto\AnomalyMultipleRequest;
+use App\Dto\AnomalyMultipleResponse;
+use App\Action\AnomalyAction;
 /**
  * @ApiResource(
  *   order= {"id" = "DESC"},
@@ -25,6 +27,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'anomalies_add')"},
  *      "get"= { "access_control"="is_granted('hasPermission', 'anomalies_show')"},
+ *      "bulk"= {
+ *          "method"="POST",
+ *          "path"="/anomalies/bulk",
+ *          "input"=AnomalyMultipleRequest::class,
+ *          "controller"=AnomalyAction::class,
+ *          "normalizationContext"={"groups"={"anomalies_nrml"}},
+ *          "denormalizationContext"={"groups"={"anomalies_dnrml"}},
+ *          "validation_groups"={"default", "anomalies_dnrml"},
+ *          "openapi_context"={
+ *              "summary"="Bulk create, edit, delete",
+ *              "parameters"={
+ *                {
+ *                  "in"="query",
+ *                  "name"="action",
+ *                  "required"=true,
+ *                  "schema"={
+ *                    "type"="string"
+ *                  }
+ *                },
+ *              },
+ *          },
+ *      },
  *   },
  * )
  * @ApiFilter(
@@ -33,6 +57,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "title"=SearchFilter::STRATEGY_PARTIAL,
  *          "severity"=SearchFilter::STRATEGY_EXACT,
  *          "status"=SearchFilter::STRATEGY_EXACT,
+ *          "edge.id"=SearchFilter::STRATEGY_EXACT,
  *          "edge.department.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )

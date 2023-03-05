@@ -123,12 +123,10 @@ export class departmentService extends EntityCollectionServiceBase<Department> {
     this.isLoading = true;
     let toast = this.toast;
     let observable: Observable<Department>;
-    let obj = form.value;
     let _this = this;
+    let obj = Object.entries(form.value as Department);
     // remove empty values
-    let department = Object.keys(obj)
-      .filter((k) => obj[k] != "" && obj[k] != null)
-      .reduce((a, k) => ({ ...a, [k]: obj[k] }), {}) as Department;
+    const department = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
     // if has attachment add new observable to upload the file
     if (this.selectedFile) {
       // upload the attach file id to department
@@ -168,13 +166,9 @@ export class departmentService extends EntityCollectionServiceBase<Department> {
     let _this = this;
     let toast = this.toast;
     let observables = [];
-    let obj = form.value;
+    let obj = Object.entries(form.value as Department);
     // remove empty values
-    let department: Department = {
-      ...Object.keys(obj)
-        .filter((k) => obj[k] != "" && obj[k] != null)
-        .reduce((a, k) => ({ ...a, [k]: obj[k] }), {})
-    };
+    const department = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
     department.id = id;
     this.FileRemoved !== false && (department.visuel = null);
     // x if added (for first time just add it id)
