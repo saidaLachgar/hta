@@ -50,12 +50,13 @@ class AnomalyAction extends AbstractController
         
         $anomalies = $data->getAnomalies();
         $ids = $data->getIds();
+        
 
         if ($action === 'delete') {
             foreach ($ids as $id) {
-                $anomalyEntity = $this->repository->find($id);
-                if (!$anomalyEntity) continue;
-                $this->em->remove($anomalyEntity);
+                $anomaly = $this->repository->find($id);
+                if (!$anomaly) continue;
+                $this->em->remove($anomaly);
             }
         } elseif ($action === 'update') {
             foreach ($anomalies as $key => $anomaly) {
@@ -88,6 +89,7 @@ class AnomalyAction extends AbstractController
         } else {
             throw new \Exception(sprintf('Invalid action %s', $action));
         }
+
         $this->em->flush();
 
         return $response;

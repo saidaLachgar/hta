@@ -23,7 +23,6 @@ interface Alert {
 export class missionPersistComponent {
   breadCrumbItems: Array<{}>;
   showError: boolean = false;
-  EditeMode: boolean = false;
   showAdvanced: boolean = false;
   id: string;
   currentUser: User;
@@ -57,7 +56,7 @@ export class missionPersistComponent {
     let copy = this.route.snapshot.paramMap.get("copy");
 
     if (paramId) {
-      this.EditeMode = true;
+      this.service.EditeMode = true;
 
       let getItem = copy ? service.clone(paramId) : service.getByKey(Number(paramId));
       getItem.subscribe((obj) => {
@@ -89,7 +88,7 @@ export class missionPersistComponent {
           node_a: obj.node_a ? obj.node_a["@id"] : null,
           node_b: obj.node_b.length ? obj.node_b.map((e) => e["@id"]) : [],
         });
-        this.getRelatedAnomalies();
+        this.service.getRelatedAnomalies();
         this.formListeners();
       });
 
@@ -109,111 +108,7 @@ export class missionPersistComponent {
 
   }
 
-  AlertANodeChange() {
-    this.addAlert("En changeant le PS, les champs tronçons d'anomalies seront réinitialisés.", "warning")
-  }
-  AlertEdgeChange() {
-    this.addAlert('Vous devez choisir un Point coupure, pour pouvoir choisir un tronçon !', 'danger')
-  }
-  AlertDeparChange() {
-    let anode = this.service.ANode.value;
-    let bnode = this.service.BNode.value;
-    let hasNonEmptyNodes = (anode && anode.trim() !== '') || (bnode && bnode.length !== 0);
-    let hasNonEmptyEdges = this.hasNonEmptyEdges;
-    this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
-  }
-  formListeners() {
-    // on change ANode reset && reload edges aand anomalies
-    this.service.ANode.valueChanges.subscribe(() => {
-      // reset anomalies edges
-      this.anomalies.controls.forEach((control) => {
-        control.get('edge').reset();
-      });
-      //  reload edges and anomalies
-      this.getRelatedAnomalies();
-    });
-
-    // on change BNode reload edges aand anomalies
-    this.service.BNode.valueChanges.subscribe(() => {
-      // if has ps
-      this.service.ANode.value && this.service.ANode.value.trim() !== '' &&
-        this.getRelatedAnomalies();
-    });
-    // reset edges on change on change depar 
-    this.service.department.valueChanges.subscribe(() => {
-      this.service.ANode.reset();
-      this.service.BNode.reset();
-      // reset anomalies edges
-      this.anomalies.controls.forEach((control) => {
-        control.get('edge').reset();
-      });
-
-    });
-  }
-
-  removeAlert(alert: Alert) {
-    const index = this.alerts.indexOf(alert);
-    if (index !== -1) {
-      this.alerts.splice(index, 1);
-    }
-  }
-  addAlert(message: string, type: string) {
-    const index = this.alerts.findIndex(alert => 
-      alert.message === message && alert.type === type
-    );
-    if (index === -1) {
-      window.scrollTo(0, 0);
-      const alert: Alert = { message, type };
-      // add alert if not already exists
-      this.alerts.push(alert);
-      // remove alert after 30s
-      setTimeout(() => this.removeAlert(alert), 15000); 
-    }
-  }
-
-  Submit(Action:string) {
-    if (!this.EditeMode) {
-      this.service.Persist(null, Action);
-      this.EditeMode = Action == 'EDIT';
-    } else {
-      // update Taff
-      this.service.interruption && this.service.Persist((this.service.interruption as Mission).id, Action);
-    }
-  }
-
-
-  newAnomaly(): FormGroup {
-    return this.fb.group({
-      severity: [""],
-      status: [false],
-      edge: ["", Validators.required],
-      title: ["", Validators.required],
-    })
-  }
-
-  addAnomaly() {
-    if (this.service.ANode.value)
-      this.anomalies.push(this.newAnomaly());
-    else
-      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.","danger");
-  }
-
-  removeAnomaly(i: number) {
-    this.anomalies.removeAt(i);
-  }
-
-  getRelatedAnomalies() {
-    // get edges and anomalies of current mission range
-    let anode = this.service.ANode.value;
-    let bnode = this.service.BNode.value;
-    let depar = this.service.department.value;
-    anode && anode.trim() !== '' && this.anomalyService.findByCriteria({
-      page: 1,
-      ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
-      ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
-    });
-  }
-
+  // add actions
   onActionsChange(e) {
     const checkArray: FormArray = this.service.missionForm.get('actions') as FormArray;
     if (e.target.checked) {
@@ -230,6 +125,92 @@ export class missionPersistComponent {
     }
   }
 
+
+  // Anomalies CRUD
+  newAnomaly(): FormGroup {
+    return this.fb.group({
+      severity: [""],
+      status: [false],
+      edge: ["", Validators.required],
+      title: ["", Validators.required],
+    })
+  }
+  addAnomaly() {
+    if (this.service.ANode.value)
+      this.anomalies.push(this.newAnomaly());
+    else
+      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.", "danger");
+  }
+  removeAnomaly(i: number) {
+    this.anomalies.removeAt(i);
+  }
+  
+
+
+  // Validation && Alerts
+  AlertANodeChange() {
+    this.addAlert("En changeant le PS, les champs tronçons d'anomalies seront réinitialisés.", "warning")
+  }
+  AlertEdgeChange() {
+    this.addAlert('Vous devez choisir un Point coupure, pour pouvoir choisir un tronçon !', 'danger')
+  }
+  AlertDeparChange() {
+    let anode = this.service.ANode.value;
+    let bnode = this.service.BNode.value;
+    let hasNonEmptyNodes = (anode && anode.trim() !== '') || (bnode && bnode.length !== 0);
+    let hasNonEmptyEdges = this.hasNonEmptyEdges;
+    (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
+  }
+  formListeners() {
+    // on change ANode reset && reload edges aand anomalies
+    this.service.ANode.valueChanges.subscribe(() => {
+      // reset anomalies edges
+      this.anomalies.controls.forEach((control) => {
+        control.get('edge').reset();
+      });
+      //  reload edges and anomalies
+      this.service.getRelatedAnomalies();
+    });
+
+    // on change BNode reload edges aand anomalies
+    this.service.BNode.valueChanges.subscribe(() => {
+      // if has ps
+      this.service.ANode.value && this.service.ANode.value.trim() !== '' &&
+        this.service.getRelatedAnomalies();
+    });
+    // reset edges on change on change depar 
+    this.service.department.valueChanges.subscribe(() => {
+      this.service.ANode.reset();
+      this.service.BNode.reset();
+      // reset anomalies edges
+      this.anomalies.controls.forEach((control) => {
+        control.get('edge').reset();
+      });
+
+    });
+  }
+  removeAlert(alert: Alert) {
+    const index = this.alerts.indexOf(alert);
+    if (index !== -1) {
+      this.alerts.splice(index, 1);
+    }
+  }
+  addAlert(message: string, type: string) {
+    const index = this.alerts.findIndex(alert =>
+      alert.message === message && alert.type === type
+    );
+    if (index === -1) {
+      window.scrollTo(0, 0);
+      const alert: Alert = { message, type };
+      // add alert if not already exists
+      this.alerts.push(alert);
+      // remove alert after 30s
+      setTimeout(() => this.removeAlert(alert), 15000);
+    }
+  }
+
+
+  // Getters
   get anomalies(): FormArray {
     return this.service.missionForm.get("anomalies") as FormArray
   }
@@ -239,4 +220,5 @@ export class missionPersistComponent {
       return edgeControl && edgeControl.value.trim() !== '';
     });
   }
+
 }

@@ -1,21 +1,21 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FormGroup } from "@angular/forms";
+import { HttpClient } from "@angular/common/http";
+
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, timeout } from "rxjs/operators";
-import { Anomaly, Department, Edge, Node, Pagination, SEVERITY_OPTIONS, User } from "src/app/core/models";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { Anomaly, Department, Edge, Pagination, SEVERITY_OPTIONS, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 import { edgeService } from "../edges/edge.service";
-import { UserService } from "../users/user.service";
-
+import { UserService } from "../users/user.service"; 
 const formatDate = (date) => date !== "" ? date.year + "-" + date.month + "-" + ("0" + date.day).slice(-2) : "";
 
 
@@ -23,7 +23,7 @@ const formatDate = (date) => date !== "" ? date.year + "-" + date.month + "-" + 
   providedIn: "root",
 })
 export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
-  readonly pageSize = environment.pageSize;
+  readonly pageSize = environment.pageSize; readonly server = environment.serverURL;
   readonly severityOptions = SEVERITY_OPTIONS;
   anomalies$: Observable<Anomaly[]>;
 
@@ -53,7 +53,7 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     public departmentService: departmentService,
     public communeService: communeService,
     public edgeService: edgeService,
-    public userService: UserService,
+    public userService: UserService, 
     private http: HttpClient,
     private toast: HotToastService
   ) {
@@ -240,6 +240,9 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     });
   }
 
+  bulkCreate(anomalies: Anomaly[]): Observable<[]> {
+    return this.http.post<[]>(`${this.server}/api/anomalies/bulk?action=create`, { anomalies: anomalies });
+  }
   /**
    * find By Criteria
    * @param obj query parameters

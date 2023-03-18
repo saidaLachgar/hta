@@ -37,14 +37,6 @@ final class AnomalyMultipleResponseDataTransformer implements DataTransformerInt
     {
         // in the case of an input, the value given here is an array (the JSON decoded).
         // if it's a media object we transformed the data already
-        if(!is_iterable($data["anomalies"]) && !is_iterable($data["ids"])) return false;
-
-        if($data["anomalies"]){
-            foreach ($data["anomalies"] as $anomaly) {
-                if (!$anomaly instanceof Anomaly) return false;
-            }
-        }
-
-        return AnomalyMultipleResponse::class === $to && AnomalyMultipleResponse::class === ($context['output']['class'] ?? null);
+        return array_key_exists("anomalies", $data) || array_key_exists("ids", $data);
     }
 }

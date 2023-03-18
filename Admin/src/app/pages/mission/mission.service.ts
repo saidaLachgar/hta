@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { FormArray, FormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
@@ -12,6 +12,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap,
 import { Department, Mission, Node, Pagination, MISSION_ACTIONS } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
+import { anomalyService } from "../anomalies/anomaly.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
 
@@ -28,6 +29,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   readonly MISSION_ACTIONS = MISSION_ACTIONS;
   mission$: Observable<Mission[]>;
   interruption: Mission | boolean = false;
+  EditeMode: boolean = false;
 
   ANode$: Observable<any[] | Node[]>;
   ANodeLoading = false;
@@ -46,8 +48,8 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page: number = 1;
+  anomalyLoading: boolean = false;
   lastSearchedParams;
-  lastFormData;
   // initialValues;
   public missionForm: FormGroup;
 
@@ -55,6 +57,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     public departmentService: departmentService,
+    public anomalyService: anomalyService,
     public nodeService: nodeService,
     private toast: HotToastService,
     private http: HttpClient,
@@ -88,7 +91,6 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       )
     );
   }
-
   loadBNodes(defaultVal = []): void {
     this.BNode$ = concat(
       of(defaultVal), // default items
@@ -130,6 +132,19 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   clone(key: string): Observable<Mission> {
     return this.http.get<Mission>(`${this.server}/api/mission/${key}/clone`);
   }
+
+  getRelatedAnomalies() {
+    // get edges and anomalies of current mission range
+    let anode = this.ANode.value;
+    let bnode = this.BNode.value;
+    let depar = this.department.value;
+    anode && anode.trim() !== '' && this.anomalyService.findByCriteria({
+      page: 1,
+      ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
+      ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
+    });
+  }
+
   /**
    * Get pagination
    */
@@ -178,8 +193,17 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   /**
    * Persist : Create / update
    */
-  Persist(id = null, action: string): void {
-    this.submitted = action == 'EDIT';
+  async Persist(Action: string): Promise<void>  {
+    this.submitted = true;
+    if (this.missionForm.invalid) return;
+    this.submitted = false;
+    let id = null;
+    if (!this.EditeMode) {
+      this.EditeMode = Action == 'EDIT';
+    } else {
+      // update Taff
+      id = this.interruption ? (this.interruption as Mission).id : null;
+    }
 
     let form = this.missionForm.value;
     let _this = this;
@@ -191,22 +215,27 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       causes: form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
       // department: form.department ? form.department : null,
       nodeA: form.node_a ? form.node_a : null,
-      nodeB: form.node_b.length ? form.node_b : null,
+      nodeB: form.node_b && form.node_b.length ? form.node_b : [],
       actions: form.actions.length ? form.actions : null,
     };
+    let anomalies = form.anomalies;
+    this.anomalyLoading = true;
 
     // console.log(form);
-    // return;
+    // console.log(mission);
+    // console.log(form.anomalies);
+    anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
+    this.anomalyLoading = false;
+    
+
     // compare last query with the new one to avoid unnecessary requests
-    if (JSON.stringify(this.lastFormData) === JSON.stringify(mission)) return;
-    this.lastFormData = mission;
     if (id) {
       mission["id"] = id;
       this.update(mission).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
         complete() {
           toast.success("L'interuption a été sauvegardée avec succès ");
-          action == 'LIST' && _this.router.navigate(['/mission']);
+          Action == 'LIST' && _this.router.navigate(['/mission']);
           _this.submitted = false;
         },
       });
@@ -216,12 +245,16 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
           error: () => toast.error("un problème est survenu, veuillez réessayer"),
           complete() {
             toast.success("L'interuption ajoutée avec succès");
-            action == 'NEW' && location.reload();
-            action == 'LIST' && _this.router.navigate(['/mission']);
+            Action == 'NEW' && location.reload();
+            Action == 'LIST' && _this.router.navigate(['/mission']);
             _this.submitted = false;
           },
         });
     }
+    while (form.anomalies.length !== 0) 
+      (this.missionForm.get("anomalies") as FormArray).removeAt(0);
+    this.getRelatedAnomalies();
+    console.log("mkdmlsqmlskqmd")
   }
 
 

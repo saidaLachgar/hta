@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use App\Dto\AnomalyMultipleRequest;
 use App\Dto\AnomalyMultipleResponse;
 use App\Action\AnomalyAction;
+// https://github.com/api-platform/api-platform/issues/294
 /**
  * @ApiResource(
  *   order= {"id" = "DESC"},
