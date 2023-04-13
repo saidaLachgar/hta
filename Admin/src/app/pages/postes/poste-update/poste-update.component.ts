@@ -25,6 +25,10 @@ export class posteUpdateComponent {
       nbClients: [null],
       dateMst: [""],
       department: [""],
+      type: [""],
+      marque: [""],
+      poste: [""],
+      n_serie: [""],
       node: ["", Validators.required],
       commune: [""],
     });
@@ -39,6 +43,10 @@ export class posteUpdateComponent {
         MLE : obj.MLE,
         PKVA : obj.PKVA,
         nbClients : obj.nb_clients,
+        type : obj.type,
+        marque : obj.marque,
+        poste : obj.poste,
+        n_serie : obj.n_serie,
         dateMst : date ? {
           year: date.getFullYear() ,
           month: date.getMonth() +1,

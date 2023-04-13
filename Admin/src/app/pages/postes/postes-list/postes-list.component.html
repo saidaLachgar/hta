@@ -73,13 +73,17 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th width="13%">Designation</th>
-                  <th width="16%">Départ</th>
-                  <th width="9%">MLE</th>
-                  <th width="9%">P KVA</th>
-                  <th width="9%">Nb de clients</th>
-                  <th width="16%">Commune</th>
+                  <th>Designation</th>
+                  <th>Départ</th>
+                  <th>MLE</th>
+                  <th>P KVA</th>
+                  <th>Nb de clients</th>
+                  <th>Commune</th>
                   <th>Date MST</th>
+                  <th>Type</th>
+                  <th>Marque</th>
+                  <th>Poste</th>
+                  <th>N° serie</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -132,6 +136,12 @@
                     </div>
                     </div>
                   </td>
+
+                  <td><input type="text" placeholder="Type..." formControlName="type" #searchType class="form-control"></td>
+                  <td><input type="text" placeholder="Marque..." formControlName="marque" #searchMarque class="form-control"></td>
+                  <td><input type="text" placeholder="Poste..." formControlName="poste" #searchPoste class="form-control"></td>
+                  <td><input type="text" placeholder="N° serie..." formControlName="n_serie" #searchNSerie class="form-control"></td>
+
 
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -205,6 +215,32 @@
                     [term]="searchDateStart.value+searchDateEnd.value"
                   ></ngb-highlight>
                   </td>
+
+                  <td>
+                    <ngb-highlight
+                      [result]="poste.type"
+                      [term]="searchType.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="poste.marque"
+                      [term]="searchMarque.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="poste.poste"
+                      [term]="searchPoste.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="poste.n_serie"
+                      [term]="searchNSerie.value"
+                    ></ngb-highlight>
+                  </td>
+                  
                   <td align="center">
                     <div ngbDropdown 
                       placement="bottom-left"

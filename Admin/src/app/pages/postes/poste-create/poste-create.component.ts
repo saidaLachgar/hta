@@ -22,6 +22,10 @@ export class posteCreateComponent {
       dateMst: [null],
       department: [""],
       commune: [""],
+      type: [""],
+      marque: [""],
+      poste: [""],
+      n_serie: [""],
       node: ["", Validators.required],
     });
   }

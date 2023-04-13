@@ -8,9 +8,10 @@ import {
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Pagination, Edge, Department } from "src/app/core/models";
+import { Pagination, Edge, Department, Commune } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
+import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
 
@@ -25,6 +26,10 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
   departments$: Observable<Department[]>;
   departmentLoading = false;
   departmentInput$ = new Subject<string>();
+
+  communes$: Observable<Commune[]>;
+  communeLoading = false;
+  communeInput$ = new Subject<string>();
 
   ANode$: Observable<any[] | Node[]>;
   ANodeLoading = false;
@@ -44,6 +49,7 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     public departmentService: departmentService,
+    public communeService: communeService,
     public nodeService: nodeService,
     private http: HttpClient,
     private toast: HotToastService
@@ -76,6 +82,22 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     } else {
       this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
     }
+  }
+
+  loadCommunes(defaultVal = []) : void{
+    this.communes$ = concat(
+      of(defaultVal), // default items
+      this.communeInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.communeLoading = true),
+          switchMap(term => this.communeService.getWithQuery("properties[]=id&properties[]=titre&titre="+term).pipe(
+              catchError(() => of([])), // empty list on error
+              tap(() => this.communeLoading = false)
+          ))
+      )
+    );
   }
 
   loadANodes(defaultVal = []): void {

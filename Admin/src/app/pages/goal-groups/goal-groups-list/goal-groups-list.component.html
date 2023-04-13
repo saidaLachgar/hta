@@ -1,0 +1,172 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Les Groupes"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.goalGroupForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <tbody>
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="Titre..." formControlName="name" #searchTitre class="form-control"></td>
+                  <td class="text-center">
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center mx-auto">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(service.goalGroups$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(service.goalGroups$ | async) && (service.goalGroups$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <tr *ngFor="let item of (service.goalGroups$ | async); let i = index" valign="middle">
+                  <td>
+                    <ngb-highlight
+                        [result]="item.name"
+                        [term]="searchTitre.value"
+                      ></ngb-highlight>
+                  </td>
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('goal_groups_details') || authService.isAuthorized('goal_groups_update') || authService.isAuthorized('goal_groups_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goal_groups_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goal_groups_update')"
+                          (click)="service.onUpdate(item.id, item.name)"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goal_groups_delete')"
+                          (click)="service.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" *ngIf="authService.isAuthorized('goal_groups_add')">
+      <form class="card" [formGroup]="service.goalGroupForm" (ngSubmit)="service.onSave()">
+        <fieldset class="card-body justify-content-center d-flex flex-column">
+            
+          <div class="mb-3 row">
+            <h4 class="card-title mt-2 mb-4">{{service.persistence === false ? "Créer un Nouveau groupe" : "Mise à jour du groupe"}}</h4>
+            <label for="name-input" class="col-md-2 col-form-label">Titre</label>
+            <div class="col-md-10">
+              <input
+                formControlName="name"
+                [ngClass]="{'is-invalid':service.name.invalid && service.submitted}"
+                class="form-control"
+                type="text"
+                id="name-input"
+                required
+              />
+              <div
+                *ngIf="service.submitted && service.name.errors"
+                class="invalid-feedback">
+                <span *ngIf="service.name.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-end">
+            <div class="col-auto">
+              <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> {{service.persistence === false ? "Ajouter" : "Sauvegarder"}}</button>
+            </div>
+          </div>
+
+        </fieldset>
+        <!-- end col -->
+      </form>
+    </div>
+  </div>
+
+</div>

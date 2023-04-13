@@ -10,24 +10,6 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-
-          <div class="mb-3 row">
-            <label for="name-input" class="col-md-2 col-form-label">Titre</label>
-            <div class="col-md-10">
-              <input
-                formControlName="titre"
-                [ngClass]="{'is-invalid':service.titre.invalid && service.submitted}"
-                class="form-control"
-                type="text"
-                id="name-input"
-              />
-              <div
-                *ngIf="service.submitted && service.titre.errors"
-                class="invalid-feedback">
-                <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
-              </div>
-            </div>
-          </div>
           <div class="mb-3 row">
             <label for="input-2" class="col-md-2 col-form-label">Départ</label>
             <div class="col-md-10" id="input-2" >
@@ -78,6 +60,55 @@
                   class="invalid-feedback">
                   <span *ngIf="service.BNode.errors.required">Ce champ est obligatoire.</span>
                 </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="longueur-input" class="col-md-2 col-form-label">Longueur</label>
+            <div class="col-md-10">
+              <input
+                formControlName="longueur"
+                class="form-control"
+                type="number"
+                step="0.01" 
+                id="longueur-input"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="section-input" class="col-md-2 col-form-label">Section</label>
+            <div class="col-md-10">
+              <input
+                formControlName="section"
+                class="form-control"
+                type="number"
+                step="0.01" 
+                id="section-input"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-type" class="col-md-2 col-form-label">Marque</label>
+            <div class="col-md-10">
+              <input
+                formControlName="marque"
+                id="input-type" 
+                class="form-control"
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-7" class="col-md-2 col-form-label">Commune</label>
+            <div class="col-md-10" id="input-7" >
+              <ng-select [items]="service.communes$ | async"
+                      formControlName="commune"
+                      bindLabel="titre"
+                      bindValue="@id"
+                      [minTermLength]="2"
+                      [loading]="service.communeLoading"
+                      typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                      [typeahead]="service.communeInput$">
+              </ng-select>
             </div>
           </div>
           

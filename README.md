@@ -10,6 +10,10 @@
     - php bin/console assets:install public
     - php bin/console d:d:c  (abr. doctrine:database:create )
 
+    mkdir -p config/jwt
+    openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+    openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
+    download openssl on windows : https://stackoverflow.com/a/16263688
 ## FRONTEND SETUP 
     - yarn install (install packages --1st time only)
     - yarn run build (run webpack to generate the assets)

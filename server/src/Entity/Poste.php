@@ -78,6 +78,34 @@ class Poste
     private $PKVA;
 
     /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     * 
+     * @Groups({"postes"})
+     */
+    private $type;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     * 
+     * @Groups({"postes"})
+     */
+    private $marque;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     * 
+     * @Groups({"postes"})
+     */
+    private $poste;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     * 
+     * @Groups({"postes"})
+     */
+    private $n_serie;
+
+    /**
      * @ORM\Column(type="float", nullable=true)
      * 
      * @Groups({"postes"})
@@ -106,10 +134,6 @@ class Poste
      */
     private $node;
 
-
-    public function __construct()
-    {
-    }
 
     public function __toString()
     {
@@ -153,6 +177,50 @@ class Poste
     public function setPKVA(?string $PKVA): self
     {
         $this->PKVA = $PKVA;
+
+        return $this;
+    }
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+    public function getMarque(): ?string
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(?string $marque): self
+    {
+        $this->marque = $marque;
+
+        return $this;
+    }
+    public function getPoste(): ?string
+    {
+        return $this->poste;
+    }
+
+    public function setPoste(?string $poste): self
+    {
+        $this->poste = $poste;
+
+        return $this;
+    }
+    public function getNSerie(): ?string
+    {
+        return $this->n_serie;
+    }
+
+    public function setNSerie(?string $n_serie): self
+    {
+        $this->n_serie = $n_serie;
 
         return $this;
     }

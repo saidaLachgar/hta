@@ -23,9 +23,19 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: -1
     },
     {
-        name: 'Objectifs de l\'année',
-        value: 'objectifs',
-        permissions: 4
+        name: 'État du suivi',
+        value: 'objectives',
+        permissions: [0, 1, 2, 4]
+    },
+    {
+        name: 'Groupe d\'objectif',
+        value: 'goal_groups',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Objectives',
+        value: 'goals',
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Postes',

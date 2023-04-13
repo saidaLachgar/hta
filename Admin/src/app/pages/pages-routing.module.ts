@@ -51,6 +51,21 @@ const routes: Routes = [
       import("./visites/visite.module").then((m) => m.visiteModule),
   },
   {
+    path: "objectives",
+    loadChildren: () =>
+      import("./objectives/objective.module").then((m) => m.objectiveModule),
+  },
+  {
+    path: "goals",
+    loadChildren: () =>
+      import("./goals/goal.module").then((m) => m.goalModule),
+  },
+  {
+    path: "goal-group",
+    loadChildren: () =>
+      import("./goal-groups/goal-group.module").then((m) => m.goalGroupModule),
+  },
+  {
     path: "mission",
     loadChildren: () =>
       import("./mission/mission.module").then((m) => m.missionModule),

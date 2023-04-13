@@ -1,8 +1,11 @@
-import { Department, Node } from ".";
+import { Commune, Department, Node } from ".";
 export interface Edge {
     id?: number;
-    titre?: string;
     department?: Department;
     node_a?: Node;
     node_b?: Node;
+    section?:number;
+    longueur?:number;
+    marque?:string;
+    commune?: Commune;
 }

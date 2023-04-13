@@ -24,9 +24,12 @@
               <thead>
                 <tr>
                   <th>Départ</th>
-                  <th>Titre</th>
                   <th>De</th>
                   <th>À</th>
+                  <th>Longueur</th>
+                  <th>Section</th>
+                  <th>Marque</th>
+                  <th>Commune</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -34,6 +37,7 @@
                 <!-- search -->
                 <tr valign="middle" 
                 >
+                <!-- depar -->
                   <td>
                     <ng-select [items]="service.departments$ | async"
                               #searchDepar
@@ -48,8 +52,6 @@
                               [typeahead]="service.departmentInput$">
                     </ng-select>
                   </td>
-                  <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
-
                   <!-- nodeA -->
                   <td>
                     <ng-select [items]="service.ANode$ | async"
@@ -78,6 +80,28 @@
                         [loading]="service.BNodeLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
                         [typeahead]="service.BNodeInput$">
+                    </ng-select>
+                  </td>
+                  <!-- Longueur -->
+                  <td><input type="text" placeholder="Longueur..." formControlName="longueur" #searchLongueur class="form-control"></td>
+                  <!-- Section -->
+                  <td><input type="text" placeholder="Section..." formControlName="section" #searchSection class="form-control"></td>
+                  <!-- Marque -->
+                  <td><input type="text" placeholder="Marque..." formControlName="marque" #searchMarque class="form-control"></td>
+                  <!-- Commune -->
+                  <td>
+                    <ng-select [items]="service.communes$ | async"
+                              #searchCommunes
+                              formControlName="commune.id[]"
+                              bindLabel="titre"
+                              bindValue="id"
+                              [multiple]="true"
+                              
+                              [minTermLength]="2"
+                              placeholder="Communes.."
+                              [loading]="service.communeLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.communeInput$">
                     </ng-select>
                   </td>
                  
@@ -110,31 +134,54 @@
                 </tr>
                 <!-- result -->
                 <tr *ngFor="let item of (service.edges$ | async); let i = index">
+                  <!-- depar -->
                   <td>
                     <a 
                       *ngIf="item.department"
                       [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.department.id] : null"
                       target="_blank">{{item.department.titre}}</a>
                   </td>
-                  
-                   <td>
-                    <ngb-highlight
-                      [result]="item.titre"
-                      [term]="searchTitre.value"
-                    ></ngb-highlight>
-                  </td>
-
+                  <!-- a node -->
                   <td>
                     <a 
                       *ngIf="item.node_a"
                       [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.node_a.id] : null"
                       target="_blank">{{item.node_a.titre}}</a>
                   </td>
+                  <!-- b node -->
                   <td>
                     <a 
                       *ngIf="item.node_b"
                       [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.node_b.id] : null"
                       target="_blank">{{item.node_b.titre}}</a>
+                  </td>
+                  <!-- longueur -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.longueur"
+                      [term]="searchLongueur.value"
+                    ></ngb-highlight>
+                  </td>
+                  <!-- Section -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.section"
+                      [term]="searchSection.value"
+                    ></ngb-highlight>
+                  </td>
+                  <!-- Marque -->
+                  <td>
+                    <ngb-highlight
+                      [result]="item.marque"
+                      [term]="searchMarque.value"
+                    ></ngb-highlight>
+                  </td>
+                  <!-- Commune -->
+                  <td>
+                    <a 
+                      *ngIf="item.commune"
+                      [routerLink]="authService.isAuthorized('communes_details') ? ['/communes/details', item.commune.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.commune.titre}}</a>
                   </td>
                   
                   

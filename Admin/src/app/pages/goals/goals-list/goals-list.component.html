@@ -1,0 +1,191 @@
+<div class="container-fluid mb-5">
+  <div class="row align-items-center justify-content-between mb-4">
+    <div class="col-auto">
+      <app-page-title
+        title="Objectifs"
+        [breadcrumbItems]="breadCrumbItems"
+      ></app-page-title>
+    </div>
+    <div class="col-auto">
+      <a routerLink="/goals/add" class="btn btn-primary ms-2"
+      *ngIf="authService.isAuthorized('goals_add')"
+        ><i class="fas fa-plus-circle"></i> Ajouter</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Table -->
+          <form [formGroup]="service.goalForm" (ngSubmit)="service.onSearch()" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Années ciblées</th>
+                  <th>Total des réalisations</th>
+                  <th>Groupe</th>
+                  <th width="123px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- search -->
+                <tr valign="middle" 
+                >
+                  <td><input type="text" placeholder="Titre..." formControlName="name" #searchName class="form-control"></td>
+                  <td><input type="text" placeholder="Années ciblées..." formControlName="target_years" #searchTargetYears class="form-control"></td>
+                  <td><input type="text" placeholder="Total des réalisations..." formControlName="target_achievement" #searchTargetAchievement class="form-control"></td>
+                  <td>
+                    <ng-select [items]="service.goalGroups$ | async"
+                              #searchGroup
+                              formControlName="goal_group.id[]"
+                              bindLabel="name"
+                              bindValue="id"
+                              [multiple]="true"
+                              [minTermLength]="2"
+                              placeholder="Groupe.."
+                              [loading]="service.goalGroupLoading"
+                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                              [typeahead]="service.goalGroupInput$">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
+                      <i class="bx bx-search me-1"></i>Rechercher
+                    </button>
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
+                      <i class="bx bx-x me-1"></i>Réinitialiser
+                    </button>
+                  </td>
+                </tr>
+                <!-- loading -->
+                <tr>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="!(service.goals$ | async) && service.loading$ | async"
+                  >
+                    Chargement...
+                  </td>
+                  <td
+                    class="text-center"
+                    colspan="5"
+                    *ngIf="(service.goals$ | async) && (service.goals$ | async).length === 0 && service.loaded$ | async"
+                  >
+                  Aucune donnée trouvée !
+                  </td>
+                </tr>
+                <!-- data -->
+                <tr *ngFor="let item of (service.goals$ | async); let i = index">
+                  <td>
+                    <ngb-highlight
+                      [result]="item.name"
+                      [term]="searchName.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.target_years"
+                      [term]="searchTargetYears.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="item.target_achievement"
+                      [term]="searchTargetAchievement.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <a 
+                      *ngIf="item.goal_group"
+                      [routerLink]="authService.isAuthorized('goal_groups_details') ? ['/goal-group/details', item.goal_group.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{item.goal_group.name}}</a>
+                  </td>
+                  
+                  
+                  <td align="center">
+                    <div ngbDropdown 
+                      placement="bottom-left"
+                      *ngIf="authService.isAuthorized('goals_details') || authService.isAuthorized('goals_update') || authService.isAuthorized('goals_delete')"
+                      >
+                      <i
+                        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+                        ngbDropdownToggle
+                        data-toggle="dropdown"
+                        aria-expanded="true"
+                      ></i>
+                      <div
+                        class="dropdown-menu dropdown-menu-end"
+                        ngbDropdownMenu
+                      >
+                        <a class="dropdown-item"
+                          [routerLink]="['details', item.id]"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goals_details')"
+                          >
+                          <i class="fas fa-eye me-2"></i> Voir
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goals_update')"
+                          [routerLink]="['update', item.id]"
+                          >
+                          <!-- skipLocationChange -->
+                          <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="javascript: void(0);"
+                          *ngIf="authService.isAuthorized('goals_delete')"
+                          (click)="service.deleteItem(item.id, $event.target)"
+                        >
+                          <i class="fas fa-trash me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <!-- End table -->
+          <!-- Pagination -->
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
+            <div
+              *ngIf="pagination.totalRecords > service.pageSize"
+              class="row justify-content-md-between align-items-md-center mt-2"
+            >
+              <div class="col-sm-12 col-md-5">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                Affichage de {{pagination.startIndex}} 
+                à {{pagination.endIndex}} 
+                de {{pagination.totalRecords}} entrées
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                  <ngb-pagination
+                    [collectionSize]="pagination.totalRecords"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

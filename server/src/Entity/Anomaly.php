@@ -8,9 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Dto\AnomalyMultipleRequest;
 use App\Dto\AnomalyMultipleResponse;
@@ -53,11 +54,17 @@ use App\Action\AnomalyAction;
  *   },
  * )
  * @ApiFilter(
+ *      BooleanFilter::class,
+ *      properties={
+ *          "status"
+ *      }
+ * )
+ * 
+ * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
  *          "title"=SearchFilter::STRATEGY_PARTIAL,
  *          "severity"=SearchFilter::STRATEGY_EXACT,
- *          "status"=SearchFilter::STRATEGY_EXACT,
  *          "edge.id"=SearchFilter::STRATEGY_EXACT,
  *          "edge.department.id"=SearchFilter::STRATEGY_EXACT
  *      }
@@ -80,10 +87,10 @@ class Anomaly
     private $id;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean", nullable=false, options={"default": false})
      * @Groups({"anomalies"})
      */
-    private $status; // done, undone
+    private $status = false; // done, undone
 
     /**
      * @ORM\Column(type="string", length=25, nullable=true)

@@ -142,15 +142,15 @@
                   <!-- Terminé / En attente-->
                   <td>
                     <ui-switch 
-                        [checked]="item.status" 
+                        [checked]="item.status ? item.status : false" 
                         [disabled]="!authService.isAuthorized('anomalies_update')" 
                         (changeEvent)="service.updateStatus($event, item.id)"
-                        [loading]="service.statusLoading"
+                        [loading]="service.statusLoading === item.id"
                         uncheckedLabel="En attente"
                         checkedLabel="Terminé"
                         checkedTextColor="#fff"
                     >
-                    <i class="fa fa-spinner fa-pulse" *ngIf="service.statusLoading"></i>
+                    <i class="fa fa-spinner fa-pulse" *ngIf="service.statusLoading === item.id"></i>
                   </ui-switch>
                   </td>
                   <!-- severity -->

@@ -13,3 +13,6 @@ export * from './mission.model';
 export * from './anomaly.model';
 export * from './visite.model';
 export * from './edge.model';
+export * from './objective.model';
+export * from './goal.model';
+export * from './goal-group.model';

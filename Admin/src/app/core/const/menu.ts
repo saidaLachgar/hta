@@ -34,7 +34,26 @@ export const MENU: MenuItem[] = [
         id:7,
         label: 'Objectifs de l\'année',
         icon: 'bx bx-bullseye',
-        link: '/calendar',
+        subItems: [
+            {
+                id:19,
+                label: 'État du suivi',
+                link: '/objectives',
+                parentId: 7
+            },
+            {
+                id:20,
+                label: 'Objectifs',
+                link: '/goals',
+                parentId: 7
+            },
+            {
+                id:21,
+                label: 'Groupe d\'objectifs',
+                link: '/goal-group',
+                parentId: 7
+            },
+        ]
     },
     {
         id:8,

@@ -12,7 +12,7 @@
             <tbody *ngIf="edge">
               <tr>
                 <th scope="row">Nom :</th>
-                <td>{{edge.titre}}</td>
+                <td>{{edge.node_a.titre}} → {{edge.node_b.titre}}</td>
               </tr>
               <tr valign="middle">
                 <th scope="row">Départ :</th>
@@ -39,6 +39,30 @@
                     *ngIf="edge.node_b"
                     [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', edge.node_b.id] : null"
                     target="_blank">{{edge.node_b.titre}}</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Longueur :</th>
+                <td>
+                  {{edge.longueur}}
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Section :</th>
+                <td>
+                  {{edge.section}}
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Marque :</th>
+                <td>
+                  {{edge.marque}}
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Commune :</th>
+                <td>
+                  {{edge.commune.titre}}
                 </td>
               </tr>
             </tbody>

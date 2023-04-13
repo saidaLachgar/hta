@@ -7,11 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
@@ -65,7 +65,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *      SearchFilter::class,
  *      properties={
  *          "id"=SearchFilter::STRATEGY_EXACT,
- *          "titre"=SearchFilter::STRATEGY_PARTIAL,
  *          "department.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
@@ -86,13 +85,6 @@ class Edge
      * 
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"edge","anomalies"})
-     * 
-     */
-    private $titre;
 
     /**
      * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="edges")
@@ -120,6 +112,27 @@ class Edge
      */
     private $anomalies;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * 
+     * @Groups({"edge"})
+     */
+    private $section;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * 
+     * @Groups({"edge"})
+     */
+    private $longueur;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     * 
+     * @Groups({"edge"})
+     */
+    private $marque;
+
     public function __construct()
     {
         $this->anomalies = new ArrayCollection();
@@ -127,24 +140,12 @@ class Edge
 
     public function __toString()
     {
-        return $this->titre;
+        return $this->node_a->getTitre() . " → " . $this->node_b->getTitre();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitre(): ?string
-    {
-        return $this->titre;
-    }
-
-    public function setTitre(string $titre): self
-    {
-        $this->titre = $titre;
-
-        return $this;
     }
 
     public function getDepartment(): ?Department
@@ -209,6 +210,41 @@ class Edge
                 $anomaly->setEdge(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLongueur(): ?float
+    {
+        return $this->longueur;
+    }
+
+    public function setLongueur(?float $longueur): self
+    {
+        $this->longueur = $longueur;
+
+        return $this;
+    }
+    public function getSection(): ?float
+    {
+        return $this->section;
+    }
+
+    public function setSection(?float $section): self
+    {
+        $this->section = $section;
+
+        return $this;
+    }
+
+    public function getMarque(): ?string
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(?string $marque): self
+    {
+        $this->marque = $marque;
 
         return $this;
     }

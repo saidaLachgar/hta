@@ -20,14 +20,12 @@ class AdjacencyListCache
     }
     
     // get adjacencyList from cache (if found)
-    public function getAdjacencyList($departmentId):array
+    public function getAdjacencyList($departmentId, $reset = false):array
     {
-        // dump("getAdjacencyList ------------------");
-        // dump(count($this->adjacencyList));
         if (count($this->adjacencyList) === 0) {
             $cacheItem = $this->cache->getItem('adjacency_list_'.$departmentId);
 
-            if ($cacheItem->isHit()) {
+            if ($cacheItem->isHit() && !$reset) {
                 $this->adjacencyList = $cacheItem->get();
             } else {
                 // Retrieve the adjacency list from the database and store it in the cache

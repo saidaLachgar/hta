@@ -1,0 +1,90 @@
+<style>
+    .editable-cell:hover{
+        outline: 1px solid rgba(32,45,52,.4);
+        cursor: pointer;
+        transition: outline .05s;
+    }
+</style>
+<div class="container-fluid mb-5">
+
+    <!-- start page title -->
+    <app-page-title
+    title="Etat de suivi des Objectifs {{current_year}}"
+    [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card card-body">
+
+                <p class="text-center">
+                    <button class="btn btn-light font-size-10"><i class="fas fa-chevron-left"></i></button>
+                    <b class="mx-3">{{current_year}}</b>
+                    <button class="btn btn-light font-size-10" disabled><i class="fas fa-chevron-right"></i></button>
+                </p>
+
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col" valign="middle" rowspan="2">Intitulé de l'action</th>
+            <th scope="col" valign="middle" rowspan="2">Obj</th>
+            <th scope="col" colspan="2" *ngFor="let month of months">{{month}}</th>
+            <th scope="col" colspan="2">Cumul</th>
+            <th scope="col" valign="middle" rowspan="2"> % Obj</th>
+          </tr>
+          <tr>
+            <ng-container *ngFor="let number of months">
+                <th>P</th>
+                <th>R</th>
+            </ng-container>
+            <!-- Cumul -->
+            <th>P</th>
+            <th>R</th>
+          </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let group of (data$ | async) | keyvalue">
+                <tr>
+                 <td class="bg-light fw-bold" colspan="29">{{group.key}}</td>
+                </tr>
+                <tr *ngFor="let goal of group.value | keyvalue">
+                    <td>{{goal.key}}</td>
+                    <td>{{goal.value.target_achievement}}</td>
+                    <ng-container *ngFor="let month of months | keyvalue">
+                        <ng-container *ngIf="goal.value.achievements[+month.key + 1];else empty_cells">
+                            <td class="editable-cell" (click)="updateAchievement(goal.value.achievements[+month.key + 1].id)">
+                                {{goal.value.achievements[+month.key + 1].p}}
+                            </td>
+                            <td class="editable-cell" (click)="updateAchievement(goal.value.achievements[+month.key + 1].id)">
+                                {{goal.value.achievements[+month.key + 1].r}}
+                            </td>
+                        </ng-container>
+                        <ng-template #empty_cells>
+                            <td class="editable-cell" (click)="addAchievement(month.key + 1, goal.value.id)"></td>
+                            <td class="editable-cell" (click)="addAchievement(month.key + 1, goal.value.id)"></td>
+                        </ng-template>
+                    </ng-container>
+                    <!-- Cumul -->
+                    <td>{{goal.value.target_achievement}}</td>
+                    <td>{{goal.value.cumul}}</td>
+                    <td>
+                        <ngb-progressbar 
+                            [value]="( goal.value.cumul / goal.value.target_achievement ) * 100" 
+                            [striped]="true" 
+                            type="danger"
+                            [showValue]="true"
+                            [animated]="true"
+                        ></ngb-progressbar>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+
+
+            </div>
+        </div>
+    </div>
+</div>

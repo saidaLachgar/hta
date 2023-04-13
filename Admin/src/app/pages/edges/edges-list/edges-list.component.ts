@@ -19,14 +19,18 @@ export class edgesListComponent {
   ) {
     service.findAll();
     service.loadDepartments();
+    service.loadCommunes();
     service.loadANodes();
     service.loadBNodes();
 
     service.edgeForm = fb.group({
-      titre: [''],
       "department.id[]": [''],
       "node_a.id[]": [''],
       "node_b.id[]": [''],
+      "commune.id[]": [''],
+      section: [null],
+      marque: [""],
+      longueur: [null],
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';

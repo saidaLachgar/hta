@@ -14,6 +14,9 @@ const entityMetadata: EntityMetadataMap = {
   anomalies: {},
   visites: {},
   nodes: {},
+  objectives: {},
+  goal_groups: {},
+  goals: {},
 };
 
 const pluralNames = { 
@@ -30,6 +33,9 @@ const pluralNames = {
   anomalies: 'anomalies',
   visites: 'visites',
   nodes: 'nodes',
+  objectives: 'objectives',
+  goal_groups: 'goal_groups',
+  goals: 'goals',
  };
 
 export const entityConfig: EntityDataModuleConfig = { 

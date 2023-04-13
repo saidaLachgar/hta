@@ -1,4 +1,5 @@
 import { Component , OnInit} from '@angular/core';
+import { AuthenticationService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -6,8 +7,11 @@ import { Component , OnInit} from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit  {
+  constructor(public authService: AuthenticationService,) { 
+    authService.isTokenExpired() && authService.logout();
+  }
 
   ngOnInit() {
-    // document.getElementsByTagName("html")[0].setAttribute("dir", "rtl");
+    
   }
 }

@@ -16,24 +16,29 @@ export class edgeUpdateComponent {
     this.breadCrumbItems = [{ label: 'Tronçons' }, { label: 'Mettre à jour l\'tronçon', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     service.loadDepartments(false);
+    service.loadCommunes();
     service.loadANodes();
     service.loadBNodes();
 
     service.edgeForm = this.fb.group({
-      titre: ["", Validators.required],
       node_a: ["", Validators.required],
       node_b: ["", Validators.required],
       department: [""],
+      longueur: [null],
+      section: [null],
+      commune: [""],
+      marque: [""],
     });
 
     service.getByKey(this.id).subscribe((obj) => {
       service.loadANodes(obj.node_a ? [obj.node_a] : []);
       service.loadBNodes(obj.node_b ? [obj.node_b] : []);
       service.edgeForm.patchValue({
-        titre : obj.titre,
         department :obj.department ? obj.department["@id"] : null,
+        commune :obj.commune ? obj.commune["@id"] : null,
         node_a :obj.node_a ? obj.node_a["@id"] : null,
         node_b :obj.node_b ? obj.node_b["@id"] : null,
+        marque :obj.marque,
       });
     });
 

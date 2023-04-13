@@ -136,10 +136,12 @@ export class missionPersistComponent {
     })
   }
   addAnomaly() {
-    if (this.service.ANode.value)
-      this.anomalies.push(this.newAnomaly());
+    if (!this.service.ANode.value)
+      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.", "danger")
+    else if (this.service.type.value == null)
+      this.addAlert("Vous devez choisir le type de coupure !", "danger")
     else
-      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.", "danger");
+      this.anomalies.push(this.newAnomaly());
   }
   removeAnomaly(i: number) {
     this.anomalies.removeAt(i);

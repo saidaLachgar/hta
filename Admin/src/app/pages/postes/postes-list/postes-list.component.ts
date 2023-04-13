@@ -30,6 +30,10 @@ export class postesListComponent {
       nb_clients: [""],
       before: [""],
       after: [""],
+      type: [""],
+      marque: [""],
+      poste: [""],
+      n_serie: [""],
       "node.department.id[]": [''],
       "commune.id[]": [''],
     });

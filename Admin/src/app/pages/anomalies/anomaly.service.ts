@@ -42,7 +42,7 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
-  statusLoading: boolean = false;
+  statusLoading: number = 0;
   page: number = 1;
   lastSearchedParams;
   public anomalyForm: FormGroup;
@@ -229,12 +229,12 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     let _this = this;
     let checked = !($event.target as HTMLTextAreaElement).classList.contains("checked");
     let anomaly = { id: id, status: checked } as Anomaly;
-    this.statusLoading = true;
+    this.statusLoading = id;
 
     this.update(anomaly).subscribe({
       error: () => _this.toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
-        _this.statusLoading = false;
+        _this.statusLoading = 0;
         _this.toast.success("Statut a été mis à jour avec succès");
       },
     });

@@ -243,15 +243,15 @@
                   <!-- Terminé / En attente-->
                   <td>
                     <ui-switch 
-                        [checked]="item.status" 
+                        [checked]="item.status ? item.status : false" 
                         [disabled]="!authService.isAuthorized('anomalies_update')" 
                         (changeEvent)="anomalyService.updateStatus($event, item.id)"
-                        [loading]="anomalyService.statusLoading"
+                        [loading]="anomalyService.statusLoading === item.id"
                         uncheckedLabel="En attente"
                         checkedLabel="Terminé"
                         checkedTextColor="#fff"
                     >
-                    <i class="fa fa-spinner fa-pulse" *ngIf="anomalyService.statusLoading"></i>
+                    <i class="fa fa-spinner fa-pulse" *ngIf="anomalyService.statusLoading === item.id"></i>
                   </ui-switch>
                   </td>
                   <!-- severity -->
@@ -450,7 +450,7 @@
     
     <button
       (click)="service.Persist('EDIT')"
-      [disabled]="(service.loading$ | async)"
+      [disabled]="(service.loading$ | async) || service.anomalyLoading"
       class="btn btn-primary float-end"
     > Sauvegarder</button>
 

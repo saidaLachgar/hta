@@ -1,0 +1,40 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <app-page-title
+    title="Détails de l'objectif"
+    [breadcrumbItems]="breadCrumbItems"
+  ></app-page-title>
+  <!-- end page title -->
+  <div class="card mt-4">
+    <div class="card-body pt-5">
+      <div class="table-responsive">
+        <table class="table table-nowrap mb-0">
+          <tbody *ngIf="goal">
+            <tr>
+              <th scope="row">Titre :</th>
+              <td>{{goal.name}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Années ciblées :</th>
+              <td>{{goal.targetYears}}</td>
+            </tr>
+            <tr>
+              <th scope="row">Total des réalisations :</th>
+              <td>{{goal.targetAchievement}}</td>
+            </tr>
+            <tr valign="middle">
+              <th scope="row">Groupe :</th>
+              <td>
+                <a 
+                  *ngIf="goal.goalGroup"
+                  [routerLink]="authService.isAuthorized('goal_groups_details') ? ['/goal-group/details', goal.goalGroup.id] : null"
+                  target="_blank" rel="noopener noreferrer">{{goal.goalGroup.name}}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-light mt-4 float-end" routerLink="/goals"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+    </div>
+  </div>
+</div>

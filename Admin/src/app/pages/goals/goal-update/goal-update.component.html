@@ -1,0 +1,93 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <app-page-title
+      title="Mettre à jour de l'objectif"
+      [breadcrumbItems]="breadCrumbItems"
+    ></app-page-title>
+    <!-- end page title -->
+  
+    <form class="row mt-4" [formGroup]="service.goalForm" (ngSubmit)="service.onUpdate(id)">
+      <fieldset class="col-12" [disabled]="service.loading$ | async">
+        <div class="card">
+          <div class="card-body">
+           
+            <div class="mb-3 row">
+              <label for="name-input" class="col-md-2 col-form-label">Titre</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="name"
+                  [ngClass]="{'is-invalid':service.name.invalid && service.submitted}"
+                  class="form-control"
+                  type="text"
+                  id="name-input"
+                />
+                <div
+                  *ngIf="service.submitted && service.name.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="service.name.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="input-1" class="col-md-2 col-form-label">Années ciblées</label>
+              <div class="col-md-10" id="input-1">
+                  <ng-select [items]="[]"
+                            [addTag]="true"
+                            multiple="true"
+                            formControlName="targetYears">
+                  </ng-select>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="achievement-input" class="col-md-2 col-form-label">Total des réalisations</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="targetAchievement"
+                  [ngClass]="{'is-invalid':service.targetAchievement.invalid && service.submitted}"
+                  class="form-control"
+                  type="text"
+                  id="achievement-input"
+                />
+                <div
+                  *ngIf="service.submitted && service.targetAchievement.errors"
+                  class="invalid-feedback">
+                  <span *ngIf="service.targetAchievement.errors.required">Ce champ est obligatoire.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="input-1" class="col-md-2 col-form-label">Groupe</label>
+              <div class="col-md-10" id="input-1">
+                  <ng-select [items]="service.goalGroups$ | async"
+                            formControlName="goalGroup"
+                            bindLabel="name"
+                            bindValue="@id"
+                            [minTermLength]="2"
+                            [loading]="service.goalGroupLoading"
+                            [ngClass]="{'is-invalid':service.goalGroup.invalid && service.submitted}"
+                            typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                            [typeahead]="service.goalGroupInput$">
+                  </ng-select>
+                  <div
+                    *ngIf="service.submitted && service.goalGroup.errors"
+                    class="invalid-feedback">
+                    <span *ngIf="service.goalGroup.errors.required">Ce champ est obligatoire.</span>
+                  </div>
+              </div>
+            </div>
+            
+  
+            <div class="row justify-content-end">
+              <div class="col-auto">
+                <button class="btn btn-light me-2" routerLink="/goals"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+                <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="service.submitted && (service.loading$ | async)"></i> Sauvegarder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <!-- end col -->
+    </form>
+    <!-- end row -->
+  </div>
+  

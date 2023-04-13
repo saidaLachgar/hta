@@ -69,10 +69,10 @@
                 id="input-4" 
                 class="form-control"
                 type="text"
-                
               />
             </div>
           </div>
+
           <div class="mb-3 row">
             <label for="input-5" class="col-md-2 col-form-label">P KVA</label>
             <div class="col-md-10">
@@ -120,6 +120,50 @@
               <div class="input-group clockpicker">
                 <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" id="input-8" formControlName="dateMst" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
               </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-type" class="col-md-2 col-form-label">Type</label>
+            <div class="col-md-10">
+              <input
+                formControlName="type"
+                id="input-type" 
+                class="form-control"
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-marque" class="col-md-2 col-form-label">Marque</label>
+            <div class="col-md-10">
+              <input
+                formControlName="marque"
+                id="input-marque" 
+                class="form-control"
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-poste" class="col-md-2 col-form-label">Poste</label>
+            <div class="col-md-10">
+              <input
+                formControlName="poste"
+                id="input-poste" 
+                class="form-control"
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="input-nserie" class="col-md-2 col-form-label">N° serie</label>
+            <div class="col-md-10">
+              <input
+                formControlName="n_serie"
+                id="input-nserie" 
+                class="form-control"
+                type="text"
+              />
             </div>
           </div>
           

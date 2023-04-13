@@ -12,13 +12,17 @@ export class edgeCreateComponent {
   constructor(private fb: FormBuilder, public service: edgeService) {
     this.breadCrumbItems = [{ label: 'Tronçon' }, { label: 'Nouveau tronçon', active: true }];
     service.loadDepartments(false);
+    service.loadCommunes();
     service.loadANodes();
     service.loadBNodes();
     service.edgeForm = this.fb.group({
-      titre: ["", Validators.required],
       department: [""],
       node_a: ["", Validators.required],
       node_b: ["", Validators.required],
+      longueur: [null],
+      section: [null],
+      commune: [""],
+      marque: [""],
     });
   }
 }

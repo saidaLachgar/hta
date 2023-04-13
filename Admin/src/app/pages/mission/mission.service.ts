@@ -140,6 +140,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     let depar = this.department.value;
     anode && anode.trim() !== '' && this.anomalyService.findByCriteria({
       page: 1,
+      status: [false,null],
       ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
       ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
     });
@@ -251,10 +252,11 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
           },
         });
     }
-    while (form.anomalies.length !== 0) 
-      (this.missionForm.get("anomalies") as FormArray).removeAt(0);
+
+    let anomalyFormArray = this.missionForm.get("anomalies") as FormArray;
+    while (anomalyFormArray.length !== 0) 
+      anomalyFormArray.removeAt(0);
     this.getRelatedAnomalies();
-    console.log("mkdmlsqmlskqmd")
   }
 
 
