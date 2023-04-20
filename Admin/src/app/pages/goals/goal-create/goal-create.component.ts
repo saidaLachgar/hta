@@ -14,6 +14,7 @@ export class goalCreateComponent {
     service.goalForm = this.fb.group({
       name: ['', Validators.required],
       targetYears: [''],
+      calc: [''],
       targetAchievement: [null, Validators.required],
       goalGroup: ['', Validators.required],
     });

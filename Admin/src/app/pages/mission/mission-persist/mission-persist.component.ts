@@ -38,6 +38,7 @@ export class missionPersistComponent {
     this.currentUser = authService.currentUserValue;
     this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Nouveaux travaux', active: true }];
     service.loadDepartments(false);
+    service.loadActions();
 
     service.missionForm = this.fb.group({
       date: [""],

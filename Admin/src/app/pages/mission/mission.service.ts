@@ -9,7 +9,7 @@ import {
 } from "@ngrx/data";
 import { concat, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Department, Mission, Node, Pagination, MISSION_ACTIONS } from "src/app/core/models";
+import { Department, Mission, Node, Pagination } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { anomalyService } from "../anomalies/anomaly.service";
@@ -26,7 +26,7 @@ const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(da
 export class missionService extends EntityCollectionServiceBase<Mission> {
   readonly server = environment.serverURL;
   readonly pageSize = environment.pageSize;
-  readonly MISSION_ACTIONS = MISSION_ACTIONS;
+  actions$: Observable<any[]>;
   mission$: Observable<Mission[]>;
   interruption: Mission | boolean = false;
   EditeMode: boolean = false;
@@ -42,8 +42,6 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   departments$: Observable<Department[]>;
   departmentLoading = false;
   departmentInput$ = new Subject<string>();
-
-
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
@@ -127,6 +125,13 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     } else {
       this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
     }
+  }
+  loadActions(): void{
+    this.actions$ = this.http
+      .get<string[]>(`${this.server}/api/goals/by-group`)
+      .pipe(
+        map(response => response["hydra:member"][0])
+      );
   }
 
   clone(key: string): Observable<Mission> {

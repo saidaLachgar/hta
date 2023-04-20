@@ -124,14 +124,20 @@
             </span>
           </div>
           <div class="row mt-3" [hidden]="!showAdvanced">
+            <div class="col-12">
+              <div role="alert" class="alert alert-info">
+                <i class="mdi mdi-alert-circle-outline me-2"></i>
+                <span>La sélection d'une action augmente le nombre de réalisations dans l'<b>État du suivi des objectifs</b>, tandis que la désélection d'une action le diminue.</span>
+              </div>
+            </div>
 
-            <div class="col-md-4 d-flex flex-column" *ngFor="let action of service.MISSION_ACTIONS">
+            <div class="col-md-4 d-flex flex-column" *ngFor="let action of (service.actions$ | async | keyvalue).reverse()">
               <div class="card flex-fill">
-                <div class="card-header">{{action.group}}</div>
+                <div class="card-header">{{action.key}}</div>
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between" *ngFor="let option of action.values">
+                    <li class="list-group-item d-flex justify-content-between" *ngFor="let option of action.value">
                       <label class="form-check-label" for="actions-{{option.id}}">
-                        {{option.label}}
+                        {{option.name}}
                       </label>
                       <div class="form-check font-size-16">
                         <input type="checkbox" id="actions-{{option.id}}" value="{{option.id}}" class="form-check-input" (change)="onActionsChange($event)">

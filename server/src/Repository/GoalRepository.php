@@ -100,28 +100,26 @@ class GoalRepository extends ServiceEntityRepository
         return $restructuredResult;
     }
 
-//    /**
-//     * @return Goal[] Returns an array of Goal objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('g.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getGoals(): array
+    {
+        $results =  $this->createQueryBuilder('g')
+            ->select("gg.name as group_name,g.id as goal_id, g.name as goal_name")
+            ->andWhere('gg.display_in_forms = :display_in_forms')
+            ->setParameter('display_in_forms', true)
+            ->join('g.goal_group', 'gg')
+            ->getQuery()
+            ->getResult()
+        ;
+        // Restructure the result into a desired format
+        $restructuredResult = [];
+        foreach ($results as $result ) {
+            $groupName = $result['group_name'];
+            $restructuredResult["data"][$groupName][] = [
+                'name' => $result['goal_name'],
+                'id' => $result['goal_id']
+            ];
+        }
 
-//    public function findOneBySomeField($value): ?Goal
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $restructuredResult;
+    }
 }

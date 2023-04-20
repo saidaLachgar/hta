@@ -10,7 +10,6 @@
     <!-- start page title -->
     <app-page-title
     title="Etat de suivi des Objectifs {{current_year}}"
-    [Loading]="service.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
@@ -20,9 +19,9 @@
             <div class="card card-body">
 
                 <p class="text-center">
-                    <button class="btn btn-light font-size-10"><i class="fas fa-chevron-left"></i></button>
+                    <button class="btn btn-light font-size-10" (click)="updateYear(+current_year - 1)"><i class="fas fa-chevron-left"></i></button>
                     <b class="mx-3">{{current_year}}</b>
-                    <button class="btn btn-light font-size-10" disabled><i class="fas fa-chevron-right"></i></button>
+                    <button class="btn btn-light font-size-10" (click)="updateYear(+current_year + 1)"><i class="fas fa-chevron-right"></i></button>
                 </p>
 
     <table class="table table-bordered">
@@ -44,27 +43,28 @@
             <th>R</th>
           </tr>
         </thead>
-        <tbody>
-            <ng-container *ngFor="let group of (data$ | async) | keyvalue">
+        <tbody *ngIf='(data$ | async) as data; else loading_template'>
+            <ng-container *ngFor="let group of data | keyvalue">
                 <tr>
                  <td class="bg-light fw-bold" colspan="29">{{group.key}}</td>
                 </tr>
                 <tr *ngFor="let goal of group.value | keyvalue">
                     <td>{{goal.key}}</td>
                     <td>{{goal.value.target_achievement}}</td>
-                    <ng-container *ngFor="let month of months | keyvalue">
-                        <ng-container *ngIf="goal.value.achievements[+month.key + 1];else empty_cells">
-                            <td class="editable-cell" (click)="updateAchievement(goal.value.achievements[+month.key + 1].id)">
-                                {{goal.value.achievements[+month.key + 1].p}}
+                    <ng-container *ngFor="let number of months; let month = index">
+                        <ng-container *ngIf="goal.value.achievements[+month + 1];else empty_cells">
+                            <td class="editable-cell" (click)="showForm(true, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
+                                {{goal.value.achievements[+month + 1].p? goal.value.achievements[+month + 1].p: ""}} 
                             </td>
-                            <td class="editable-cell" (click)="updateAchievement(goal.value.achievements[+month.key + 1].id)">
-                                {{goal.value.achievements[+month.key + 1].r}}
+                            <td class="editable-cell" (click)="showForm(false, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
+                                {{goal.value.achievements[+month + 1].r?goal.value.achievements[+month + 1].r: ""}} 
                             </td>
                         </ng-container>
                         <ng-template #empty_cells>
-                            <td class="editable-cell" (click)="addAchievement(month.key + 1, goal.value.id)"></td>
-                            <td class="editable-cell" (click)="addAchievement(month.key + 1, goal.value.id)"></td>
+                            <td class="editable-cell" (click)="showForm(true, +month + 1, goal.value.id)"></td>
+                            <td class="editable-cell" (click)="showForm(false, +month + 1, goal.value.id)"></td>
                         </ng-template>
+                        
                     </ng-container>
                     <!-- Cumul -->
                     <td>{{goal.value.target_achievement}}</td>
@@ -81,6 +81,9 @@
                 </tr>
             </ng-container>
         </tbody>
+        <ng-template #loading_template>
+            <tbody><tr><td colspan="29" class="text-center">Chargement...</td></tr></tbody>
+        </ng-template>
     </table>
 
 
@@ -88,3 +91,89 @@
         </div>
     </div>
 </div>
+
+<ng-template #content let-modal>
+	<div class="modal-header">
+		<h4 class="modal-title"></h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+	</div>
+	<div class="modal-body">
+		<form id="obj-form" [formGroup]="form" (ngSubmit)="persistAchievement()">
+            <input type="hidden" formControlName="id">
+			
+            <div class="mb-3 row">
+                <label for="input-date" class="col-md-2 col-form-label">Mois</label>
+                <div class="col-md-10">
+                    <input 
+                        type="text"
+                        formControlName="date"
+                        id="input-date"
+                        class="form-control"
+                        placeholder="aaaa-mm"
+                        [ngClass]="{'is-invalid':date.invalid && submitted}"
+                    >
+                    <div
+                        *ngIf="submitted && date.errors"
+                        class="invalid-feedback">
+                        <span *ngIf="date.errors.required">Ce champ est obligatoire.</span>
+                        <span *ngIf="date.errors.pattern">Format incorrect. Utilisez le format AAAA-MM.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 row" [hidden]="!planned">
+                <label for="input-p" class="col-md-2 col-form-label">Planifié</label>
+                <div class="col-md-10">
+                    <input 
+                        type="number"
+                        placeholder="Planifié"
+                        formControlName="plannedCount"
+                        id="input-p"
+                        class="form-control"
+                    >
+                </div>
+            </div>
+            <div class="mb-3 row" [hidden]="planned">
+                <label for="input-r" class="col-md-2 col-form-label">Réalisé</label>
+                <div class="col-md-10">
+                    <input 
+                        type="number"
+                        placeholder="Réalisé"
+                        formControlName="count"
+                        id="input-r"
+                        class="form-control"
+                    >
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="input-r" class="col-md-2 col-form-label">Action</label>
+                <div class="col-md-10">
+                    
+                    <ng-select 
+                        formControlName="goal"
+                        placeholder="Action"
+                        [ngClass]="{'is-invalid':goal.invalid && submitted}"
+                        >
+                        <ng-option *ngFor="let goal of (service.goals$ | async)" [value]="'/api/goals/'+goal.id">{{goal.name}}</ng-option>
+                    </ng-select>
+
+                    <div
+                        *ngIf="submitted && goal.errors"
+                        class="invalid-feedback">
+                        <span *ngIf="goal.errors.required">Ce champ est obligatoire.</span>
+                    </div>
+
+                </div>
+            </div>
+            
+
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button *ngIf="edit_mode" type="button" class="btn btn-outline-danger" [disabled]="loading" (click)="deleteAchievement(planned)">
+            Supprimer
+        </button>
+		<button type="submit" class="btn btn-primary" form="obj-form" [disabled]="loading">
+            {{edit_mode ? "Enregistrer" : "Ajouter"}}
+        </button>
+	</div>
+</ng-template>

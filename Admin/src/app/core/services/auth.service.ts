@@ -28,7 +28,7 @@ export class AuthenticationService {
     return this.currentUserSubject.value;
   }
   getToken(): any {
-    return this.currentUserValue.jwt;
+    return this.currentUserValue && this.currentUserValue.jwt;
   }
   getUserName(): string {
     return this.currentUserValue.username;
@@ -95,7 +95,7 @@ export class AuthenticationService {
   logout() {
     // remove user from local storage to log user out
     localStorage.clear();
-    this.currentUserSubject.next(null);
+    this.currentUserSubject && this.currentUserSubject.next(null);
     this.router.navigate(["account/login"]);
   }
 

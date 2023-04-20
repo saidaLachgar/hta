@@ -49,6 +49,12 @@ class GoalGroup
      */
     private $name;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"goal_group","goal", "objective"})
+     */
+    private $display_in_forms;
+
     public function __toString()
     {
         return $this->name;
@@ -68,6 +74,18 @@ class GoalGroup
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function isDisplayInForms(): ?bool
+    {
+        return $this->display_in_forms;
+    }
+
+    public function setDisplayInForms(?bool $display_in_forms): self
+    {
+        $this->display_in_forms = $display_in_forms;
 
         return $this;
     }

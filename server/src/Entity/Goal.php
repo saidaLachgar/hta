@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 /**
  * @ApiResource(
@@ -23,7 +24,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'goals_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'goals_show')"},
+ *      "get"= { "access_control"="is_granted('hasPermission', 'goals_show')", "pagination_enabled"=false},
+ *      "grouped_goals"= {
+ *          "access_control"="is_granted('hasPermission', 'goals_show')",
+ *          "method"="GET",
+ *          "path"="/goals/by-group",
+ *          "openapi_context"={
+ *              "summary"="Get goals grouped"
+ *            }
+ *      },
  *   },
  * )
  * @ApiFilter(
@@ -35,6 +44,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "goal_group.id"=SearchFilter::STRATEGY_EXACT,
  *      }
  * )
+ * 
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=GoalRepository::class)
  */
 class Goal
@@ -78,6 +89,12 @@ class Goal
      * @Groups({"goal", "objective"})
      */
     private $goal_group;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"goal", "objective"})
+     */
+    private $calc; // values SELECTION_COUNT - ANNUAL_VISIT_COUNT - ANOMALY_VISIT_COUNT
 
     public function __toString()
     {
@@ -169,6 +186,18 @@ class Goal
     public function setGoalGroup(?GoalGroup $goal_group): self
     {
         $this->goal_group = $goal_group;
+
+        return $this;
+    }
+
+    public function getCalc(): ?string
+    {
+        return $this->calc;
+    }
+
+    public function setCalc(?string $calc): self
+    {
+        $this->calc = $calc;
 
         return $this;
     }

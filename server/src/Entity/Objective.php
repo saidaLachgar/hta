@@ -47,6 +47,7 @@ class Objective
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"objective"})
      */
     private $id;
 
@@ -70,7 +71,7 @@ class Objective
     private $planned_count;
 
     /**
-     * @ORM\ManyToOne(targetEntity=goal::class, inversedBy="objectives")
+     * @ORM\ManyToOne(targetEntity=Goal::class, inversedBy="objectives")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"objective"})
      */

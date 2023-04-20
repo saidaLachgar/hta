@@ -78,7 +78,7 @@
                           class="dropdown-item"
                           href="javascript: void(0);"
                           *ngIf="authService.isAuthorized('goal_groups_update')"
-                          (click)="service.onUpdate(item.id, item.name)"
+                          (click)="service.onUpdate(item.id, item.name, item.display_in_forms)"
                           >
                           <!-- skipLocationChange -->
                           <i class="fas fa-edit me-2"></i> Modifier
@@ -156,6 +156,11 @@
                 <span *ngIf="service.name.errors.required">Ce champ est obligatoire.</span>
               </div>
             </div>
+            <div class="form-check mt-4 ms-3">
+              <input type="checkbox" id="display_in_forms" formControlName="displayInForms" class="form-check-input">
+              <label for="display_in_forms" class="form-check-label">Afficher dans le formulaire de travaux</label>
+            </div>
+            
           </div>
           <div class="row justify-content-end">
             <div class="col-auto">

@@ -24,17 +24,19 @@ export class goalUpdateComponent {
     service.loadGoalGroups();
     service.goalForm = this.fb.group({
       name: ["", Validators.required],
-      targetYears: [""],
+      targetYears: [[]],
+      calc: [""],
       targetAchievement: [null, Validators.required],
       goalGroup: ["", Validators.required],
     });
     this.service.getByKey(this.id).subscribe((obj) => {
-      service.loadGoalGroups(obj.goalGroup ? [obj.goalGroup] : []);
-      service.goalForm.setValue({
+      service.loadGoalGroups(obj.goal_group ? [obj.goal_group] : []);
+      service.goalForm.patchValue({
         name: obj.name,
-        targetYears: obj.targetYears,
-        targetAchievement: obj.targetAchievement,
-        goalGroup: obj.goalGroup ? obj.goalGroup["@id"] : null,
+        targetYears: obj.target_years,
+        calc: obj.calc,
+        targetAchievement: obj.target_achievement,
+        goalGroup: obj.goal_group ? obj.goal_group["@id"] : null,
       });
     });
   }

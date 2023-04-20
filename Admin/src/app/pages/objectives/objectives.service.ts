@@ -5,23 +5,32 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory,
 } from "@ngrx/data";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { Objective } from "src/app/core/models";
+import { Observable, Subject, concat, of } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
+import { Goal, Objective } from "src/app/core/models";
 import { environment } from "src/environments/environment";
+import { goalService } from "../goals/goal.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class ObjectivesService extends EntityCollectionServiceBase<Objective> {
   private server = environment.serverURL;
-  public ObjectivesForm: FormGroup;
+
+  goals$: Observable<Goal[]>;
+  goalLoading = false;
+  goalInput$ = new Subject<string>();
 
   constructor(
     private http: HttpClient,
+    private goalervice: goalService,
     private serviceElementsFactory: EntityCollectionServiceElementsFactory
   ) {
     super("objectives", serviceElementsFactory);
+  }
+
+  loadGoals(): void {
+    this.goals$ = this.goalervice.getWithQuery("properties[]=id&properties[]=name");
   }
 
   /**
@@ -31,13 +40,7 @@ export class ObjectivesService extends EntityCollectionServiceBase<Objective> {
     return this.http
       .get<string[]>(`${this.server}/api/objectives/get-achievements?year=${year}`)
       .pipe(
-        // map(response => response["hydra:member"][0])
-        map((response) => {
-          console.log(response["hydra:member"][0]);
-          return response["hydra:member"][0];
-        })
+        map(response => response["hydra:member"][0])
       );
   }
 }
-// http://127.0.0.1:8000/objectives/get-achievements?year=2023
-// http://127.0.0.1:8000/api/objectives/get-achievements?year=2023&page=1

@@ -19,6 +19,7 @@ export class goalGroupListComponent {
     service.findAll();
     service.goalGroupForm = fb.group({
       name: [''],
+      displayInForms: [null],
     });
   }
 }

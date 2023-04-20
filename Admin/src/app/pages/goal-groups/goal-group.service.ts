@@ -113,10 +113,11 @@ export class goalGroupService extends EntityCollectionServiceBase<GoalGroup> {
   /**
    * Toggle update
    */
-  onUpdate(id: number, name: string): void {
+  onUpdate(id: number, name: string, displayInForms : boolean): void {
     this.persistence = id;
-    this.goalGroupForm.setValue({
+    this.goalGroupForm.patchValue({
       name: name,
+      displayInForms: displayInForms,
     });
   }
 
