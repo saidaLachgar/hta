@@ -48,14 +48,14 @@ class Team
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"teams", "users"})
+     * @Groups({"teams", "users", "visite"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"teams", "depar", "users"})
+     * @Groups({"teams", "depar", "users", "visite"})
      */
     private $titre;
 

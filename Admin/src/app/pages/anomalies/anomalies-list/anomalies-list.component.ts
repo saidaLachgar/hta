@@ -21,7 +21,6 @@ export class anomaliesListComponent {
   ) {
     service.findAll();
     service.loadDepartments();
-    service.loadEdges();
     service.loadUsers();
 
     service.anomalyForm = fb.group({

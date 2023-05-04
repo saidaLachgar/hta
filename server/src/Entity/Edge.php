@@ -96,14 +96,14 @@ class Edge
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="a_edges")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"edge"})
+     * @Groups({"edge","anomalies"})
      */
     private $node_a;
 
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="b_edges")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"edge"})
+     * @Groups({"edge","anomalies"})
      */
     private $node_b;
 

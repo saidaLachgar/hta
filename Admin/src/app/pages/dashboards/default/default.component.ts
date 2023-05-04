@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-default',
@@ -9,8 +10,12 @@ export class DefaultComponent implements OnInit {
 
   isVisible: string;
   isActive: string;
+  today: Date = new Date();
 
-  constructor() {
+  constructor(
+    public authService: AuthenticationService,
+  ) {
+    
   }
 
   ngOnInit() {

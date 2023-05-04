@@ -39,6 +39,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
+ *          "node_a.department.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
  *          "causes"=SearchFilter::STRATEGY_EXACT,
  *          "DMS"=SearchFilter::STRATEGY_EXACT,
  *          "IFS"=SearchFilter::STRATEGY_EXACT,

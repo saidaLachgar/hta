@@ -45,6 +45,7 @@ class EdgeRepository extends ServiceEntityRepository
 
     public function getEdgesByRange($depar,$node_a, $node_b = null)
     {
+        // $node_b is comma-separated string
         if ($node_b !== null) {
             // or use ';' if you used that delimiter
             $node_b = array_map('intval', explode(',', $node_b));

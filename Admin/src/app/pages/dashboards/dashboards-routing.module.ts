@@ -5,7 +5,7 @@ import { DefaultComponent } from './default/default.component';
 
 const routes: Routes = [
     {
-        path: 'default',
+        path: '',
         component: DefaultComponent
     },
 ];

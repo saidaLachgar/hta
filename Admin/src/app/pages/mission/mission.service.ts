@@ -7,7 +7,7 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { concat, Observable, of, Subject } from "rxjs";
+import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Department, Mission, Node, Pagination } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
@@ -108,7 +108,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     );
   }
   loadDepartments(byTerm = true): void {
-    if(byTerm){
+    if (byTerm) {
       this.departments$ = concat(
         of([]), // default items
         this.departmentInput$.pipe(
@@ -126,7 +126,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
     }
   }
-  loadActions(): void{
+  loadActions(): void {
     this.actions$ = this.http
       .get<string[]>(`${this.server}/api/goals/by-group`)
       .pipe(
@@ -145,7 +145,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     let depar = this.department.value;
     anode && anode.trim() !== '' && this.anomalyService.findByCriteria({
       page: 1,
-      status: [false,null],
+      "status[]": [false, null],
       ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
       ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
     });
@@ -199,7 +199,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   /**
    * Persist : Create / update
    */
-  async Persist(Action: string): Promise<void>  {
+  async Persist(Action: string): Promise<void> {
     this.submitted = true;
     if (this.missionForm.invalid) return;
     this.submitted = false;
@@ -232,7 +232,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     // console.log(form.anomalies);
     anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
     this.anomalyLoading = false;
-    
+
 
     // compare last query with the new one to avoid unnecessary requests
     if (id) {
@@ -259,7 +259,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     }
 
     let anomalyFormArray = this.missionForm.get("anomalies") as FormArray;
-    while (anomalyFormArray.length !== 0) 
+    while (anomalyFormArray.length !== 0)
       anomalyFormArray.removeAt(0);
     this.getRelatedAnomalies();
   }
@@ -341,7 +341,9 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   get ANode() {
     return this.missionForm.get("node_a");
   }
-
+  get actions() {
+    return this.missionForm.get("actions");
+  }
   get type() {
     return this.missionForm.get("type");
   }

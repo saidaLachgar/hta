@@ -13,6 +13,7 @@ use App\Repository\PosteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\Poste;
+use App\Entity\Objective;
 use App\Service\GraphSearch;
 
 class MissionDataPersister implements DataPersisterInterface
@@ -111,6 +112,22 @@ class MissionDataPersister implements DataPersisterInterface
             );
         }
 
+        // update objectives 
+        $newActions = $Mission->getActions();
+        $removedActions = [];
+        if ($previousData) {
+            $oldActions = $previousData->getActions();
+            // Get the gloas that were removed from the old mission
+            $removedActions = array_diff($oldActions, $newActions);
+            // Get the gloas that were added to the new mission
+            $newActions = array_diff($newActions, $oldActions);
+        }
+        
+        $objectivesRepo = $this->em->getRepository(Objective::class);
+        count($removedActions) && $objectivesRepo->UpdateAchievement($removedActions, true, $Mission->getDateStart());
+        count($newActions) && $objectivesRepo->UpdateAchievement($newActions, false, $Mission->getDateStart());
+
+
         $this->em->persist($Mission);
         $this->em->flush();
     }
@@ -120,6 +137,10 @@ class MissionDataPersister implements DataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
+
+        // update objectives 
+        $this->em->getRepository(Objective::class)->UpdateAchievement($data->getActions(), true, $data->getDateStart());
+
         $this->em->remove($data);
         $this->em->flush();
     }
@@ -157,7 +178,7 @@ class MissionDataPersister implements DataPersisterInterface
         ];
     }
 
-    private function compareCollections(ArrayCollection $collection1, ArrayCollection $collection2): bool
+    private function compareCollections($collection1, $collection2): bool
     {
         if ($collection1->count() !== $collection2->count()) {
             return true;

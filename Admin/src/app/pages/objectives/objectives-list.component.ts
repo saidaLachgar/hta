@@ -1,18 +1,15 @@
 import { Component, TemplateRef, ViewChild } from "@angular/core";
-import { ObjectivesService } from "./objectives.service";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
+  Validators
 } from "@angular/forms";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { HotToastService } from "@ngneat/hot-toast";
+import { BehaviorSubject, Observable, of } from "rxjs";
+import { switchMap, tap } from "rxjs/operators";
 import { Objective } from "src/app/core/models";
-import { startWith, switchMap } from "rxjs/operators";
+import { ObjectivesService } from "./objectives.service";
 
 @Component({
   selector: "app-objectives-list",
@@ -25,10 +22,11 @@ export class ObjectivesComponent {
   current_year: number;
   submitted: boolean = false;
   loading: boolean = false;
+  data_loading: boolean = false;
   planned: boolean = false;
   edit_mode: boolean | number = false;
+  data$: Observable<any[]>;
   private refreshTrigger$ = new BehaviorSubject<void>(undefined);
-  readonly data$: Observable<any[]>;
 
   constructor(
     public service: ObjectivesService,
@@ -52,7 +50,9 @@ export class ObjectivesComponent {
     ];
     this.current_year = new Date().getFullYear();
     this.data$ = this.refreshTrigger$.pipe(
-      switchMap(() => service.getData(this.current_year))
+      tap(() => this.data_loading = true),
+      switchMap(() => service.getData(this.current_year)),
+      tap(() => this.data_loading = false)
     );
 
     this.form = this.fb.group({
@@ -83,13 +83,14 @@ export class ObjectivesComponent {
     this.form.patchValue({
       date: this.current_year + "-" + String(month).padStart(2, "0"),
       goal: "/api/goals/" + goal_id,
-      ...(achievement && { id: achievement.id }),
-      ...(achievement && achievement.p && { plannedCount: achievement.p }),
-      ...(achievement && achievement.r && { count: achievement.r }),
+      id: achievement ? achievement.id : null,
+      plannedCount: achievement && achievement.p ? achievement.p : null,
+      count: achievement && achievement.r ? achievement.r : null,
     });
   }
 
   updateYear(year: number) {
+    // this.data$ = of([]);
     this.current_year = year;
     this.refreshData();
   }

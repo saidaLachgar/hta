@@ -11,8 +11,9 @@ export interface Anomaly {
 }
 
 export const SEVERITY_OPTIONS = [
-    { label: 'Élevé', value: 'ELEVE' },
-    { label: 'Faible', value: 'FAIBLE' },
-    { label: 'Normal', value: 'NORMAL' },
+    { label: 'Urgent < mois', value: 'ELEVE', color: 'danger' },
+    { label: 'Court terme < 1an', value: 'FAIBLE', color: 'warning' },
+    { label: 'Faible terme > 1an', value: 'NORMAL', color: 'success' },
+    { label: 'Autre', value: 'OTHER', color: 'info' },
 ];
   

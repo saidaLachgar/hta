@@ -97,10 +97,10 @@
                   <th>Départ</th>
                   <th>De</th>
                   <th>À</th>
-                  <th>Nb Support</th>
+                  <th>Longueur visitée</th>
                   <th>Équipe</th>
+                  <th>Anomalies</th>
                   <th width="123px"></th>
-                  <th class="text-center">Anomalies</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,16 +120,16 @@
                   <!-- Départ -->
                   <td>
                     <ng-select [items]="service.departments$ | async"
-                              #searchDepar
-                              formControlName="nodeA.departments.id[]"
-                              bindLabel="titre"
-                              bindValue="id"
-                              [multiple]="true"
-                              [minTermLength]="2"
-                              placeholder="Départ.."
-                              [loading]="service.departmentLoading"
-                              typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="service.departmentInput$">
+                        #searchDepar
+                        formControlName="node_a.department.id[]"
+                        bindLabel="titre"
+                        bindValue="id"
+                        [multiple]="true"
+                        [minTermLength]="2"
+                        placeholder="Départ.."
+                        [loading]="service.departmentLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.departmentInput$">
                     </ng-select>
                   </td>
                    <!-- nodeA -->
@@ -162,9 +162,9 @@
                         [typeahead]="service.BNodeInput$">
                     </ng-select>
                   </td>
-                  <!-- Nb Support -->
+                  <!-- Longueur visitée -->
                   <td>
-                    <input type="text" placeholder="Nb Support..." formControlName="nbSupport" #searchNbSupport class="form-control">
+                    <input type="text" placeholder="Longueur visitée..." formControlName="nbSupport" #searchNbSupport class="form-control">
                   </td>
                   <!-- Équipe -->
                   <td>
@@ -181,6 +181,7 @@
                               [typeahead]="service.teamInput$">
                     </ng-select>
                   </td>
+                  <td></td>
                  <!-- Actions -->
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -190,8 +191,6 @@
                       <i class="bx bx-x me-1"></i>Réinitialiser
                     </button>
                   </td>
-                  <!-- visites -->
-                  <td></td>
                 </tr>
                 <!-- state -->
                 <tr>
@@ -222,28 +221,28 @@
                   <!-- department -->
                   <td>
                     <a 
-                      *ngIf="item.nodeA.departments"
-                      [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.nodeA.departments.id] : null"
-                      target="_blank">{{item.nodeA.departments.titre}}</a>
+                      *ngIf="item.node_a.department"
+                      [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.node_a.department.id] : null"
+                      target="_blank">{{item.node_a.department.titre}}</a>
                   </td>
                   <!-- nodeA -->
                   <td>
                     <a 
-                      *ngIf="item.nodeA"
-                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.nodeA.id] : null"
-                      target="_blank">{{item.nodeA.titre}}</a>
+                      *ngIf="item.node_a"
+                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.node_a.id] : null"
+                      target="_blank">{{item.node_a.titre}}</a>
                   </td>
                   
                   <!-- nodeB -->
                   <td>
-                    <div *ngFor="let nodeB of item.nodeB">
+                    <div *ngFor="let node_b of item.node_b">
                       <a 
-                        [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', nodeB.id] : null"
-                        target="_blank">- {{nodeB.titre}}</a>
+                        [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+                        target="_blank">- {{node_b.titre}}</a>
                     </div>
                   </td>
                   
-                  <!-- Nb Support -->
+                  <!-- Longueur visitée -->
                   <td>
                     <ngb-highlight
                       [result]="item.nbSupport"
@@ -258,7 +257,21 @@
                       [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', item.team.id] : null"
                       target="_blank">{{item.team.titre}}</a>
                   </td>
+                  
 
+                  <!-- Anomalies -->
+                  <td>
+                    <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
+                      <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
+                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
+                      </div>
+                    </ng-container>
+                    <ng-template #NoAnomalies>
+                      <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+                        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
+                      </div>
+                    </ng-template>
+                  </td>
 
                   <!-- actions -->
                   <td align="center">
@@ -302,20 +315,6 @@
                         </a>
                       </div>
                     </div>
-                  </td>
-
-                  <!-- Anomalies -->
-                  <td>
-                    <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
-                      <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
-                      </div>
-                    </ng-container>
-                    <ng-template #NoAnomalies>
-                      <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
-                      </div>
-                    </ng-template>
                   </td>
                   
                   

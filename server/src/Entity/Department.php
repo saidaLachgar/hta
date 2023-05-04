@@ -47,14 +47,14 @@ class Department
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies"})
+     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies"})
+     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite"})
      */
     private $titre;
 

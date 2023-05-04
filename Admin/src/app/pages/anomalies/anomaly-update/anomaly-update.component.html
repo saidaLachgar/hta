@@ -32,7 +32,7 @@
             <div class="mb-3 row">
               <div class="col-6">
                 <label>Départ</label>
-                <ng-select formControlName="department" placeholder="Dépar..">
+                <ng-select formControlName="department" placeholder="Dépar.." (change)="service.loadEdgesByDepar($event)">
                   <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
                 </ng-select>
                 <div #postfeedback *ngIf="showError && !service.department.value"
@@ -41,17 +41,13 @@
   
               <div class="col-6">
                 <label>Tronçon</label>
-                <ng-select [items]="service.edges$ | async"
-                          formControlName="edge"
-                          bindLabel="titre"
-                          bindValue="@id"
-                          (click)="showError = true"
-                          [minTermLength]="2"
-                          [readonly]="!service.department.value"
-                          [loading]="service.edgesLoading"
-                          [ngClass]="{'is-invalid':service.edge.invalid && service.submitted}"
-                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                          [typeahead]="service.edgesInput$">
+                <ng-select 
+                    formControlName="edge" 
+                    placeholder="Tronçon.."
+                    (click)="showError = true"
+                    [readonly]="!service.department.value"
+                    >
+                  <ng-option *ngFor="let edge of (service.edgesInRange$ | async)" [value]="edge['@id']">{{edge.node_a.titre +" - "+ edge.node_b.titre}}</ng-option>
                 </ng-select>
                 <div
                   *ngIf="service.submitted && service.edge.errors"

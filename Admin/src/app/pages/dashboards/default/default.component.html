@@ -13,4 +13,111 @@
         </div>
     </div>
     <!-- end page title -->
+
+
+
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card card-body">
+                <div class="card-title">Equipe 1</div>
+
+                <table class="table table-centered align-middle table-nowrap">
+                <tbody>
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('visites_show') ? '/visites': null">Visite au sol</a></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">1800 km</h5>
+                        <!-- each visit has edges - each edge has a length -->
+                        <!-- get sum of length of visits of this team (all time ? month) -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Anomalies réalisées</a></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">20%</h5>
+                        <!-- each team has a visites - each visit has anomalies -->
+                        <!-- get total anomalies with status true of this team (all time) -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">
+                            <a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Nombre d'incidents
+                            <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small>
+                            <span role="status" class="spinner-grow text-danger ms-1" style="width: 0.4rem; height: 0.4rem;vertical-align: 0.475em;"></span>
+                            </a>
+                        </p>
+                        <!-- each mission has a depar - each depar has a team -->
+                        <!-- get sum of mission type:true of this team of this month -->
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">102</h5>
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">102</h5>
+                        <!-- each mission has a depar - each depar has a team -->
+                        <!-- get sum of mission type:false of this team of this month -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">102</h5>
+                        <!-- each mission has a node - each node has a post - each post has clients count -->
+                        <!-- get sum of clients count of this team of this month -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">102</h5>
+                        <!-- each mission has a node - each node has a post -->
+                        <!-- get sum of post  of this team of this month -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">0.45</h5>
+                        <!-- each mission has DMS -->
+                        <!-- get sum of DMS  of this team of this month -->
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td class="w-50">
+                        <p class="mb-0">IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
+                    </td>
+                    <td class="w-50 text-end">
+                        <h5 class="mb-0">0.32</h5>
+                        <!-- each mission has IFS -->
+                        <!-- get sum of IFS  of this team of this month -->
+                    </td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div> <!-- container-fluid -->

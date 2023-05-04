@@ -156,8 +156,8 @@
                   <!-- severity -->
                   <!-- élevé, faible ou normal -->
                   <td>
-                    <span class="badge badge-pill font-size-11 badge-soft-{{item.severity === 'NORMAL' ? 'success' : (item.severity === 'ELEVE' ? 'danger' : 'warning')}}">
-                      {{item.severity === "NORMAL" ? "Normal": (item.severity === "ELEVE" ? "Élevé" : "Faible")}}
+                    <span class="badge badge-pill font-size-11 badge-soft-{{ service.getSeverity(item.severity, true) }}">
+                      {{service.getSeverity(item.severity, false)}}
                     </span>
                   </td>
                   <!-- title -->
@@ -186,7 +186,7 @@
                         target="_blank">{{item.edge.department.titre}}</a>
                       - <a 
                         [routerLink]="authService.isAuthorized('edges_details') ? ['/edges/details', item.edge.id] : null"
-                        target="_blank">{{item.edge.titre}}</a>
+                        target="_blank">{{item.edge.node_a.titre}} - {{item.edge.node_b.titre}}</a>
                     </ng-container>
                   </td>
                    <!-- date -->

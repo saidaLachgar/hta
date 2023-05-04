@@ -58,7 +58,7 @@ export class visitesListComponent {
       nbSupport: [null],
       before: [""],
       after: [""],
-      "departments.id[]": [""],
+      "node_a.department.id[]": [""],
       "node_a.id[]": [''],
       "node_b.id[]": [''],
       "team.id[]": [""],

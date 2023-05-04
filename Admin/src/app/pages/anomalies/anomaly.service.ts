@@ -15,7 +15,7 @@ import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 import { edgeService } from "../edges/edge.service";
-import { UserService } from "../users/user.service"; 
+import { UserService } from "../users/user.service";
 const formatDate = (date) => date !== "" ? date.year + "-" + date.month + "-" + ("0" + date.day).slice(-2) : "";
 
 
@@ -53,7 +53,7 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     public departmentService: departmentService,
     public communeService: communeService,
     public edgeService: edgeService,
-    public userService: UserService, 
+    public userService: UserService,
     private http: HttpClient,
     private toast: HotToastService
   ) {
@@ -115,28 +115,14 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     this.edgesInRange$ = this.edgesInRange$.pipe(
       shareReplay() // Use shareReplay to make the observable hot
     );
-
-
-
   }
 
-  loadEdges(defaultVal = []): void {
-    this.edges$ = concat(
-      of(defaultVal), // default items
-      this.edgesInput$.pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        filter((val) => val != null),
-        tap(() => this.edgesLoading = true),
-        switchMap(term => this.edgeService.getWithQuery(`properties[]=id&properties[]=titre&titre=${term}` +
-          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
-        ).pipe(
-          catchError(() => of([])), // empty list on error
-          tap(() => this.edgesLoading = false)
-        ))
-      )
-    );
 
+  loadEdgesByDepar($event): void {
+    this.edge.reset();
+    this.edgesInRange$ = of([]);
+    this.edgesInRange$ = 
+      this.edgeService.getWithQuery(`properties[]=id&properties[]=node_a&properties[]=node_b&itemsPerPage=1000&department.id=` + $event.match(/\d+/)[0]);
   }
 
   /**
@@ -284,6 +270,11 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
    */
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
+  }
+
+  getSeverity(value: string, color: boolean): string {
+    const severity = this.severityOptions.find(option => option.value === value);
+    return severity ? (color ? severity.color : severity.label) : '';
   }
 
   get department() {

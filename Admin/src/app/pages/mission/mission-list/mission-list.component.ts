@@ -35,7 +35,7 @@ export class missionListComponent {
     this.ReportDMS(true);
 
     service.missionForm = fb.group({
-      "department.id[]": [''],
+      "node_a.department.id[]": [''],
       "node_a.id[]": [''],
       "node_b.id[]": [''],
       after: [null],

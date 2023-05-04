@@ -130,8 +130,8 @@
                 <span>La sélection d'une action augmente le nombre de réalisations dans l'<b>État du suivi des objectifs</b>, tandis que la désélection d'une action le diminue.</span>
               </div>
             </div>
-
-            <div class="col-md-4 d-flex flex-column" *ngFor="let action of (service.actions$ | async | keyvalue).reverse()">
+          <ng-container *ngIf="(service.actions$ | async) as data;">
+            <div class="col-md-4 d-flex flex-column" *ngFor="let action of (data | keyvalue).reverse()">
               <div class="card flex-fill">
                 <div class="card-header">{{action.key}}</div>
                   <ul class="list-group list-group-flush">
@@ -140,12 +140,13 @@
                         {{option.name}}
                       </label>
                       <div class="form-check font-size-16">
-                        <input type="checkbox" id="actions-{{option.id}}" value="{{option.id}}" class="form-check-input" (change)="onActionsChange($event)">
+                        <input type="checkbox" id="actions-{{option.id}}" [checked]="service.actions.value.includes(option.id)" [value]="option.id" class="form-check-input" (change)="onActionsChange($event)">
                       </div>
                     </li>
                   </ul>
               </div> 
             </div>
+          </ng-container>
 
             <div class="col-md-4 d-flex flex-column" *ngIf="service.type.value!='false'">
               <div class="card flex-fill">
@@ -263,8 +264,8 @@
                   <!-- severity -->
                   <!-- élevé, faible ou normal -->
                   <td>
-                    <span class="badge badge-pill font-size-11 badge-soft-{{item.severity === 'NORMAL' ? 'success' : (item.severity === 'ELEVE' ? 'danger' : 'warning')}}">
-                      {{item.severity === "NORMAL" ? "Normal": (item.severity === "ELEVE" ? "Élevé" : "Faible")}}
+                    <span class="badge badge-pill font-size-11 badge-soft-{{item.severity === 'NORMAL' ? 'success' : (item.severity === 'ELEVE' ? 'danger' : (item.severity === 'FAIBLE' ? 'warning' : 'info'))}}">
+                      {{item.severity === "NORMAL" ? "Normal": (item.severity === "ELEVE" ? "Élevé" : (item.severity === 'FAIBLE' ? "Faible" : 'Autre'))}}
                     </span>
                   </td>
                   <!-- title -->

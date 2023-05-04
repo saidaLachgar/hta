@@ -1,13 +1,11 @@
 import { Component } from "@angular/core";
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import { pairwise } from "rxjs/operators";
-import { Anomaly, Mission, User } from "src/app/core/models";
+import { User } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { anomalyService } from "../../anomalies/anomaly.service";
 import { missionService } from "../mission.service";
 
-const zeroPad = num => String(num).padStart(2, '0');
 const parseDate = d => new Date(Date.parse(d))
 const timeObject = d => { return { hour: d.getHours(), minute: d.getMinutes(), second: d.getSeconds() } };
 const dateObject = d => { return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() } };
@@ -88,7 +86,9 @@ export class missionPersistComponent {
           department: obj.node_a.department ? obj.node_a.department["@id"] : null,
           node_a: obj.node_a ? obj.node_a["@id"] : null,
           node_b: obj.node_b.length ? obj.node_b.map((e) => e["@id"]) : [],
+          // actions: obj.actions.length ? this.fb.array(obj.actions.map(val => new FormControl(parseInt(val)))) : [],
         });
+        obj.actions.forEach(val => (service.actions as FormArray).push(new FormControl(parseInt(val))))
         this.service.getRelatedAnomalies();
         this.formListeners();
       });
@@ -111,8 +111,10 @@ export class missionPersistComponent {
 
   // add actions
   onActionsChange(e) {
-    const checkArray: FormArray = this.service.missionForm.get('actions') as FormArray;
+    const checkArray: FormArray = this.service.actions as FormArray;
     if (e.target.checked) {
+      console.log(e.target.value);
+      
       checkArray.push(new FormControl(e.target.value));
     } else {
       let i: number = 0;

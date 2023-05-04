@@ -17,7 +17,6 @@ export class anomalyUpdateComponent  {
     this.breadCrumbItems = [{ label: 'Anomalies' }, { label: 'Mise à jour de anomalie', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     service.loadDepartments(false);
-    service.loadEdges();
     service.anomalyForm = fb.group({
       severity: [""],
       status: [false],
@@ -26,7 +25,7 @@ export class anomalyUpdateComponent  {
       department: ["", Validators.required],
     });
     service.getByKey(this.id).subscribe((obj) => {
-      service.loadEdges(obj.edge ? [obj.edge] : []);
+      // service.loadEdges(obj.edge ? [obj.edge] : []);
 
       service.anomalyForm.setValue({
         severity: obj.severity,

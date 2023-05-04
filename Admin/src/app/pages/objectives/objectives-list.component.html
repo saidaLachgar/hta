@@ -43,7 +43,7 @@
             <th>R</th>
           </tr>
         </thead>
-        <tbody *ngIf='(data$ | async) as data; else loading_template'>
+        <tbody *ngIf='!data_loading && (data$ | async) as data; else loading_template'>
             <ng-container *ngFor="let group of data | keyvalue">
                 <tr>
                  <td class="bg-light fw-bold" colspan="29">{{group.key}}</td>

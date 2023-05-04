@@ -34,6 +34,9 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      properties={
  *          "team.id"=SearchFilter::STRATEGY_EXACT,
  *          "nbSupport"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.department.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_b.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
  * @ApiFilter(PropertyFilter::class)
@@ -59,7 +62,6 @@ class Visite
     private $date;
 
     /**
-     * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"visite"})
      */
     private $nbSupport;
