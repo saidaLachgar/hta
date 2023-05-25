@@ -66,6 +66,32 @@ class EdgeRepository extends ServiceEntityRepository
 
         return $edges;
     }
+    public function getEdgesLengthByRange($depar,$node_a, $node_b = null)
+    {
+        // $node_b is comma-separated string
+        if ($node_b !== null) {
+            // or use ';' if you used that delimiter
+            $node_b = array_map('intval', explode(',', $node_b));
+            // use $node_b_array as an array of integers
+        }
+
+        $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
+
+        $results =  $this->createQueryBuilder('e')
+            ->select("sum(e.longueur)")
+            ->innerJoin('e.node_a', 'n')
+
+            ->andWhere('n.id IN (:nodes)')
+            ->setParameter('nodes', $nodesInRange)
+
+            ->andWhere('e.longueur IS NOT NULL')
+
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+
+        return $results;
+    }
 
 //    /**
 //     * @return Edge[] Returns an array of Edge objects

@@ -25,6 +25,11 @@ const routes: Routes = [
       import("./departments/department.module").then((m) => m.departmentModule),
   },
   {
+    path: "dps",
+    loadChildren: () =>
+      import("./dps/dps.module").then((m) => m.dpsModule),
+  },
+  {
     path: "postes",
     loadChildren: () =>
       import("./postes/poste.module").then((m) => m.posteModule),
@@ -83,6 +88,11 @@ const routes: Routes = [
     path: "historique",
     loadChildren: () =>
       import("./logs/logs.module").then((m) => m.LogsModule),
+  },
+  {
+    path: "statistiques",
+    loadChildren: () =>
+      import("./statistiques/statistiques.module").then((m) => m.StatistiquesModule),
   },
 ];
 

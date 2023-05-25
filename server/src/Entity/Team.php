@@ -74,6 +74,11 @@ class Team
      */
     private $departments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Dps::class, inversedBy="team")
+     */
+    private $dps;
+
     public function __construct()
     {
         $this->membres = new ArrayCollection();
@@ -156,6 +161,18 @@ class Team
                 $department->setTeam(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDps(): ?Dps
+    {
+        return $this->dps;
+    }
+
+    public function setDps(?Dps $dps): self
+    {
+        $this->dps = $dps;
 
         return $this;
     }

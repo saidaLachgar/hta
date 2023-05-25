@@ -17,8 +17,8 @@ export class edgeCreateComponent {
     service.loadBNodes();
     service.edgeForm = this.fb.group({
       department: [""],
-      node_a: ["", Validators.required],
-      node_b: ["", Validators.required],
+      nodeA: ["", Validators.required],
+      nodeB: ["", Validators.required],
       longueur: [null],
       section: [null],
       commune: [""],

@@ -34,7 +34,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
  *          "MLE"=SearchFilter::STRATEGY_PARTIAL,
  *          "PKVA"=SearchFilter::STRATEGY_EXACT,
  *          "nb_clients"=SearchFilter::STRATEGY_EXACT,
- *          "commune.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node.commune.id"=SearchFilter::STRATEGY_EXACT,
  *          "node.department.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
@@ -112,12 +112,6 @@ class Poste
      */
     private $nb_clients;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Commune::class, inversedBy="postes")
-     * 
-     * @Groups({"postes"})
-     */
-    private $commune;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -128,11 +122,16 @@ class Poste
 
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="postes")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * 
      * @Groups({"postes"})
      */
     private $node;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $origine;
 
 
     public function __toString()
@@ -237,18 +236,6 @@ class Poste
         return $this;
     }
 
-    public function getCommune(): ?Commune
-    {
-        return $this->commune;
-    }
-
-    public function setCommune(?Commune $commune): self
-    {
-        $this->commune = $commune;
-
-        return $this;
-    }
-
     public function getDateMst(): ?\DateTimeInterface
     {
         return $this->date_mst;
@@ -269,6 +256,18 @@ class Poste
     public function setNode(?Node $node): self
     {
         $this->node = $node;
+
+        return $this;
+    }
+
+    public function getOrigine(): ?string
+    {
+        return $this->origine;
+    }
+
+    public function setOrigine(?string $origine): self
+    {
+        $this->origine = $origine;
 
         return $this;
     }

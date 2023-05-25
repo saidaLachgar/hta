@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import {  FormBuilder, Validators } from '@angular/forms';
-import { posteService } from '../poste.service';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { posteService } from '../poste.service';
 
 @Component({
   selector: 'app-poste-update',
@@ -30,12 +30,10 @@ export class posteUpdateComponent {
       poste: [""],
       n_serie: [""],
       node: ["", Validators.required],
-      commune: [""],
     });
     this.posteService.getByKey(this.id).subscribe((obj) => {
       
       let date = obj.date_mst?  new Date(obj.date_mst) : null;
-      posteService.loadCommunes(obj.commune ? [obj.commune] : []);
       posteService.loadNodes(obj.node ? [obj.node] : []);
 
       posteService.posteForm.setValue({
@@ -54,7 +52,6 @@ export class posteUpdateComponent {
         } : null,
         department: obj.node.department ? obj.node.department["@id"] : null,
         node: obj.node ? obj.node["@id"] : null,
-        commune: obj.commune ? obj.commune["@id"] : null,
       });
     });
   }

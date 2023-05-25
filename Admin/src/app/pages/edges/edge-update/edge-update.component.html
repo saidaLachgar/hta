@@ -25,7 +25,7 @@
               <label for="input-1" class="col-md-2 col-form-label">De</label>
               <div class="col-md-10" (click)="showError = true" id="input-1">
                   <ng-select [items]="service.ANode$ | async"
-                            formControlName="node_a"
+                            formControlName="nodeA"
                             bindLabel="titre"
                             bindValue="@id"
                             [minTermLength]="2"
@@ -46,7 +46,7 @@
               <label for="input-1" class="col-md-2 col-form-label">À</label>
               <div class="col-md-10" (click)="showError = true" id="input-1">
                   <ng-select [items]="service.BNode$ | async"
-                            formControlName="node_b"
+                            formControlName="nodeB"
                             bindLabel="titre"
                             bindValue="@id"
                             [minTermLength]="2"

@@ -19,7 +19,6 @@ export class visiteCreateComponent{
     service.visiteForm = this.fb.group({
       date: [""],
       team: [""],
-      nbSupport: [null],
       department: ["", Validators.required],
       nodeA: ["", Validators.required],
       nodeB: [[]],

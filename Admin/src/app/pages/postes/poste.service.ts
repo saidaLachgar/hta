@@ -1,14 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { FormGroup, ValidationErrors } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { concat, Observable, of, Subject } from "rxjs";
+import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Node, Commune, Department, Pagination, Poste } from "src/app/core/models";
+import { Commune, Department, Node, Pagination, Poste } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
@@ -40,9 +40,13 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
+  isLoading = false;
   page:number = 1;
   lastSearchedParams;
+  
+  public selectedFile:File;
   public posteForm: FormGroup;
+  public importForm: FormGroup;
 
   constructor(
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
@@ -160,6 +164,35 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   }
 
   /**
+   * upload spreadsheet
+   */
+  uploadSpreadSheet(): void{
+    this.submitted = true;    
+    if (this.importForm.invalid) return;
+    
+    let url = `${this.server}/api/upload_spreadsheet`;
+    let that = this;
+    let toast = this.toast;
+    let body: FormData = new FormData();
+    body.append("spreadSheet", this.selectedFile);
+    body.append("addNonExitingAssociation", this.addNonExitingAssociation.value);
+
+     this.http.post( url, body, { reportProgress: true, responseType: 'json' }).pipe().subscribe({
+      error: () => {
+        that.isLoading = false;
+        toast.error("un problème est survenu, veuillez réessayer")
+      },
+      complete() {
+        that.importForm.reset();
+        that.submitted = false;
+        that.isLoading = false;
+        toast.success("Postes importés avec succès");
+      },
+    });
+  }
+
+
+  /**
    * Persist : Create
    */
   onCreate(): void {
@@ -243,5 +276,11 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   }
   get department() {
     return this.posteForm.get("department");
+  }
+  get addNonExitingAssociation() {
+    return this.importForm.get("addNonExitingAssociation");
+  }
+  get spreadSheet() {
+    return this.importForm.get("spreadSheet");
   }
 }

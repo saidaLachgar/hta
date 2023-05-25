@@ -30,12 +30,12 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Groupe d\'objectif',
         value: 'goal_groups',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Objectives',
         value: 'goals',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Postes',
@@ -50,32 +50,37 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Équipes',
         value: 'teams',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Départ',
         value: 'departments',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
+    },
+    {
+        name: 'Dps',
+        value: 'dps',
+        permissions: -1
     },
     {
         name: 'Commune',
         value: 'communes',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Tronçon',
         value: 'edges',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Appareils coupeur',
         value: 'nodes',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Members',
         value: 'users',
-        permissions: [0, 1, 2, 3, 4]
+        permissions: -1
     },
     {
         name: 'Autorisation',
@@ -100,7 +105,7 @@ export const PermissionsIndex = [ // has all checkboxes -> -1
     {name:'Ajouter', value: 'add'}, // -> 2
     {name:'Details', value: 'details'}, // -> 3
     {name:'Afficher', value: 'show'}, // -> 4
-    {name:'Exporter', value: 'export'}, // -> 5
-    {name:'Importer', value: 'import'}, // -> 6
+    // {name:'Exporter', value: 'export'}, // -> 5
+    // {name:'Importer', value: 'import'}, // -> 6
     // {name:'Profile', value: 'profile'}, // -> 7
 ]

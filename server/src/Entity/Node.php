@@ -58,7 +58,7 @@ class Node
      * 
      * @Groups({"nodes","postes", "edge", "missions", "visite","anomalies"})
      */
-    private $titre;
+    private $titre = "Sans titre";
 
     /**
      * @ORM\OneToMany(targetEntity=Edge::class, mappedBy="node_a", orphanRemoval=true)
@@ -97,13 +97,37 @@ class Node
      */
     private $b_visites;
 
+
+    /**
+     * Adding this relationship to optimize queries that frequently require
+     * access to the COMMUNE && DEPAR  associated with a node or post. 
+     * While this denormalization introduces some redundancy and complexity,
+     * the potential performance benefits are worth it for this use case.
+     */
+
     /**
      * @ORM\ManyToOne(targetEntity=Department::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * 
      * @Groups({"nodes","postes", "missions", "visite"})
      */
     private $department;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Commune::class)
+     * @Groups({"nodes","postes"})
+     */
+    private $commune;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $identifier;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $temp;
 
     public function __construct()
     {
@@ -351,6 +375,42 @@ class Node
     public function setDepartment(?Department $department): self
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    public function getCommune(): ?Commune
+    {
+        return $this->commune;
+    }
+
+    public function setCommune(?Commune $commune): self
+    {
+        $this->commune = $commune;
+
+        return $this;
+    }
+
+    public function getIdentifier(): ?string
+    {
+        return $this->identifier;
+    }
+
+    public function setIdentifier(?string $identifier): self
+    {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    public function isTemp(): ?bool
+    {
+        return $this->temp;
+    }
+
+    public function setTemp(?bool $temp): self
+    {
+        $this->temp = $temp;
 
         return $this;
     }

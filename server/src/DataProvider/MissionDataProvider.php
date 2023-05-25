@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 // https://stackoverflow.com/questions/66053948/api-plateform-custom-get-operation
 // https://api-platform.com/docs/core/data-providers/#custom-item-data-provider
 // https://symfonycasts.com/screencast/api-platform-extending/data-provider
-class MissionProvider implements
+class MissionDataProvider implements
     ContextAwareCollectionDataProviderInterface,
     DenormalizedIdentifiersAwareItemDataProviderInterface,
     RestrictedDataProviderInterface

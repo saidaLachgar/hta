@@ -101,20 +101,6 @@
             </div>
           </div>
           <div class="mb-3 row">
-            <label for="input-7" class="col-md-2 col-form-label">Commune</label>
-            <div class="col-md-10" id="input-7" >
-              <ng-select [items]="posteService.communes$ | async"
-                      formControlName="commune"
-                      bindLabel="titre"
-                      bindValue="@id"
-                      [minTermLength]="2"
-                      [loading]="posteService.communeLoading"
-                      typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                      [typeahead]="posteService.communeInput$">
-              </ng-select>
-            </div>
-          </div>
-          <div class="mb-3 row">
             <label for="input-8" class="col-md-2 col-form-label">Date MST</label>
             <div class="col-md-10">
               <div class="input-group clockpicker">

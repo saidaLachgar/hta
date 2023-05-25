@@ -21,7 +21,6 @@ export class posteCreateComponent {
       nbClients: [null],
       dateMst: [null],
       department: [""],
-      commune: [""],
       type: [""],
       marque: [""],
       poste: [""],

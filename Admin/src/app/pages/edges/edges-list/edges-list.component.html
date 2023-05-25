@@ -119,14 +119,14 @@
                 <tr>
                   <td
                     class="text-center"
-                    colspan="4"
+                    colspan="8"
                     *ngIf="!(service.edges$ | async) && service.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
-                    colspan="4"
+                    colspan="8"
                     *ngIf="(service.edges$ | async) && (service.edges$ | async).length === 0 && service.loaded$ | async"
                   >
                   Aucune donnée trouvée !

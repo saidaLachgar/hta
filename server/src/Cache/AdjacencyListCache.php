@@ -49,9 +49,6 @@ class AdjacencyListCache
         $nodes = $this->em->getRepository(Node::class)->findBy(['department' => $department]);
         $edges = $this->em->getRepository(Edge::class)->findBy(['department' => $department]);
 
-        // dump("nodes");dump(array_map(fn($entity) => $entity->getId(), $nodes));
-        // dump("edges");dump(array_map(fn($entity) => $entity->getId(), $edges));
-
         // Create the Graph
         foreach ($nodes as $node) {
             $this->addNode($node->getId());

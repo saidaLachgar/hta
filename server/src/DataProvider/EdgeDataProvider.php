@@ -3,13 +3,12 @@
 namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 use App\Entity\Edge;
 use App\Repository\EdgeRepository;
 
-class EdgeDataProvider implements ContextAwareCollectionDataProviderInterface, DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface
+class EdgeDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
     private $edgeRepository;
 
@@ -21,13 +20,6 @@ class EdgeDataProvider implements ContextAwareCollectionDataProviderInterface, D
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return Edge::class === $resourceClass && $operationName === 'by_range';
-    }
-
-
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
-    {
-        // not used for other itemOperations
-        return null;
     }
 
 

@@ -107,7 +107,7 @@ class Anomaly
     private $createdBy;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Edge::class, inversedBy="anomalies")
+     * @ORM\ManyToOne(targetEntity=Edge::class)
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"anomalies"})
      */

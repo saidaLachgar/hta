@@ -30,11 +30,22 @@ class EdgeDataPersister implements ContextAwareDataPersisterInterface
     /**
      * @param Edge $data
      */
-    public function persist($data, array $context = [])
+    public function persist($Edge, array $context = [])
     {
         // Update the adjacency list in the cache with the new department entity data
-        $this->adjacencyListCache->getAdjacencyList($data->getDepartment()->getId(), true);
-        $this->em->remove($data);
+        $this->adjacencyListCache->getAdjacencyList($Edge->getDepartment()->getId(), true);
+
+        // update nodes commune
+        $prevEdge = $context['previous_data'] ?? null;
+        if (
+            !$prevEdge || // if Edge is new
+            ($prevEdge && $prevEdge->getCommune() !== $Edge->getCommune())// or not new but Commune updated
+        ) {
+            $Edge->getNodeA()->setCommune($Edge->getCommune());
+            $Edge->getNodeB()->setCommune($Edge->getCommune());
+        }
+
+        $this->em->persist($Edge);
         $this->em->flush();
     }
 

@@ -107,6 +107,13 @@ export const MENU: MenuItem[] = [
         icon: 'bx bx-cog',
         subItems: [
             {
+                id:22,
+                label: 'Dps',
+                link: '/dps',
+                checkPermissions: 'dps',
+                parentId: 15
+            },
+            {
                 id:16,
                 label: 'Départ',
                 link: '/departments',

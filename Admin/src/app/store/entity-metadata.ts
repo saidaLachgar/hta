@@ -2,18 +2,22 @@ import { EntityMetadataMap, EntityDataModuleConfig } from '@ngrx/data';
 
 const entityMetadata: EntityMetadataMap = {
   users: {},
-  user_permissions: {},
   logs: {},
+  user_permissions: {},
+  media_objects: {},
+  
+  dps: {},
   teams: {},
   departments: {},
-  media_objects: {},
   communes: {},
   edges: {},
+  nodes: {},
   postes: {},
+
   missions: {},
   anomalies: {},
   visites: {},
-  nodes: {},
+  
   objectives: {},
   goal_groups: {},
   goals: {},
@@ -24,6 +28,7 @@ const pluralNames = {
   user_permissions: 'user_permissions',
   logs: 'logs',
   teams: 'teams',
+  dps: 'dps',
   departments: 'departments',
   media_objects: 'media_objects',
   communes: 'communes',

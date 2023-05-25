@@ -25,7 +25,6 @@ export class visiteUpdateComponent  {
       department: ["", Validators.required],
       nodeA: ["", Validators.required],
       nodeB: [[]],
-      nbSupport: [null],
       team: [""],
     });
     service.getByKey(this.id).subscribe((obj) => {
@@ -36,9 +35,7 @@ export class visiteUpdateComponent  {
 
       service.visiteForm.setValue({
         date: obj.date,
-        nbSupport: obj.nbSupport,
         team: obj.team ? obj.team["@id"] : null,
-
         department: obj.node_a.department ? obj.node_a.department["@id"] : null,
         nodeA :obj.node_a ? obj.node_a["@id"] : null,
         nodeB : obj.node_b.length ? obj.node_b.map((e)=>e["@id"]) : [],

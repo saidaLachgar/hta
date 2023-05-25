@@ -45,14 +45,14 @@ class Commune
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"commune","postes"})
+     * @Groups({"commune","postes", "edge"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"commune","postes"})
+     * @Groups({"commune","postes", "edge"})
      */
     private $titre;
 

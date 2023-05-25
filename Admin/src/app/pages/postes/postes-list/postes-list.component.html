@@ -7,14 +7,10 @@
       ></app-page-title>
     </div>
     <div class="col-auto">
-      <button class="btn bg-light text-primary ms-2" 
-        data-toggle="collapse" *ngIf="authService.isAuthorized('users_export')"
-        (click)="hideExport = !hideExport"
-        title="Exporter">
+      <button class="btn bg-light text-primary ms-2" title="Importer" (click)="openModal()">
         <i class="fas fa-upload"></i>
       </button>
-      <button class="btn bg-light text-primary ms-2" title="Importer" 
-        *ngIf="authService.isAuthorized('users_import')">
+      <button class="btn bg-light text-primary ms-2" title="Exporter" >
         <i class="fas fa-download"></i>
       </button>
       <a routerLink="/postes/add" class="btn btn-primary ms-2"
@@ -24,45 +20,6 @@
     </div>
   </div>
 
-  <div class="collapse" id="collapseExample" [ngbCollapse]="hideExport">
-    <div class="row">
-      <div class="col-12">
-        <div class="card card-body">
-          <form class="row gy-2 gx-3 align-items-end">
-            <div class="col-auto col-lg-5">
-              <label for="filterSelect">Propriété</label>
-              <!-- formControlName="property" -->
-              <select class="form-select w-100"
-                id="filterSelect"
-                required>
-                <option selected>Choisir une option...</option>
-                <option value="username">Matricule</option>
-                <option value="name">Nom</option>
-                <option value="role">Role</option>
-                <option value="team">Equipe</option>
-              </select>
-            </div>
-            <div class="col-sm-auto col-lg-5">
-              <label for="filterInput">Valeur</label>
-              <!-- formControlName="value" -->
-              <input
-                type="text"
-                class="form-control"
-                id="filterInput"
-                placeholder="Recherche..."
-                required
-              />
-            </div>
-            <div class="col-sm-auto col-lg">
-              <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-filter"></i> Filtrer
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -113,7 +70,7 @@
                   <td>
                     <ng-select [items]="posteService.communes$ | async"
                               #searchCommunes
-                              formControlName="commune.id[]"
+                              formControlName="node.commune.id[]"
                               bindLabel="titre"
                               bindValue="id"
                               [multiple]="true"
@@ -156,14 +113,14 @@
                 <tr>
                   <td
                     class="text-center"
-                    colspan="8"
+                    colspan="11"
                     *ngIf="!(posteService.postes$ | async) && posteService.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
-                    colspan="8"
+                    colspan="11"
                     *ngIf="(posteService.postes$ | async) && (posteService.postes$ | async).length === 0 && posteService.loaded$ | async"
                   >
                   Aucune donnée trouvée !
@@ -205,9 +162,9 @@
                   </td>
                   <td>
                     <a 
-                      *ngIf="poste.commune"
-                      [routerLink]="authService.isAuthorized('communes_details') ? ['/communes/details', poste.commune.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{poste.commune.titre}}</a>
+                      *ngIf="poste.node.commune"
+                      [routerLink]="authService.isAuthorized('communes_details') ? ['/communes/details', poste.node.commune.id] : null"
+                      target="_blank" rel="noopener noreferrer">{{poste.node.commune.titre}}</a>
                   </td>
                   <td>
                     <ngb-highlight
@@ -325,3 +282,51 @@
     </div>
   </div>
 </div>
+
+<ng-template #content let-modal>
+	<div class="modal-header border-0">
+		<h4 class="modal-title"></h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+	</div>
+	<div class="modal-body">
+		<form id="import-form" [formGroup]="posteService.importForm" (ngSubmit)="posteService.uploadSpreadSheet()">
+      <div class="mb-3 row m-n2">
+
+        <div class="col-lg-6 p-2">
+          <div class="text-center border rounded-lg py-4 p-2 p-lg-5 h-100">
+          <h3 class="mb-4">Commencer par un modèle</h3>
+          <i class="fas fa-file-download display-1 my-3" style="color: #d3e8fc;"></i>
+          <p class="text-muted">Téléchargez un modèle pour commencer.</p>
+          <button class="btn btn-outline-info">Télécharger un modèle</button>
+        </div>
+        </div>
+
+        <div class="col-lg-6 p-2 text-center">
+          <div class=" border rounded-lg py-4 p-2 p-lg-5">
+          <h3>J'ai déjà un fichier prêt</h3>
+          <label class="d-flex align-items-center justify-content-center flex-column my-4 position-relative">
+            <i class="fas fa-file-excel display-1 my-3" style="color: #d3e8fc;"></i>
+            <input class="position-absolute w-100 h-100 opacity-0 c-pointer" formControlName="spreadSheet" type="file" accept="text/plain, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" (change)="onUpload($event)">
+
+            <p class="text-muted">{{posteService.selectedFile && posteService.selectedFile.name ? posteService.selectedFile.name : "Sélectionnez un fichier ou glissez-le ici"}}</p>
+            <p *ngIf="posteService.submitted && posteService.spreadSheet.errors" class="text-danger">
+                <span *ngIf="posteService.spreadSheet.errors.required">Veuillez sélectionner un fichier !</span>
+            </p>
+            <span class="btn btn-outline-info">Sélectionner un fichier</span>
+          </label>
+          <div class="form-check form-checkbox-outline form-check-info mb-3">
+            <input type="checkbox" value="true" formControlName="addNonExitingAssociation" id="addNonExitingAssociation" checked class="form-check-input">
+            <label for="addNonExitingAssociation" class="form-check-label">Ajouter " Appareils coupeur " si elle n'a pas été trouvée</label>
+          </div>
+          </div>
+
+        </div>
+
+      </div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-light" [disabled]="posteService.isLoading">Annuler</button>
+		<button type="submit" class="btn btn-info" [disabled]="posteService.isLoading" form="import-form">Importer</button>
+	</div>
+</ng-template>

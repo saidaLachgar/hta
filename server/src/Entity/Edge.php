@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\EdgeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -68,6 +67,10 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *          "department.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
+ *          "commune.id"=SearchFilter::STRATEGY_EXACT,
+ *          "section"=SearchFilter::STRATEGY_EXACT,
+ *          "longueur"=SearchFilter::STRATEGY_EXACT,
+ *          "marque"=SearchFilter::STRATEGY_PARTIAL
  *      }
  * )
  * @ApiFilter(PropertyFilter::class)
@@ -107,10 +110,13 @@ class Edge
      */
     private $node_b;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Anomaly::class, mappedBy="edge", orphanRemoval=true)
+     /**
+     * @ORM\ManyToOne(targetEntity=Commune::class)
+     * 
+     * @Groups({"edge"})
      */
-    private $anomalies;
+    private $commune;
+
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -133,10 +139,10 @@ class Edge
      */
     private $marque;
 
-    public function __construct()
-    {
-        $this->anomalies = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $identifier;
 
     public function __toString()
     {
@@ -184,35 +190,18 @@ class Edge
         return $this;
     }
 
-    /**
-     * @return Collection<int, Anomaly>
-     */
-    public function getAnomalies(): Collection
+    public function getCommune(): ?Commune
     {
-        return $this->anomalies;
+        return $this->commune;
     }
 
-    public function addAnomaly(Anomaly $anomaly): self
+    public function setCommune(?Commune $commune): self
     {
-        if (!$this->anomalies->contains($anomaly)) {
-            $this->anomalies[] = $anomaly;
-            $anomaly->setEdge($this);
-        }
+        $this->commune = $commune;
 
         return $this;
     }
 
-    public function removeAnomaly(Anomaly $anomaly): self
-    {
-        if ($this->anomalies->removeElement($anomaly)) {
-            // set the owning side to null (unless already changed)
-            if ($anomaly->getEdge() === $this) {
-                $anomaly->setEdge(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getLongueur(): ?float
     {
@@ -245,6 +234,18 @@ class Edge
     public function setMarque(?string $marque): self
     {
         $this->marque = $marque;
+
+        return $this;
+    }
+
+    public function getIdentifier(): ?string
+    {
+        return $this->identifier;
+    }
+
+    public function setIdentifier(?string $identifier): self
+    {
+        $this->identifier = $identifier;
 
         return $this;
     }

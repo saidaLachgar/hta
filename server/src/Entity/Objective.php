@@ -51,7 +51,6 @@ class Objective
      */
     private $id;
 
-
     /**
      * @ORM\Column(type="date")
      * @Groups({"objective"})

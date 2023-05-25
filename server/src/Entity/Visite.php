@@ -62,6 +62,7 @@ class Visite
     private $date;
 
     /**
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"visite"})
      */
     private $nbSupport;
@@ -112,12 +113,12 @@ class Visite
         return $this;
     }
 
-    public function getNbSupport(): ?int
+    public function getNbSupport(): ?float
     {
         return $this->nbSupport;
     }
 
-    public function setNbSupport(?int $nbSupport): self
+    public function setNbSupport(?float $nbSupport): self
     {
         $this->nbSupport = $nbSupport;
 

@@ -21,8 +21,8 @@ export class edgeUpdateComponent {
     service.loadBNodes();
 
     service.edgeForm = this.fb.group({
-      node_a: ["", Validators.required],
-      node_b: ["", Validators.required],
+      nodeA: ["", Validators.required],
+      nodeB: ["", Validators.required],
       department: [""],
       longueur: [null],
       section: [null],
@@ -36,9 +36,11 @@ export class edgeUpdateComponent {
       service.edgeForm.patchValue({
         department :obj.department ? obj.department["@id"] : null,
         commune :obj.commune ? obj.commune["@id"] : null,
-        node_a :obj.node_a ? obj.node_a["@id"] : null,
-        node_b :obj.node_b ? obj.node_b["@id"] : null,
+        nodeA :obj.node_a ? obj.node_a["@id"] : null,
+        nodeB :obj.node_b ? obj.node_b["@id"] : null,
         marque :obj.marque,
+        section :obj.section,
+        longueur :obj.longueur,
       });
     });
 

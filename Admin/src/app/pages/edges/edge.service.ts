@@ -235,10 +235,10 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     return this.edgeForm.get("department");
   }
   get BNode() {
-    return this.edgeForm.get("node_b");
+    return this.edgeForm.get("nodeA");
   }
   get ANode() {
-    return this.edgeForm.get("node_a");
+    return this.edgeForm.get("nodeB");
   }
 
   /**

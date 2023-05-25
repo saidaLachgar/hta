@@ -45,10 +45,6 @@ services:
     App\Action\AnomalyAction:
         tags: ['controller.service_arguments']
 
-    App\DataProvider\MissionProvider:
-        arguments:
-            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
-    
-    App\DataProvider\VisiteProvider:
+    App\DataProvider\MissionDataProvider:
         arguments:
             $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection

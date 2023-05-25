@@ -33,7 +33,7 @@ class NodeDataPersister implements ContextAwareDataPersisterInterface
     public function persist($data, array $context = [])
     {
         // Update the adjacency list in the cache with the new department entity data
-        $this->adjacencyListCache->getAdjacencyList($data->getDepartment()->getId(), true);
+        $data->isTemp() !== true && $this->adjacencyListCache->getAdjacencyList($data->getDepartment()->getId(), true);
         $this->em->remove($data);
         $this->em->flush();
     }
@@ -44,7 +44,7 @@ class NodeDataPersister implements ContextAwareDataPersisterInterface
     public function remove($data, array $context = [])
     {
         // Update the adjacency list in the cache with the new department entity data
-        $this->adjacencyListCache->getAdjacencyList($data->getDepartment()->getId(), true);
+        $data->isTemp() !== true &&  $this->adjacencyListCache->getAdjacencyList($data->getDepartment()->getId(), true);
         $this->em->remove($data);
         $this->em->flush();
     }
