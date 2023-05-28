@@ -16,8 +16,9 @@ class SpreadsheetController extends AbstractController
     public function upload_spreadsheet(Request $request, SpreadsheetService $SpreadsheetService)
     {
         $file = $request->files->get('spreadSheet'); // get the file from the sent request
-        $entity = "App\Entity\\".ucfirst($request->request->get('class'));
+        $className = $request->request->get('className');
         $addNonExAssoc = $request->request->get('addNonExAssoc')?:null;
+        $uniqueColumns = $request->request->get('uniqueColumns')?:null;
         
 
         $fileFolder = __DIR__ . '/../../public/uploads/'; //choose the folder in which the uploaded file will be stored
@@ -28,11 +29,11 @@ class SpreadsheetController extends AbstractController
             dd($e);
         }
 
-        $SpreadsheetService->import(
+        return $SpreadsheetService->import(
             $addNonExAssoc,
             $fileFolder . $filePathName,
-            $entity,
-            null
+            $className,
+            $uniqueColumns
         );
     }
     /**

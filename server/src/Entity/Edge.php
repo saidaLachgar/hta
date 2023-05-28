@@ -139,11 +139,6 @@ class Edge
      */
     private $marque;
 
-    /**
-     * @ORM\Column(type="string", length=40, nullable=true)
-     */
-    private $identifier;
-
     public function __toString()
     {
         return $this->node_a->getTitre() . " → " . $this->node_b->getTitre();
@@ -234,18 +229,6 @@ class Edge
     public function setMarque(?string $marque): self
     {
         $this->marque = $marque;
-
-        return $this;
-    }
-
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): self
-    {
-        $this->identifier = $identifier;
 
         return $this;
     }

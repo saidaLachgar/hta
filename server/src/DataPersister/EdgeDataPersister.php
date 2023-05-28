@@ -37,17 +37,23 @@ class EdgeDataPersister implements ContextAwareDataPersisterInterface
 
         // update nodes commune
         $prevEdge = $context['previous_data'] ?? null;
-        if (
-            !$prevEdge || // if Edge is new
-            ($prevEdge && $prevEdge->getCommune() !== $Edge->getCommune())// or not new but Commune updated
-        ) {
-            $Edge->getNodeA()->setCommune($Edge->getCommune());
-            $Edge->getNodeB()->setCommune($Edge->getCommune());
+        $cloneData = ["Commune","Department"];
+        foreach ($cloneData as $field) {
+            $getter = "get".$field;
+            $setter = "set".$field;
+            if (
+                !$prevEdge || // if Edge is new
+                ($prevEdge && $prevEdge->$getter() !== $Edge->$getter())// or not new but field updated
+            ) {
+                $Edge->getNodeA()->$setter($Edge->$getter());
+                $Edge->getNodeB()->$setter($Edge->$getter());
+            }
         }
 
         $this->em->persist($Edge);
         $this->em->flush();
     }
+
 
     /**
      * {@inheritdoc}

@@ -5,10 +5,12 @@ namespace App\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SpreadsheetService
 {
     private $em;
+    const SHEET_HEAD =  2;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -18,212 +20,200 @@ class SpreadsheetService
     public function import(
         bool $addNonExAssoc,
         string $filePath,
-        string $entityClass,
-        string $uniqueColumn = null
+        string $className,
+        string $uniqueColumns
     ) {
-        $spreadsheet = IOFactory::load($filePath); // Here we are able to read from the excel file 
-        $workSheet = $spreadsheet->getActiveSheet();
-        $data = $workSheet->toArray(null, true, true, true);
-        // $workSheet->removeRow(1); // skip the first row 
-
-        $getterName = 'get' . basename(str_replace('\\', '/', $entityClass)) . "Fields";
-        $Fields = $this->$getterName($workSheet, $entityClass);
-        
+        $errorMessages = [];
         $canceledEntities = [];
-        $missingDataObjs = [];
+        $missingData = [];
 
-        // Map the data to the entity properties
-        // $repository = $this->em->getRepository($entityClass);
-        // dump($metadata->getFieldNames());
-        // dump($getterName);
-        // exit;
+        try {
+            $spreadsheet = IOFactory::load($filePath); // Here we are able to read from the excel file 
+            $workSheet = $spreadsheet->getActiveSheet();
+            $data = $workSheet->toArray(null, true, true, true);
+            // $workSheet->removeRow(1); // skip the first row 
 
-        foreach ($data as $key => $row) {
-            $entity = new $entityClass();
-            if (
-                $key<=2 || // skip 1st two rows (columns name and the title)
-                // Skip the empty row
-                empty(array_filter($row, function ($value) {return !empty($value);}))
-            ) continue; 
+            $entityClass = "App\Entity\\".ucfirst($className);
+            $getterName = 'get' . $className . "Fields";
+            $Fields = $this->$getterName($data[2], $entityClass);
+            $repository = $this->em->getRepository($entityClass);
 
-            foreach ($Fields as $column => $field) {
-                $value = $row[$column];
-                if(is_null($value)) continue;
-                
-                $fieldName = $field["name"];
-                $setterName = $field["setter"];
-                $fieldType = $field["type"];
-                
-                // dump($field);
-                // dd( $field->getValue());
-                
-                // todo check if a nested $fieldName e.g NSerie is gonna be added or i will need to have it in this format n_serie
-                if ($fieldType === "association") {
-                    // Handle related entity
-                    $relatedEntityName = $field["entity"];
-                    $relatedRepository = $this->em->getRepository($relatedEntityName);
-                    $searchBy = $field["searchBy"] ? $field["searchBy"] : 'id';
-                    $obj = $relatedRepository->findOneBy([
-                        $searchBy => trim($value)
-                    ]);
-
-                    if ($obj) {
-                        $entity->$setterName($obj);
-                    } elseif($addNonExAssoc) {
-                        $missingDataObjs[] = $row; // store unfounded Association eg: nodes (app. cp)
-                        // add new nested association e.g : node with no name
-                        $nestedEntityClass = 'App\Entity\\' . ucfirst($fieldName);
-                        $nestedEntity = new $nestedEntityClass();
-                        
-                        if($searchBy != "id"){
-                            $nestedSetterName = 'set' . ucfirst($searchBy);
-                            $nestedEntity->$nestedSetterName($value);
-                        }
-                        
-                        // This field was added to prevent having to interact with 
-                        // the object (like using the Adjacency List) until it has the missing data
-                        if (method_exists($nestedEntity, "setTemp")) 
-                            $nestedEntity->setTemp(true);
-
-
-                        $this->em->persist($nestedEntity);
-                        $this->em->flush();
-                        $entity->$setterName($nestedEntity);
-                    }
-                } else {
-                    // Handle normal field
-                    // if date and not null convert to DateTimeInterface
-                    if ($fieldType === 'datetime' || $fieldType === 'date' || $fieldType === 'time') {
-                        $value = \DateTime::createFromFormat('d/m/y', $value);
-
-                    } 
-                    $entity->$setterName($value);
-                    // try {
-                    //     //code...
-                    // } catch (\Throwable $th) {
-                    //     //throw $th;
-                    //     dump($value);
-                    //     dd($fieldType);
-                    // }
-
-                }
-            }
-            // dd($fieldType);
+            // Map the data to the entity properties
+            // dump($metadata->getFieldNames());
+            // dump($Fields);
             // exit;
 
-            $this->em->persist($entity);
-        }
+            foreach ($data as $key => $row) {
+                $entity = new $entityClass();
+                if (
+                    $key <= self::SHEET_HEAD || // skip sheet head (columns name and the title)
+                    // Skip the empty row
+                    empty(array_filter($row, function ($value) {
+                        return !empty($value);
+                    }))
+                ) continue;
 
-        // todo : make testes before presist the data
 
 
-        $unitOfWork = $this->em->getUnitOfWork();
-        $persistedEntities = $unitOfWork->getScheduledEntityInsertions();
-        // Dump the persisted entities for debugging
-        dump($persistedEntities);
-        // Dump missingDataObjs
-        // dump($missingDataObjs);
-        exit;
+                foreach ($Fields as $column => $field) {
+                    // dd($row);
+                    $value = $row[$column];
+                    if (is_null($value))
+                        continue;
 
-        $this->em->flush();
+                    // $fieldName = $field["name"];
+                    $setterName = $field["setter"];
+                    $fieldType = $field["type"];
 
-        // todo : create a excel file base on the fields key in $associationFields
-        // create an array of non excepted rows e.g a node(app.) that has the same identifier ($uniqueColumn)
+                    // dump($field);
+                    // dd( $field->getValue());
 
-        return $this->json('users registered', 200);
-    }
+                    if ($fieldType === "association") {
+                        // Handle related entity
+                        $relatedEntityName = $field["entity"];
+                        $relatedRepository = $this->em->getRepository($relatedEntityName);
+                        $searchBy = $field["searchBy"] ? $field["searchBy"] : 'id';
+                        $obj = $relatedRepository->findOneBy([
+                            $searchBy => trim($value)
+                        ]);
+                        // dump($value);
 
-    public function export(string $entityClass, array $fields): void
-    {
-        // $entityManager = $this->getDoctrine()->getManager();
-        // $repository = $entityManager->getRepository($entityClass);
-        // $metadata = $entityManager->getClassMetadata($entityClass);
+                        if ($obj) {
+                            $entity->$setterName($obj);
+                        } elseif ($addNonExAssoc) {
+                            
+                            // add new nested association e.g : node with no name
+                            $nestedEntity = new $relatedEntityName();
 
-        // $data = [];
+                            if ($searchBy != "id") {
+                                $nestedSetterName = 'set' . ucfirst($searchBy);
+                                $nestedEntity->$nestedSetterName($value);
+                            }
+                            
+                            
+                            if (array_key_exists("fields", $field)) {
+                                foreach ($field["fields"] as $nestedField) {
+                                    $nestedSetterName = 'set' . ucfirst(reset($nestedField));
+                                    $nestedEntity->$nestedSetterName($row[key($nestedField)]);
+                                }
+                            }
+                            // This field was added to prevent having to interact with 
+                            // the object (like using the Adjacency List) until it has the missing data
+                            if (method_exists($nestedEntity, "setTemp"))
+                                $nestedEntity->setTemp(true);
 
-        // foreach ($repository->findAll() as $entity) {
-        //     $rowData = [];
 
-        //     foreach ($fields as $fieldName) {
-        //         $getterName = 'get' . ucfirst($fieldName);
+                            $this->em->persist($nestedEntity);
+                            // $this->em->flush();
+                            // todo $this->em->flush();
+                            $entity->$setterName($nestedEntity);
+                            // dump($nestedEntity);
 
-        //         if (method_exists($entity, $getterName)) {
-        //             $rowData[] = $entity->$getterName();
-        //         }
-        //     }
 
-        //     $data[] = $rowData;
-        // }
+                            // store unfounded Association eg: nodes (app. cp)
+                            array_key_exists("store", $field) && 
+                                $missingData[$relatedEntityName][] = 
+                                $this->restructureData($row, array_column($Fields, 'name'), $field["store"]); 
 
-        // $spreadsheet = new Spreadsheet();
-        // $workSheet = $spreadsheet->getActiveSheet();
+                        }
+                    } else {
+                        // Handle normal field
+                        // if date and not null convert to DateTimeInterface
+                        if ($fieldType === 'datetime' || $fieldType === 'date' || $fieldType === 'time') {
+                            $value = \DateTime::createFromFormat('d/m/y', $value);
 
-        // foreach ($data as $rowIndex => $rowData) {
-        //     foreach ($rowData as $columnIndex => $value) {
-        //         $workSheet->setCellValueByColumnAndRow($columnIndex + 1, $rowIndex + 1, $value);
-        //     }
-        // }
+                        }
+                        $entity->$setterName($value);
+                        // try {
+                        //     //code...
+                        // } catch (\Throwable $th) {
+                        //     //throw $th;
+                        //     dump($value);
+                        //     dd($fieldType);
+                        // }
 
-        // $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        // $writer->save($filePath);
-    }
+                    }
+                }
+                // dump($entity);
+                // exit;
 
-    // this was made to keep the spread sheet columns name readable for the clients
-    function getPosteFields($workSheet, $entityClass)
-    {
-        $firstRowCells = $workSheet->getRowIterator(2)->current()->getCellIterator();
-        $posteFields = [];
-        foreach ($firstRowCells as $column => $cell) {
-            $cellValue = trim($cell->getValue());
-            // dump($cellValue);
-            if ($cellValue === 'N° serie') {
-                $cell->setValue("NSerie");
-            } elseif ($cellValue === 'P KVA') {
-                $cell->setValue("PKVA");
-            } elseif ($cellValue === 'nbr client BT') {
-                $cell->setValue("NbClients");
-            } elseif ($cellValue === 'DATE MST') {
-                $cell->setValue("DateMst");
-            } elseif ($cellValue === 'Départ') {
-                $cell->setValue("Department");
-            } elseif ($cellValue === 'CR') {
-                $cell->setValue("Commune");
-            } elseif ($cellValue === 'LCLCLC') {
-                $cell->setValue("node");
-            } elseif ($cellValue === 'Sect MM2') {
-                $cell->setValue("section");
-            } elseif ($cellValue === 'Long aérien') {
-                $cell->setValue("longueur");
+                if ($uniqueColumns) {
+
+                    $searchArgs = array_map(function ($field) use ($entity) {
+                        $field = explode(':', $field);
+                        $getter = "get" . $field[0];
+                        return [$field[1] => $entity->$getter()];
+                    }, explode(',', $uniqueColumns));
+
+                    // dump($uniqueColumns);
+                    // dd($searchArgs);
+                    // todo : $obj = $repository->findOneBy($searchArgs);
+
+                    if ($obj) {
+                        $canceledEntities[] = $row; // store canceled rows
+                        continue;
+                    }
+                }
+
+                $this->em->persist($entity);
+
             }
-            // dump($cell->getValue());
-            $fieldData = $this->getFieldData($cell->getValue(), $entityClass);
-            
-            $cellValue === 'LCLCLC' && 
-                $fieldData = array_merge($fieldData, ["searchBy" =>"identifier", "fields" => ["commune","department","section", "longueur"]]) ;
-            // todo [,"marque"] wach marque lifiha dik MET.. nzidha ftableux dyal les appareils yak machi tronçon omachi poste?
 
-            $fieldData && $posteFields[$column] = $fieldData;
+            // exit;
+            // $unitOfWork = $this->em->getUnitOfWork();
+            // $persistedEntities = $unitOfWork->getScheduledEntityInsertions();
+            // Dump the persisted entities for debugging
+            // dump($persistedEntities);
+            // Dump missingData
+            // dump($canceledEntities);
+            // dd($missingData);
+
+            if (!empty($canceledEntities)) {
+                $url = $this->generateSpreadsheet($canceledEntities,$className."-template");
+                $errorMessages[] = `Erreur d'insertion de données : Des doublons ont été détectés. Certaines données n'ont pas pu être insérées dans la base de données car elles existent déjà. Veuillez consulter <a class="link" target="_blank" href="$url" download>ce fichier</a> pour obtenir la liste des lignes annulées.`;
+            }
+
+            if (!empty($missingData)) {
+                foreach ($missingData as $key => $value) {
+                    $url = $this->generateSpreadsheet($value,$key."-template");
+                    $errorMessages[] = `Erreur de données manquantes : Certains champs associés ont des données manquantes. Veuillez vous référer à <a class="link" target="_blank" href="$url" download>ce fichier</a> pour compléter les informations requises et importer le fichier modifié dans la table désignée de la demande.`;
+                }
+            }
+
+            // todo - remove create spreadsheet from upload
+
+            // todo $this->em->flush();
+
+        } catch (\Exception $e) {
+            $errorMessages[] = $e->getMessage();
         }
 
-        // dd($posteFields);
-        return $posteFields;
+        // Create a JSON response 
+        $response = new JsonResponse([ 'messages' => $errorMessages ]);
+        return $response;
     }
 
 
-    private function getFieldData($fieldName, $entityClass){
+    private function getFieldData($fieldName, $entityClass)
+    {
         $fieldName = preg_replace('/\s+/', '', $fieldName);
         $setterName = 'set' . ucfirst($fieldName);
         $entity = new $entityClass();
-        if (!method_exists($entity, $setterName)) return false;
+        $fieldData = [];
+        // dump($setterName);
+        if (!method_exists($entity, $setterName))
+            return false;
         $metadata = $this->em->getClassMetadata($entityClass);
         $reflectionClass = $metadata->getReflectionClass();
         $properties = $reflectionClass->getProperties();
-
-        $fieldType = array_reduce($properties, function($carry, $property) use ($fieldName, $metadata) {
+        // dump($properties);exit;
+        $fieldType = array_reduce($properties, function ($carry, $property) use ($fieldName, $metadata, &$fieldData) {
             $propertyName = strtolower(str_replace('_', '', $property->getName()));
             if ($propertyName === strtolower($fieldName)) {
-                
-                if($metadata->hasAssociation($fieldName)) return "association";
+                if ($metadata->hasAssociation($property->getName())) {
+                    $fieldData["entity"] = $metadata->getAssociationTargetClass($property->getName());
+                    return "association";
+                }
 
                 $fieldMapping = $metadata->getFieldMapping($property->getName());
                 return $fieldMapping['type'];
@@ -237,15 +227,131 @@ class SpreadsheetService
         //     "type" => $fieldType,
         //     "setter" => $setterName
         // ]);
-        $fieldData =[
+
+        $fieldData = array_merge($fieldData, [
             "name" => $fieldName,
             "type" => $fieldType,
             "setter" => $setterName
-        ];
-
-        $fieldData["type"] === "association" && 
-            $fieldData["entity"] = $metadata->getAssociationTargetClass($fieldName);
+        ]);
 
         return $fieldData;
+    }
+
+    private function getFieldColumn($fieldColumn, $fieldName, $rowData)
+    {
+        $column = array_search(trim($fieldColumn), $rowData);
+        return $column ? [$column => $fieldName] : null;
+    }
+
+    public function generateSpreadsheet($data, $template)
+    {
+        $fileFolder = __DIR__ . '/../../public/';
+        $templateFile = $fileFolder . "templates/" . $template. '.xlsx';
+
+        // Load the template spreadsheet
+        $spreadsheet = IOFactory::load($templateFile);
+
+        // Get the active sheet
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set the data from your array to the spreadsheet
+        $sheet->fromArray($data, null, "A". (self::SHEET_HEAD+1));
+
+        // Save the spreadsheet to a file
+        $filename = md5(uniqid()) . "-" . 'spreadsheet.xlsx';
+        $filePath = $fileFolder. "uploads/" . $filename;
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($filePath);
+
+        return $filePath;
+    }
+
+
+    // this was made to keep the spread sheet columns name readable for the clients
+    function getEdgeFields($rowData, $entityClass)
+    {
+        $fields = [];
+        foreach ($rowData as $column => $cell) {
+            $cellValue = trim($cell);
+            // dump($cellValue);
+            if ($cellValue === 'ID source') {
+                $rowData[$column] = "NodeA";
+            } elseif ($cellValue === 'ID charge') {
+                $rowData[$column] = "NodeB";
+            } elseif ($cellValue === 'Départ') {
+                $rowData[$column] = "Department";
+            }
+            // dump($cell);
+            $fieldData = $this->getFieldData($rowData[$column], $entityClass);
+            if (!$fieldData)
+                continue;
+
+            $cellValue === 'ID source' &&
+                $fieldData = array_merge($fieldData, ["searchBy" => "identifier", "fields" => [$this->getFieldColumn("Nom source", "Titre", $rowData)]]);
+            $cellValue === 'ID charge' &&
+                $fieldData = array_merge($fieldData, ["searchBy" => "identifier", "fields" => [$this->getFieldColumn("Nom charge", "Titre", $rowData)]]);
+            $cellValue === 'Commune' &&
+                $fieldData = array_merge($fieldData, ["searchBy" => "titre"]);
+            $cellValue === 'Départ' &&
+                $fieldData = array_merge($fieldData, ["searchBy" => "titre"]);
+
+            $fields[$column] = $fieldData;
+        }
+
+        // dd($fields);
+        return $fields;
+    }
+    function getPosteFields($rowData, $entityClass)
+    {
+        $fields = [];
+        foreach ($rowData as $column => $cell) {
+            $cellValue = trim($cell);
+            if ($cellValue === 'N° serie') {
+                $rowData[$column] = "NSerie";
+            } elseif ($cellValue === 'P KVA') {
+                $rowData[$column] = "PKVA";
+            } elseif ($cellValue === 'nbr client BT') {
+                $rowData[$column] = "NbClients";
+            } elseif ($cellValue === 'DATE MST') {
+                $rowData[$column] = "DateMst";
+            } elseif ($cellValue === 'Départ') {
+                $rowData[$column] = "Department";
+            } elseif ($cellValue === 'CR') {
+                $rowData[$column] = "Commune";
+            } elseif ($cellValue === 'LCLCLC') {
+                $rowData[$column] = "node";
+            } elseif ($cellValue === 'Sect MM2') {
+                $rowData[$column] = "section";
+            } elseif ($cellValue === 'Long aérien') {
+                $rowData[$column] = "longueur";
+            }
+            // dump($rowData[$column]);
+            $fieldData = $this->getFieldData($rowData[$column], $entityClass);
+
+            $cellValue === 'LCLCLC' &&
+                $fieldData = array_merge($fieldData, ["searchBy" => "identifier", "store" => ["department",null,null,"node",null, "longueur", "section","commune"]]);
+            // todo [,"marque"] wach marque lifiha dik MET.. nzidha ftableux dyal les appareils yak machi tronçon omachi poste?
+
+            $fieldData && $fields[$column] = $fieldData;
+        }
+        // dd($fields);
+        return $fields;
+    }
+
+
+    function restructureData($data, $columns, $newColumns) {
+        $result = [];
+        
+        foreach ($newColumns as $column) {
+            if ($column === null) {
+                $result[] = ""; // Add an empty value for null columns
+            } elseif (in_array($column, $columns)) {
+                $columnIndex = array_search($column, $columns);
+                $result[] = $data[$columnIndex];
+            }
+        }
+        
+        return $result;
     }
 }

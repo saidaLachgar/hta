@@ -1,16 +1,18 @@
-TODO
-- add getEdgesFields in SpreadsheetService
-- create a adges model like the one of postes
-- test it on postman
-- store objs if troncon with the same depr nodes already exsits
-  - print them as error on $canceledEntities
-- create spread sheet of $missingDataObjs
+FRONT
 - add popup upload for edges
 - add api to edges service
 - copy paste on poste service
 - show origine in post table
 
 
-WHAT I AM DOING
-trying to 100% dynimise the spreadsheet process so i use 
-it for both troncones and postes
+- Before Start > clockify
+- After End > Commit
+
+
+
+FUTURE ME!!! HA ACH KANDIR :
+7aydat flush
+wbghit ntister $canceledEntities && $missingData
+wayni kayjini null fjson ?!
+
+lova ya 🥰
