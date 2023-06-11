@@ -13,17 +13,17 @@ export class postesListComponent {
   breadCrumbItems: Array<{}>;
 
   constructor(
-    public posteService: posteService,
+    public service: posteService,
     private fb: FormBuilder,
     public authService: AuthenticationService,
     private modalService: NgbModal,
     private config: NgSelectConfig
   ) {
-    posteService.findAll();
-    posteService.loadCommunes();
-    posteService.loadDepartments();
+    service.findAll();
+    service.loadCommunes();
+    service.loadDepartments();
 
-    posteService.posteForm = fb.group({
+    service.posteForm = fb.group({
       titre: [""],
       designation: [""],
       MLE: [""],
@@ -38,8 +38,25 @@ export class postesListComponent {
       "node.department.id[]": [''],
       "node.commune.id[]": [''],
     });
-    posteService.importForm = fb.group({
+    service.exportForm = fb.group({
+      titre: [""],
+      designation: [""],
+      MLE: [""],
+      PKVA: [""],
+      nb_clients: [""],
+      before: [""],
+      after: [""],
+      type: [""],
+      marque: [""],
+      poste: [""],
+      n_serie: [""],
+      "node.department.id[]": [''],
+      "node.commune.id[]": [''],
+    });
+
+    service.importForm = fb.group({
       addNonExitingAssociation: [true],
+      updateIfExist: [false],
       spreadSheet: [null,Validators.required],
     });
 
@@ -47,12 +64,17 @@ export class postesListComponent {
 
   }
   onUpload(fileInput: any){
-    this.posteService.selectedFile = fileInput.target.files[0];
+    this.service.selectedFile = fileInput.target.files[0];
   }
 
   @ViewChild("content")
   private content: TemplateRef<any>;
   openModal() {
     this.modalService.open(this.content, { size: 'xl',centered: true });
+  }
+  @ViewChild("export_content")
+  private export_content: TemplateRef<any>;
+  ExportModal() {
+    this.modalService.open(this.export_content, { size: 'xl',centered: true });
   }
 }

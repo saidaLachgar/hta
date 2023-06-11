@@ -130,6 +130,7 @@ class Poste
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"postes"})
      */
     private $origine;
 

@@ -46,7 +46,7 @@ Obtain a token for API access:
 <br>
 
 ## Symfony CLI
-    - Clear cache  - php bin/console cache:clear
+    - Clear cache  - php bin/console c:c
     - DB update    - php bin/console d:s:u --force
     - New Entity   - php bin/console make:entity
     - Show routes  - php bin/console debug:router  

@@ -43,9 +43,11 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   isLoading = false;
   page:number = 1;
   lastSearchedParams;
+  uploadResponse:string[];
   
   public selectedFile:File;
   public posteForm: FormGroup;
+  public exportForm: FormGroup;
   public importForm: FormGroup;
 
   constructor(
@@ -164,10 +166,43 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   }
 
   /**
-   * upload spreadsheet
+   * export spreadsheet from the server
    */
-  uploadSpreadSheet(): void{
+  exportSpreadSheet(): void{
+    let form = this.exportForm;
+    this.isLoading = true;
+    let that = this;
+    let toast = this.toast;
+    let url = `${this.server}/api/export_spreadsheet`;
+    let obj = Object.entries(form.value as Poste);
+    // remove empty values
+    const filter = Object.fromEntries(obj.filter(([key, value]) => value !== "" && value !== null ));
+    filter["dateMst"] && (filter["dateMst"] = formatDate(filter["dateMst"]));
+    // console.log(data);
+    // return; 
+    this.http.post(url, {className : "poste", filter }, { responseType: 'blob' } ).subscribe(
+      (response) => {
+        that.isLoading = false;
+        // Create a blob URL from the response
+        const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank').focus();
+
+      },
+      (error) => {
+        that.isLoading = false;
+        toast.error("un problème est survenu, veuillez réessayer"+error)
+      })
+   }
+
+
+  /**
+   * import spreadsheet to the server
+   */
+  importSpreadSheet(): void{
     this.submitted = true;    
+    this.isLoading = true;
+
     if (this.importForm.invalid) return;
     
     let url = `${this.server}/api/upload_spreadsheet`;
@@ -175,20 +210,28 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     let toast = this.toast;
     let body: FormData = new FormData();
     body.append("spreadSheet", this.selectedFile);
-    body.append("addNonExitingAssociation", this.addNonExitingAssociation.value);
+    body.append("addNonExAssoc", this.addNonExitingAssociation.value);
+    body.append("updateIfExist", this.updateIfExist.value);
+    body.append("className", "poste");
+    body.append("uniqueColumns", "Designation,Node");
 
-     this.http.post( url, body, { reportProgress: true, responseType: 'json' }).pipe().subscribe({
-      error: () => {
-        that.isLoading = false;
-        toast.error("un problème est survenu, veuillez réessayer")
-      },
-      complete() {
+     this.http.post<{messages: string[]}>( url, body, { reportProgress: true, responseType: 'json' }).pipe().subscribe(
+      
+      (response) => {
+        // console.log('Response:', response);
         that.importForm.reset();
         that.submitted = false;
+        that.selectedFile = null;
         that.isLoading = false;
-        toast.success("Postes importés avec succès");
+        // console.log(response);
+        that.uploadResponse = response.messages;
+        toast.show('L\'opération se termine avec succès', {icon: ''});
       },
-    });
+      (error) => {
+        that.isLoading = false;
+        toast.error("un problème est survenu, veuillez réessayer"+error)
+      }  
+    );
   }
 
 
@@ -215,6 +258,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
       },
     });
   }
+
   /**
    * Persist : update
    */
@@ -279,6 +323,9 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   }
   get addNonExitingAssociation() {
     return this.importForm.get("addNonExitingAssociation");
+  }
+  get updateIfExist() {
+    return this.importForm.get("updateIfExist");
   }
   get spreadSheet() {
     return this.importForm.get("spreadSheet");

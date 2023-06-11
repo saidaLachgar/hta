@@ -41,8 +41,14 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
+  isLoading = false;
   page: number = 1;
   lastSearchedParams;
+  uploadResponse:string[];
+
+  public selectedFile:File;
+  public importForm: FormGroup;
+  public exportForm: FormGroup;
   public edgeForm: FormGroup;
 
   constructor(
@@ -240,6 +246,15 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
   get ANode() {
     return this.edgeForm.get("nodeB");
   }
+  get addNonExitingAssociation() {
+    return this.importForm.get("addNonExitingAssociation");
+  }
+  get spreadSheet() {
+    return this.importForm.get("spreadSheet");
+  }
+  get updateIfExist() {
+    return this.importForm.get("updateIfExist");
+  }
 
   /**
    * find By Criteria
@@ -262,4 +277,73 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
   }
+
+   /**
+   * export spreadsheet from the server
+   */
+   exportSpreadSheet(): void{
+    let form = this.exportForm;
+    this.isLoading = true;
+    let that = this;
+    let toast = this.toast;
+    let url = `${this.server}/api/export_spreadsheet`;
+    let obj = Object.entries(form.value as Edge);
+    // remove empty values
+    const filter = Object.fromEntries(obj.filter(([key, value]) => value !== "" && value !== null ));
+    // console.log(data);
+    // return; 
+    this.http.post(url, {className : "edge", filter }, { responseType: 'blob' } ).subscribe(
+      (response) => {
+        that.isLoading = false;
+        // Create a blob URL from the response
+        const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank').focus();
+
+      },
+      (error) => {
+        that.isLoading = false;
+        toast.error("un problème est survenu, veuillez réessayer"+error)
+      })
+   }
+
+
+   /**
+   * import spreadsheet to the server
+   */
+   importSpreadSheet(): void{
+    this.submitted = true;    
+    this.isLoading = true;
+    if (this.importForm.invalid) return;
+    
+    let url = `${this.server}/api/import_spreadsheet`;
+    let that = this;
+    let toast = this.toast;
+    let body: FormData = new FormData();
+    body.append("spreadSheet", this.selectedFile);
+    body.append("addNonExAssoc", this.addNonExitingAssociation.value);
+    body.append("updateIfExist", this.updateIfExist.value);
+    body.append("className", "edge");
+    body.append("uniqueColumns", "NodeA,NodeB");
+
+     this.http.post<{messages: string[]}>( url, body, { reportProgress: true, responseType: 'json' }).pipe().subscribe(
+      
+      (response) => {
+        // console.log('Response:', response);
+        that.importForm.reset();
+        that.selectedFile = null;
+        that.submitted = false;
+        that.isLoading = false;
+        // console.log(response);
+        that.uploadResponse = response.messages;
+        toast.show('L\'opération se termine avec succès', {icon: ''});
+      },
+      (error) => {
+        that.isLoading = false;
+        toast.error("un problème est survenu, veuillez réessayer"+error)
+      }  
+    );
+  }
+
 }
+

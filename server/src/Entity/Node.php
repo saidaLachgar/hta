@@ -121,6 +121,7 @@ class Node
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
+     * @Groups({"nodes","edge", "postes"})
      */
     private $identifier;
 

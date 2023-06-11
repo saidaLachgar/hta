@@ -7,6 +7,12 @@
       ></app-page-title>
     </div>
     <div class="col-auto">
+      <button class="btn bg-light text-primary ms-2" title="Importer" (click)="openModal()">
+        <i class="fas fa-upload"></i>
+      </button>
+      <button class="btn bg-light text-primary ms-2" title="Exporter" (click)="ExportModal()">
+        <i class="fas fa-download"></i>
+      </button>
       <a routerLink="/edges/add" class="btn btn-primary ms-2"
       *ngIf="authService.isAuthorized('edges_add')"
         ><i class="fas fa-plus-circle"></i> Ajouter</a
@@ -76,7 +82,7 @@
                         bindValue="id"
                         [multiple]="true"
                         [minTermLength]="2"
-                        placeholder="De.."
+                        placeholder="À.."
                         [loading]="service.BNodeLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
                         [typeahead]="service.BNodeInput$">
@@ -269,3 +275,171 @@
     </div>
   </div>
 </div>
+
+
+<ng-template #content let-modal>
+	<div class="modal-header border-0">
+		<h4 class="modal-title"></h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+	</div>
+	<div class="modal-body">
+		<form id="import-form" [formGroup]="service.importForm" (ngSubmit)="service.importSpreadSheet()">
+      <div class="mb-3 row m-n2">
+        <div *ngIf="service.uploadResponse" class="col-12">
+          <div class="alert alert-warning" *ngFor="let msg of service.uploadResponse" [innerHTML]="msg"></div>
+        </div>
+        
+
+        <div class="col-lg-6 p-2">
+          <div class="text-center border rounded-lg py-4 p-2 p-lg-5 h-100">
+          <h3 class="mb-4">Commencer par un modèle</h3>
+          <i class="fas fa-file-download display-1 my-3" style="color: #d3e8fc;"></i>
+          <p class="text-muted">Téléchargez un modèle pour commencer.</p>
+          <button class="btn btn-outline-info">Télécharger un modèle</button>
+        </div>
+        </div>
+
+        <div class="col-lg-6 p-2 text-center">
+          <div class=" border rounded-lg py-4 p-2 p-lg-5">
+          <h3>J'ai déjà un fichier prêt</h3>
+          <label class="d-flex align-items-center justify-content-center flex-column my-4 position-relative">
+            <i class="fas fa-file-excel display-1 my-3" style="color: #d3e8fc;"></i>
+            <input class="position-absolute w-100 h-100 opacity-0 c-pointer" formControlName="spreadSheet" type="file" accept="text/plain, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" (change)="onUpload($event)">
+
+            <p class="text-muted">{{service.selectedFile && service.selectedFile.name ? service.selectedFile.name : "Sélectionnez un fichier ou glissez-le ici"}}</p>
+            <p *ngIf="service.submitted && service.spreadSheet.errors" class="text-danger">
+                <span *ngIf="service.spreadSheet.errors.required">Veuillez sélectionner un fichier !</span>
+            </p>
+            <span class="btn btn-outline-info">Sélectionner un fichier</span>
+          </label>
+          <div class="form-check form-checkbox-outline form-check-info mb-3">
+            <input type="checkbox" value="true" formControlName="addNonExitingAssociation" id="addNonExitingAssociation" checked class="form-check-input">
+            <label for="addNonExitingAssociation" class="form-check-label">Ajouter " Appareils coupeur " si elle n'a pas été trouvée</label>
+          </div>
+          <div class="form-check form-checkbox-outline form-check-info mb-3">
+            <input type="checkbox" value="true" formControlName="updateIfExist" id="updateIfExist" checked class="form-check-input">
+            <label for="updateIfExist" class="form-check-label">Mettre à jour le tronçon s'il a déjà été trouvé<br><small class="text-muted">(chaque tronçon est identifié par son appareil de coupure)</small></label>
+          </div>
+          </div>
+
+        </div>
+
+      </div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-light" [disabled]="service.isLoading" (click)="modal.dismiss()">Annuler</button>
+		<button type="submit" class="btn btn-info" [disabled]="service.isLoading" form="import-form">Importer</button>
+	</div>
+</ng-template>
+
+<ng-template #export_content let-exportmodal>
+	<div class="modal-header border-0">
+		<h4 class="modal-title">Filtre de données exportées</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="exportmodal.dismiss()"></button>
+	</div>
+	<div class="modal-body">
+		<form id="import-form" [formGroup]="service.exportForm" (ngSubmit)="service.exportSpreadSheet()">
+      <div class="mb-3 row m-n2">
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">Départ</label>
+            <div class="col-md-10">
+
+          <ng-select [items]="service.departments$ | async"
+                    #searchDepar
+                    formControlName="department.id[]"
+                    bindLabel="titre"
+                    bindValue="id"
+                    [multiple]="true"
+                    [minTermLength]="2"
+                    placeholder="Départ.."
+                    [loading]="service.departmentLoading"
+                    typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                    [typeahead]="service.departmentInput$">
+          </ng-select>
+        </div>
+        </div>
+        <!-- nodeA -->
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">De</label>
+            <div class="col-md-10">
+
+          <ng-select [items]="service.ANode$ | async"
+              #searchANode
+              formControlName="node_a.id[]"
+              bindLabel="titre"
+              bindValue="id"
+              [multiple]="true"
+              [minTermLength]="2"
+              placeholder="De.."
+              [loading]="service.ANodeLoading"
+              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+              [typeahead]="service.ANodeInput$">
+          </ng-select>
+        </div>
+        </div>
+        <!-- nodeB -->
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">À</label>
+            <div class="col-md-10">
+
+          <ng-select [items]="service.BNode$ | async"
+              #searchBNode
+              formControlName="node_b.id[]"
+              bindLabel="titre"
+              bindValue="id"
+              [multiple]="true"
+              [minTermLength]="2"
+              placeholder="À.."
+              [loading]="service.BNodeLoading"
+              typeToSearchText="Veuillez saisir 2 caractères ou plus"
+              [typeahead]="service.BNodeInput$">
+          </ng-select>
+        </div>
+        </div>
+        <!-- Longueur -->
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">Longueur</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Longueur..." formControlName="longueur" #searchLongueur class="form-control"></div>
+              </div>
+        <!-- Section -->
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">Section</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Section..." formControlName="section" #searchSection class="form-control"></div>
+              </div>
+        <!-- Marque -->
+        <div class="mb-3 row">
+            <label for="input-2" class="col-md-2 col-form-label">Marque</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Marque..." formControlName="marque" #searchMarque class="form-control"></div>
+              </div>
+        <!-- Commune -->
+        <div class="mb-3 row">
+          <label for="input-2" class="col-md-2 col-form-label">Communes</label>
+          <div class="col-md-10">
+            <ng-select [items]="service.communes$ | async"
+                      #searchCommunes
+                      formControlName="commune.id[]"
+                      bindLabel="titre"
+                      bindValue="id"
+                      [multiple]="true"
+                      
+                      [minTermLength]="2"
+                      placeholder="Communes.."
+                      [loading]="service.communeLoading"
+                      typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                      [typeahead]="service.communeInput$">
+            </ng-select>
+          </div>
+        </div>
+
+      </div>
+		</form>
+	</div>
+	<div class="modal-footer mt-3 border-0">
+		<button type="button" class="btn btn-light" [disabled]="service.isLoading" (click)="exportmodal.dismiss()">Annuler</button>
+		<button type="submit" class="btn btn-info" [disabled]="service.isLoading" form="import-form">Télécharger</button>
+	</div>
+</ng-template>

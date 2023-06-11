@@ -43,7 +43,7 @@ class EdgeRepository extends ServiceEntityRepository
         }
     }
 
-    public function getEdgesByRange($depar,$node_a, $node_b = null)
+    public function getEdgesByRange($depar, $node_a, $node_b = null)
     {
         // $node_b is comma-separated string
         if ($node_b !== null) {
@@ -54,7 +54,7 @@ class EdgeRepository extends ServiceEntityRepository
 
         $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
 
-        $results =  $this->createQueryBuilder('e')
+        $results = $this->createQueryBuilder('e')
             ->select("e.id")
             ->andWhere('n.id IN (:nodes)')
             ->setParameter('nodes', $nodesInRange)
@@ -66,7 +66,7 @@ class EdgeRepository extends ServiceEntityRepository
 
         return $edges;
     }
-    public function getEdgesLengthByRange($depar,$node_a, $node_b = null)
+    public function getEdgesLengthByRange($depar, $node_a, $node_b = null)
     {
         // $node_b is comma-separated string
         if ($node_b !== null) {
@@ -77,7 +77,7 @@ class EdgeRepository extends ServiceEntityRepository
 
         $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
 
-        $results =  $this->createQueryBuilder('e')
+        $results = $this->createQueryBuilder('e')
             ->select("sum(e.longueur)")
             ->innerJoin('e.node_a', 'n')
 
@@ -93,7 +93,25 @@ class EdgeRepository extends ServiceEntityRepository
         return $results;
     }
 
-//    /**
+    public function isNotUnique($searchArgs)
+    {
+        $queryBuilder = $this->createQueryBuilder('e');
+
+        foreach ($searchArgs as $search) {
+            foreach ($search as $key => $value) {
+                $queryBuilder
+                    ->innerJoin('e.'.$key, $key)
+                    ->andWhere($key.'.id = :'.$key.'_id')
+                    ->setParameter($key.'_id', $value);
+
+            }
+        }
+
+        return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+
+    //    /**
 //     * @return Edge[] Returns an array of Edge objects
 //     */
 //    public function findByExampleField($value): array
@@ -108,7 +126,7 @@ class EdgeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Edge
+    //    public function findOneBySomeField($value): ?Edge
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

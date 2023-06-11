@@ -10,7 +10,7 @@
       <button class="btn bg-light text-primary ms-2" title="Importer" (click)="openModal()">
         <i class="fas fa-upload"></i>
       </button>
-      <button class="btn bg-light text-primary ms-2" title="Exporter" >
+      <button class="btn bg-light text-primary ms-2" title="Exporter" (click)="ExportModal()">
         <i class="fas fa-download"></i>
       </button>
       <a routerLink="/postes/add" class="btn btn-primary ms-2"
@@ -26,7 +26,7 @@
         <div class="card-body">
           
           <!-- Table -->
-          <form [formGroup]="posteService.posteForm" (ngSubmit)="posteService.onSearch()" class="table-responsive">
+          <form [formGroup]="service.posteForm" (ngSubmit)="service.onSearch()" class="table-responsive">
             <table class="table table-bordered">
               <thead>
                 <tr>
@@ -50,7 +50,7 @@
                 >
                   <td><input type="text" placeholder="Designation..." formControlName="designation" #searchDesignation class="form-control"></td>
                   <td>
-                    <ng-select [items]="posteService.departments$ | async"
+                    <ng-select [items]="service.departments$ | async"
                               #searchDepar
                               formControlName="node.department.id[]"
                               bindLabel="titre"
@@ -58,9 +58,9 @@
                               [multiple]="true"
                               [minTermLength]="2"
                               placeholder="Départ.."
-                              [loading]="posteService.departmentLoading"
+                              [loading]="service.departmentLoading"
                               typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="posteService.departmentInput$">
+                              [typeahead]="service.departmentInput$">
                     </ng-select>
                   </td>
                   <td><input type="text" placeholder="MLE..." formControlName="MLE" #searchMLE class="form-control"></td>
@@ -68,7 +68,7 @@
                   <td><input type="text" placeholder="Nb de clients..." formControlName="nb_clients" #searchNbClients class="form-control"></td>
 
                   <td>
-                    <ng-select [items]="posteService.communes$ | async"
+                    <ng-select [items]="service.communes$ | async"
                               #searchCommunes
                               formControlName="node.commune.id[]"
                               bindLabel="titre"
@@ -77,9 +77,9 @@
                               
                               [minTermLength]="2"
                               placeholder="Communes.."
-                              [loading]="posteService.communeLoading"
+                              [loading]="service.communeLoading"
                               typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                              [typeahead]="posteService.communeInput$">
+                              [typeahead]="service.communeInput$">
                     </ng-select>
                   </td>
 
@@ -104,7 +104,7 @@
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
                       <i class="bx bx-search me-1"></i>Rechercher
                     </button>
-                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="posteService.findAll()">
+                    <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
                       <i class="bx bx-x me-1"></i>Réinitialiser
                     </button>
                   </td>
@@ -114,20 +114,20 @@
                   <td
                     class="text-center"
                     colspan="11"
-                    *ngIf="!(posteService.postes$ | async) && posteService.loading$ | async"
+                    *ngIf="!(service.postes$ | async) && service.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
                     colspan="11"
-                    *ngIf="(posteService.postes$ | async) && (posteService.postes$ | async).length === 0 && posteService.loaded$ | async"
+                    *ngIf="(service.postes$ | async) && (service.postes$ | async).length === 0 && service.loaded$ | async"
                   >
                   Aucune donnée trouvée !
                   </td>
                 </tr>
                 <!-- data -->
-                <tr *ngFor="let poste of (posteService.postes$ | async); let i = index">
+                <tr *ngFor="let poste of (service.postes$ | async); let i = index">
                   <td>
                     <ngb-highlight
                       [result]="poste.designation"
@@ -233,7 +233,7 @@
                           class="dropdown-item text-danger"
                           href="javascript: void(0);"
                           *ngIf="authService.isAuthorized('postes_delete')"
-                          (click)="posteService.deleteItem(poste.id, $event.target)"
+                          (click)="service.deleteItem(poste.id, $event.target)"
                         >
                           <i class="fas fa-trash me-2"></i> Supprimer
                         </a>
@@ -246,9 +246,9 @@
           </form>
           <!-- End table -->
           <!-- Pagination -->
-          <ng-container *ngIf="(posteService.pagination$ | async) as pagination">
+          <ng-container *ngIf="(service.pagination$ | async) as pagination">
             <div
-              *ngIf="pagination.totalRecords > posteService.pageSize"
+              *ngIf="pagination.totalRecords > service.pageSize"
               class="row justify-content-md-between align-items-md-center mt-2"
             >
               <div class="col-sm-12 col-md-5">
@@ -267,9 +267,9 @@
                 <div class="text-md-right float-md-end pagination-rounded">
                   <ngb-pagination
                     [collectionSize]="pagination.totalRecords"
-                    [(page)]="posteService.page"
-                    [pageSize]="posteService.pageSize"
-                    (pageChange)="posteService.onPaginate($event)"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                    (pageChange)="service.onPaginate($event)"
                   >
                   </ngb-pagination>
                 </div>
@@ -289,7 +289,7 @@
 		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
 	</div>
 	<div class="modal-body">
-		<form id="import-form" [formGroup]="posteService.importForm" (ngSubmit)="posteService.uploadSpreadSheet()">
+		<form id="import-form" [formGroup]="service.importForm" (ngSubmit)="service.importSpreadSheet()">
       <div class="mb-3 row m-n2">
 
         <div class="col-lg-6 p-2">
@@ -308,15 +308,19 @@
             <i class="fas fa-file-excel display-1 my-3" style="color: #d3e8fc;"></i>
             <input class="position-absolute w-100 h-100 opacity-0 c-pointer" formControlName="spreadSheet" type="file" accept="text/plain, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" (change)="onUpload($event)">
 
-            <p class="text-muted">{{posteService.selectedFile && posteService.selectedFile.name ? posteService.selectedFile.name : "Sélectionnez un fichier ou glissez-le ici"}}</p>
-            <p *ngIf="posteService.submitted && posteService.spreadSheet.errors" class="text-danger">
-                <span *ngIf="posteService.spreadSheet.errors.required">Veuillez sélectionner un fichier !</span>
+            <p class="text-muted">{{service.selectedFile && service.selectedFile.name ? service.selectedFile.name : "Sélectionnez un fichier ou glissez-le ici"}}</p>
+            <p *ngIf="service.submitted && service.spreadSheet.errors" class="text-danger">
+                <span *ngIf="service.spreadSheet.errors.required">Veuillez sélectionner un fichier !</span>
             </p>
             <span class="btn btn-outline-info">Sélectionner un fichier</span>
           </label>
           <div class="form-check form-checkbox-outline form-check-info mb-3">
             <input type="checkbox" value="true" formControlName="addNonExitingAssociation" id="addNonExitingAssociation" checked class="form-check-input">
             <label for="addNonExitingAssociation" class="form-check-label">Ajouter " Appareils coupeur " si elle n'a pas été trouvée</label>
+          </div>
+          <div class="form-check form-checkbox-outline form-check-info mb-3">
+            <input type="checkbox" value="true" formControlName="updateIfExist" id="updateIfExist" checked class="form-check-input">
+            <label for="updateIfExist" class="form-check-label">Mettre à jour le poste s'il a déjà été trouvé<br><small class="text-muted">(chaque poste est identifié par sa désignation et son appareil de coupure)</small></label>
           </div>
           </div>
 
@@ -326,7 +330,129 @@
 		</form>
 	</div>
 	<div class="modal-footer border-0">
-		<button type="button" class="btn btn-light" [disabled]="posteService.isLoading">Annuler</button>
-		<button type="submit" class="btn btn-info" [disabled]="posteService.isLoading" form="import-form">Importer</button>
+		<button type="button" class="btn btn-light" [disabled]="service.isLoading">Annuler</button>
+		<button type="submit" class="btn btn-info" [disabled]="service.isLoading" form="import-form">Importer</button>
+	</div>
+</ng-template>
+
+
+<ng-template #export_content let-exportmodal>
+	<div class="modal-header border-0">
+		<h4 class="modal-title">Filtre de données exportées</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="exportmodal.dismiss()"></button>
+	</div>
+	<div class="modal-body">
+		<form id="import-form" [formGroup]="service.exportForm" (ngSubmit)="service.exportSpreadSheet()">
+      <div class="mb-3 row m-n2">
+       
+       
+        <!-- Designation -->
+        <div class="mb-3 row">
+            <label for="export-1" class="col-md-2 col-form-label">Designation</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Designation..." formControlName="designation"  class="form-control">
+            </div>
+        </div>
+        <!-- Départ -->
+        <div class="mb-3 row">
+            <label for="export-2" class="col-md-2 col-form-label">Départ</label>
+            <div class="col-md-10">
+              <ng-select [items]="service.departments$ | async"
+                          formControlName="node.department.id[]"
+                          bindLabel="titre"
+                          bindValue="id"
+                          [multiple]="true"
+                          [minTermLength]="2"
+                          placeholder="Départ.."
+                          [loading]="service.departmentLoading"
+                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                          [typeahead]="service.departmentInput$">
+                </ng-select>
+            </div>
+        </div>
+        <!-- MLE -->
+        <div class="mb-3 row">
+            <label for="export-3" class="col-md-2 col-form-label">MLE</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="MLE..." formControlName="MLE"  class="form-control">
+            </div>
+        </div>
+        <!-- P KVA -->
+        <div class="mb-3 row">
+            <label for="export-4" class="col-md-2 col-form-label">P KVA</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="P KVA..." formControlName="PKVA"  class="form-control">
+            </div>
+        </div>
+        <!-- Nb de clients -->
+        <div class="mb-3 row">
+            <label for="export-5" class="col-md-2 col-form-label">Nb de clients</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Nb de clients..." formControlName="nb_clients"  class="form-control">
+            </div>
+        </div>
+        <!-- Commune -->
+        <div class="mb-3 row">
+            <label for="export-6" class="col-md-2 col-form-label">Commune</label>
+            <div class="col-md-10">
+              <ng-select [items]="service.communes$ | async"
+                          formControlName="node.commune.id[]"
+                          bindLabel="titre"
+                          bindValue="id"
+                          [multiple]="true"
+                          [minTermLength]="2"
+                          placeholder="Communes.."
+                          [loading]="service.communeLoading"
+                          typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                          [typeahead]="service.communeInput$">
+                </ng-select>
+            </div>
+        </div>
+        <!-- Date MST -->
+        <div class="mb-3 row">
+            <label for="export-7" class="col-md-2 col-form-label">Date MST</label>
+            <div class="col-md-5">
+              <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="after" class="form-control" (click)="ds.open()" placeholder="De..." #sds="ngbDatepicker">
+            </div>
+            <div class="col-md-5">
+              <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="before" class="form-control" (click)="de.open()" placeholder="À..." #sde="ngbDatepicker">
+            </div>
+        </div>
+        <!-- Type -->
+        <div class="mb-3 row">
+            <label for="export-8" class="col-md-2 col-form-label">Type</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Type..." formControlName="type" class="form-control">
+            </div>
+        </div>
+        <!-- Marque -->
+        <div class="mb-3 row">
+            <label for="export-9" class="col-md-2 col-form-label">Marque</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Marque..." formControlName="marque" class="form-control">
+            </div>
+        </div>
+        <!-- Poste -->
+        <div class="mb-3 row">
+            <label for="export-10" class="col-md-2 col-form-label">Poste</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="Poste..." formControlName="poste" class="form-control">
+            </div>
+        </div>
+        <!-- N° serie -->
+        <div class="mb-3 row">
+            <label for="export-11" class="col-md-2 col-form-label">N° serie</label>
+            <div class="col-md-10">
+              <input type="text" placeholder="N° serie..." formControlName="n_serie" class="form-control">
+            </div>
+        </div>
+        
+
+      </div>
+		</form>
+	</div>
+	<div class="modal-footer mt-3 border-0">
+		<button type="button" class="btn btn-light" [disabled]="service.isLoading" (click)="exportmodal.dismiss()">Annuler</button>
+		<button type="submit" class="btn btn-info" [disabled]="service.isLoading" form="import-form">Télécharger</button>
 	</div>
 </ng-template>
