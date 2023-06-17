@@ -1,6 +1,6 @@
 ## APP VERSION
-    SYMFONY 5.4 | PHP 7.4 | Angular CLI 13.2
-
+    SYMFONY 5.4 | PHP 7.4 | Angular 13
+    Symfony CLI 4.22 | Angular CLI 13.2
 ## APP INFOS
     The website is an Electric Power Quality Monitoring System (SQE CMMS). It is a web application that allows users to track and manage the performance of electricity production, transmission, and distribution. The app allows users to monitor and measure the quality of electricity service, including continuity of service, interruption frequency, and downtime. It also allows workers to log and track breakdowns and schedule visits to fix anomalies. Additionally, it allows tracking the monthly objectives of each year, like how many visits they should do, which includes how many kilometers they will cover, and how much equipment they should set up. All data will be stored in a database and can be analyzed and visualized in charts and other forms of analysis.
 
@@ -13,11 +13,11 @@
     mkdir -p config/jwt
     openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
     openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
+    password write anything && put it in .env
     download openssl on windows : https://stackoverflow.com/a/16263688
 ## FRONTEND SETUP 
-    - yarn install (install packages --1st time only)
-    - yarn run build (run webpack to generate the assets)
-    - You can also make webpack listen for changes and compile only what’s needed as you work on your files using: npm run watch
+    - npm install (install packages --1st time only)
+    - ng build  (run webpack to generate the assets)
 
 ## SERVE CLIENT SIDE
 > http://localhost:4200

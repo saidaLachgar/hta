@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { FormArray, FormGroup } from "@angular/forms";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
@@ -14,9 +14,10 @@ import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
+import { anomalyService } from "../anomalies/anomaly.service";
+import { Router } from "@angular/router";
 
 const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
-
 
 @Injectable({
   providedIn: "root",
@@ -25,7 +26,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   readonly pageSize = environment.pageSize;
   private server = environment.serverURL;
   visites$: Observable<Visite[]>;
-  
+  existingVisit: Visite | boolean = false;
+  EditeMode: boolean = false;
+
   departments$: Observable<Department[]>;
   departmentLoading = false;
   departmentInput$ = new Subject<string>();
@@ -45,6 +48,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page:number = 1;
+  anomalyLoading: boolean = false;
   lastSearchedParams;
   public visiteForm: FormGroup;
 
@@ -53,7 +57,9 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     private confirmDialogService: ConfirmDialogService,
     public departmentService: departmentService,
     public nodeService: nodeService,
+    public anomalyService: anomalyService,
     public communeService: communeService,
+    private router: Router,
     private http: HttpClient,
     private toast: HotToastService
   ) {
@@ -185,48 +191,63 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   }
 
   /**
-   * Persist : Create
+   * Persist : Create / update
    */
-  onCreate(): void {
-    let visiteForm = this.visiteForm;
+  async Persist(Action: string): Promise<void> {
     this.submitted = true;
-    if (visiteForm.invalid) return;
+    if (this.visiteForm.invalid) return;
     this.submitted = false;
-    let toast = this.toast;
-    let obj = Object.entries(visiteForm.value as Visite);
-    // remove empty values
-    const visite = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
-    visite["date"] && (visite["date"] = formatDate(visite["date"]));
+    let id = null;
+    if (!this.EditeMode) {
+      this.EditeMode = Action == 'EDIT';
+    } else {
+      // update Taff
+      id = this.existingVisit ? (this.existingVisit as Visite).id : null;
+    }
 
-    this.add(visite).subscribe({
-      error: () => toast.error("un problème est survenu, veuillez réessayer"),
-      complete() {
-        visiteForm.reset();
-        toast.success("Visite ajouté avec succès");
-      },
-    });
-  }
-  /**
-   * Persist : update
-   */
-  onUpdate(id:number): void {
-    let visiteForm = this.visiteForm;
-    this.submitted = true;
-    if (visiteForm.invalid) return;
-    this.submitted = false;
+    let form = this.visiteForm.value;
+    let _this = this;
     let toast = this.toast;
-    let obj = Object.entries(visiteForm.value as Visite);
-    // remove empty values
-    const visite = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
-    visite["date"] && (visite["date"] = formatDate(visite["date"]));
-    visite.id = id;
+    let visite = {
+      date: form.date ? form.date : null,
+      team: form.team ? form.team : null,
+      department: form.department ? form.department : null,
+      nodeA: form.node_a ? form.node_a : null,
+      nodeB: form.node_b && form.node_b.length ? form.node_b : [],
+    };
+    let anomalies = form.anomalies;
+    this.anomalyLoading = true;
 
+    anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
+    this.anomalyLoading = false;
+
+    // compare last query with the new one to avoid unnecessary requests
+    if (id) {
+      visite["id"] = id;
       this.update(visite).subscribe({
         error: () => toast.error("un problème est survenu, veuillez réessayer"),
         complete() {
-          toast.success("Visite a été mis à jour avec succès");
+          toast.success("L'interuption a été sauvegardée avec succès ");
+          Action == 'LIST' && _this.router.navigate(['/visites']);
+          _this.submitted = false;
         },
       });
+    } else {
+      this.add(visite).pipe(tap(data => this.existingVisit = data))
+        .subscribe({
+          error: () => toast.error("un problème est survenu, veuillez réessayer"),
+          complete() {
+            toast.success("L'interuption ajoutée avec succès");
+            Action == 'NEW' && location.reload();
+            Action == 'LIST' && _this.router.navigate(['/visites']);
+            _this.submitted = false;
+          },
+        });
+    }
+
+    let anomalyFormArray = this.visiteForm.get("anomalies") as FormArray;
+    while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
+    this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department);
   }
 
   /**

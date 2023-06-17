@@ -28,7 +28,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   readonly pageSize = environment.pageSize;
   actions$: Observable<any[]>;
   mission$: Observable<Mission[]>;
-  interruption: Mission | boolean = false;
+  existingMission: Mission | boolean = false;
   EditeMode: boolean = false;
 
   ANode$: Observable<any[] | Node[]>;
@@ -138,18 +138,6 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     return this.http.get<Mission>(`${this.server}/api/mission/${key}/clone`);
   }
 
-  getRelatedAnomalies() {
-    // get edges and anomalies of current mission range
-    let anode = this.ANode.value;
-    let bnode = this.BNode.value;
-    let depar = this.department.value;
-    anode && anode.trim() !== '' && this.anomalyService.findByCriteria({
-      page: 1,
-      "status[]": [false, null],
-      ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
-      ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
-    });
-  }
 
   /**
    * Get pagination
@@ -169,7 +157,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
    */
   deleteItem(id: number = null, target: HTMLElement = null) {
     this.confirmDialogService.setConfirmation("Vous êtes sûr de vouloir supprimer?", () => {
-      this.delete(id ? id : (this.interruption as Mission).id)
+      this.delete(id ? id : (this.existingMission as Mission).id)
         .pipe(
           this.toast.observe({
             loading: "Suppression...",
@@ -178,7 +166,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
               // !id && this.missionForm.reset(this.initialValues);
               // !id && window.location.reload();
               this.router.navigate(['/mission']);
-              return "L'interruption supprimé avec succès";
+              return "L'existingMission supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })
@@ -208,7 +196,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       this.EditeMode = Action == 'EDIT';
     } else {
       // update Taff
-      id = this.interruption ? (this.interruption as Mission).id : null;
+      id = this.existingMission ? (this.existingMission as Mission).id : null;
     }
 
     let form = this.missionForm.value;
@@ -246,7 +234,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
         },
       });
     } else {
-      this.add(mission).pipe(tap(data => this.interruption = data))
+      this.add(mission).pipe(tap(data => this.existingMission = data))
         .subscribe({
           error: () => toast.error("un problème est survenu, veuillez réessayer"),
           complete() {
@@ -259,9 +247,8 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     }
 
     let anomalyFormArray = this.missionForm.get("anomalies") as FormArray;
-    while (anomalyFormArray.length !== 0)
-      anomalyFormArray.removeAt(0);
-    this.getRelatedAnomalies();
+    while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
+    this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department);
   }
 
 

@@ -117,7 +117,6 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     );
   }
 
-
   loadEdgesByDepar($event): void {
     this.edge.reset();
     this.edgesInRange$ = of([]);
@@ -229,6 +228,18 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
   bulkCreate(anomalies: Anomaly[]): Observable<[]> {
     return this.http.post<[]>(`${this.server}/api/anomalies/bulk?action=create`, { anomalies: anomalies });
   }
+
+
+  // get edges and anomalies of current mission range
+  getRelatedAnomalies(anode, bnode, depar) {
+    anode && anode.trim() !== '' && this.findByCriteria({
+      page: 1,
+      "status[]": [false, null],
+      ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
+      ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
+    });
+  }
+
   /**
    * find By Criteria
    * @param obj query parameters

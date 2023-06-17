@@ -59,7 +59,7 @@ export class missionPersistComponent {
 
       let getItem = copy ? service.clone(paramId) : service.getByKey(Number(paramId));
       getItem.subscribe((obj) => {
-        this.service.interruption = obj;
+        this.service.existingMission = obj;
         this.id = String(obj.id);
 
         // fill ng-select
@@ -89,7 +89,7 @@ export class missionPersistComponent {
           // actions: obj.actions.length ? this.fb.array(obj.actions.map(val => new FormControl(parseInt(val)))) : [],
         });
         obj.actions.forEach(val => (service.actions as FormArray).push(new FormControl(parseInt(val))))
-        this.service.getRelatedAnomalies();
+        this.anomalyService.getRelatedAnomalies(obj.node_a,obj.node_b,obj.node_a.department["@id"]);
         this.formListeners();
       });
 
@@ -167,26 +167,29 @@ export class missionPersistComponent {
     (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
   }
   formListeners() {
+    let na = this.service.ANode;
+    let nb = this.service.BNode;
+    let dp = this.service.department;
     // on change ANode reset && reload edges aand anomalies
-    this.service.ANode.valueChanges.subscribe(() => {
+    na.valueChanges.subscribe(() => {
       // reset anomalies edges
       this.anomalies.controls.forEach((control) => {
         control.get('edge').reset();
       });
       //  reload edges and anomalies
-      this.service.getRelatedAnomalies();
+      this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
     });
 
     // on change BNode reload edges aand anomalies
-    this.service.BNode.valueChanges.subscribe(() => {
+    nb.valueChanges.subscribe(() => {
       // if has ps
-      this.service.ANode.value && this.service.ANode.value.trim() !== '' &&
-        this.service.getRelatedAnomalies();
+      na.value && na.value.trim() !== '' &&
+        this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
     });
     // reset edges on change on change depar 
-    this.service.department.valueChanges.subscribe(() => {
-      this.service.ANode.reset();
-      this.service.BNode.reset();
+    dp.valueChanges.subscribe(() => {
+      na.reset();
+      nb.reset();
       // reset anomalies edges
       this.anomalies.controls.forEach((control) => {
         control.get('edge').reset();
