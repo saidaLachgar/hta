@@ -9,7 +9,7 @@ import {
 } from "@ngrx/data";
 import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Department, Mission, Node, Pagination } from "src/app/core/models";
+import { Department, Mission, Node, Pagination, Team } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { anomalyService } from "../anomalies/anomaly.service";
@@ -43,12 +43,15 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   departmentLoading = false;
   departmentInput$ = new Subject<string>();
 
+  teams$: Observable<Team[]>;
+  teamLoading = false;
+  teamInput$ = new Subject<string>();
+
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
   page: number = 1;
   anomalyLoading: boolean = false;
   lastSearchedParams;
-  // initialValues;
   public missionForm: FormGroup;
 
   constructor(
@@ -70,7 +73,25 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   findAll(): void {
     this.findByCriteria({ page: 1 });
   }
-
+  loadTeams(defaultVal = []) : void{
+    this.teams$ = concat(
+      of(defaultVal), // default items
+      this.teamInput$.pipe(
+          debounceTime(500),
+          distinctUntilChanged(),
+          filter((val) => val != null),
+          tap(() => this.teamLoading = true),
+          switchMap(term => 
+            this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=`+term)
+            .pipe(
+              map(response => response["hydra:member"]),
+              catchError(() => of([])), // empty list on error
+              tap(() => this.teamLoading = false)
+            )
+          )
+      )
+    );
+  }
   loadANodes(defaultVal = []): void {
     this.ANode$ = concat(
       of(defaultVal), // default items
@@ -162,11 +183,8 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
           this.toast.observe({
             loading: "Suppression...",
             success: () => {
-              target && target.closest("tr").remove();
-              // !id && this.missionForm.reset(this.initialValues);
-              // !id && window.location.reload();
-              this.router.navigate(['/mission']);
-              return "L'existingMission supprimé avec succès";
+              target ? target.closest("tr").remove() : this.router.navigate(['/mission']);
+              return "Supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })

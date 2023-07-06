@@ -203,7 +203,9 @@ export class edgeService extends EntityCollectionServiceBase<Edge> {
     if (edgeForm.invalid) return;
     this.submitted = false;
     let toast = this.toast;
-    let edge = edgeForm.value as Edge;
+    let obj = Object.entries(edgeForm.value as Edge);
+    // remove empty values
+    const edge = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
 
     this.add(edge).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),

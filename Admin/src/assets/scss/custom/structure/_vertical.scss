@@ -1,6 +1,6 @@
 //
 // _menu.scss
-// 
+//
 
 .metismenu {
   margin: 0;
@@ -18,7 +18,7 @@
     }
 
     &.mm-show {
-      display: block
+      display: block;
     }
   }
 
@@ -27,11 +27,10 @@
     height: 0;
     overflow: hidden;
     transition-timing-function: ease;
-    transition-duration: .35s;
+    transition-duration: 0.35s;
     transition-property: height, visibility;
   }
 }
-
 
 .vertical-menu {
   width: $sidebar-width;
@@ -54,12 +53,11 @@
   }
 }
 
-
 #sidebar-menu {
   padding: 10px 0 30px 0;
 
   .mm-active {
-    >.has-arrow {
+    > .has-arrow {
       &:after {
         transform: rotate(-180deg);
       }
@@ -69,10 +67,10 @@
   .has-arrow {
     &:after {
       content: "\F0140";
-      font-family: 'Material Design Icons';
+      font-family: "Material Design Icons";
       display: block;
       float: right;
-      transition: transform .2s;
+      transition: transform 0.2s;
       font-size: 1rem;
     }
   }
@@ -81,21 +79,21 @@
     li {
       a {
         display: block;
-        padding: .625rem 1.5rem;
+        padding: 0.625rem 1.5rem;
         color: $sidebar-menu-item-color;
         position: relative;
         font-size: 13px;
-        transition: all .4s;
+        transition: all 0.4s;
 
         i {
           display: inline-block;
           min-width: 1.75rem;
-          padding-bottom: .125em;
+          padding-bottom: 0.125em;
           font-size: 1.25rem;
           line-height: 1.40625rem;
           vertical-align: middle;
           color: $sidebar-menu-item-icon-color;
-          transition: all .4s;
+          transition: all 0.4s;
         }
 
         &:hover {
@@ -115,9 +113,8 @@
         padding: 0;
 
         li {
-
           a {
-            padding: .4rem 1.5rem .4rem 3.5rem;
+            padding: 0.4rem 1.5rem 0.4rem 3.5rem;
             font-size: 13px;
             color: $sidebar-menu-sub-item-color;
 
@@ -131,23 +128,20 @@
 
             li {
               a {
-                padding: .4rem 1.5rem .4rem 4.5rem;
+                padding: 0.4rem 1.5rem 0.4rem 4.5rem;
                 font-size: 13px;
-
-
               }
             }
           }
         }
       }
     }
-
   }
 }
 
 .menu-title {
   padding: 12px 20px !important;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   pointer-events: none;
   cursor: default;
   font-size: 11px;
@@ -159,7 +153,7 @@
 .mm-active {
   color: $sidebar-menu-item-active-color !important;
 
-  >a {
+  > a {
     color: $sidebar-menu-item-active-color !important;
 
     i {
@@ -175,7 +169,7 @@
     }
   }
 
-  >i {
+  > i {
     color: $sidebar-menu-item-active-color !important;
   }
 }
@@ -198,7 +192,6 @@
 
 // Enlarge menu
 .vertical-collpsed {
-
   .main-content {
     margin-left: $sidebar-collapsed-width;
   }
@@ -219,7 +212,6 @@
 
   // Side menu
   .vertical-menu {
-
     // scroll
 
     perfect-scrollbar {
@@ -234,9 +226,27 @@
       }
     }
 
-    position: absolute;
+    position: fixed;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #232836 #2c3243;
     width: $sidebar-collapsed-width !important;
     z-index: 5;
+
+    /* Chrome, Edge, and Safari */
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #2c3243;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #232836;
+      border-radius: 10px;
+      border: 0px solid transparent;
+    }
 
     .simplebar-mask,
     .simplebar-content-wrapper {
@@ -253,7 +263,6 @@
 
     // Sidebar Menu
     #sidebar-menu {
-
       .menu-title,
       .badge,
       .collapse.in {
@@ -270,12 +279,12 @@
         }
       }
 
-      >ul {
-        >li {
+      > ul {
+        > li {
           position: relative;
           white-space: nowrap;
 
-          >a {
+          > a {
             padding: 15px 20px;
             min-height: 55px;
             transition: none;
@@ -298,7 +307,7 @@
           }
 
           &:hover {
-            >a {
+            > a {
               position: relative;
               width: calc(190px + #{$sidebar-collapsed-width});
               color: $primary;
@@ -314,16 +323,16 @@
               }
             }
 
-            >ul {
+            > ul {
               display: block;
               left: $sidebar-collapsed-width;
               position: absolute;
               width: 190px;
               height: auto !important;
-              box-shadow: 3px 5px 10px 0 rgba(54, 61, 71, .1);
+              box-shadow: 3px 5px 10px 0 rgba(54, 61, 71, 0.1);
 
               ul {
-                box-shadow: 3px 5px 10px 0 rgba(54, 61, 71, .1);
+                box-shadow: 3px 5px 10px 0 rgba(54, 61, 71, 0.1);
               }
 
               a {
@@ -350,7 +359,7 @@
 
           li {
             &:hover {
-              >ul {
+              > ul {
                 display: block;
                 left: 190px;
                 height: auto !important;
@@ -360,7 +369,7 @@
               }
             }
 
-            >a {
+            > a {
               span.pull-right {
                 position: absolute;
                 right: 20px;
@@ -378,10 +387,8 @@
         }
       }
     }
-
   }
 }
-
 
 body[data-sidebar="dark"] {
   .vertical-menu {
@@ -389,7 +396,6 @@ body[data-sidebar="dark"] {
   }
 
   #sidebar-menu {
-
     ul {
       li {
         a {
@@ -410,7 +416,6 @@ body[data-sidebar="dark"] {
 
         ul.sub-menu {
           li {
-
             a {
               color: $sidebar-dark-menu-sub-item-color;
 
@@ -430,15 +435,12 @@ body[data-sidebar="dark"] {
 
     // Side menu
     .vertical-menu {
-
       // Sidebar Menu
       #sidebar-menu {
-
-        >ul {
-          >li {
-
+        > ul {
+          > li {
             &:hover {
-              >a {
+              > a {
                 background: lighten($sidebar-dark-bg, 2%);
                 color: $sidebar-dark-menu-item-hover-color;
 
@@ -447,7 +449,7 @@ body[data-sidebar="dark"] {
                 }
               }
 
-              >ul {
+              > ul {
                 a {
                   color: $sidebar-dark-menu-sub-item-color;
 
@@ -462,11 +464,9 @@ body[data-sidebar="dark"] {
           ul {
             background-color: $sidebar-dark-bg;
           }
-
         }
 
         ul {
-
           li {
             &.mm-active .active {
               color: $sidebar-dark-menu-item-active-color !important;
@@ -477,17 +477,14 @@ body[data-sidebar="dark"] {
             }
           }
         }
-
       }
-
-
     }
   }
 
   .mm-active {
     color: $sidebar-dark-menu-item-active-color !important;
 
-    >a {
+    > a {
       color: $sidebar-dark-menu-item-active-color !important;
 
       i {
@@ -495,7 +492,7 @@ body[data-sidebar="dark"] {
       }
     }
 
-    >i {
+    > i {
       color: $sidebar-dark-menu-item-active-color !important;
     }
 
@@ -512,7 +509,6 @@ body[data-sidebar="dark"] {
     color: $sidebar-dark-menu-item-icon-color;
   }
 }
-
 
 body[data-layout="horizontal"] {
   .main-content {
@@ -584,9 +580,9 @@ body[data-sidebar-size="small"] {
       #sidebar-menu {
         text-align: left;
 
-        >ul {
-          >li {
-            >a {
+        > ul {
+          > li {
+            > a {
               i {
                 display: inline-block;
               }
@@ -624,7 +620,7 @@ body[data-sidebar="colored"] {
   .mm-active {
     color: $white !important;
 
-    >a {
+    > a {
       color: $white !important;
 
       i {
@@ -632,7 +628,7 @@ body[data-sidebar="colored"] {
       }
     }
 
-    >i,
+    > i,
     .active {
       color: $white !important;
     }
@@ -670,7 +666,7 @@ body[data-sidebar="colored"] {
         ul.sub-menu {
           li {
             a {
-              color: rgba($white, .5);
+              color: rgba($white, 0.5);
 
               &:hover {
                 color: $white;
@@ -685,9 +681,9 @@ body[data-sidebar="colored"] {
   &.vertical-collpsed {
     .vertical-menu {
       #sidebar-menu {
-        >ul {
-          >li {
-            &:hover>a {
+        > ul {
+          > li {
+            &:hover > a {
               background-color: lighten($primary, 2%);
               color: $white;
 
@@ -717,7 +713,7 @@ body[data-sidebar="colored"] {
                 &.mm-active {
                   color: $sidebar-menu-item-active-color !important;
 
-                  >a {
+                  > a {
                     color: $sidebar-menu-item-active-color !important;
 
                     i {
@@ -734,121 +730,121 @@ body[data-sidebar="colored"] {
   }
 }
 
-
 // colored sidebar
 
 body[data-sidebar="colored"] {
-  .vertical-menu{
-      background-color: $primary;
+  .vertical-menu {
+    background-color: $primary;
   }
-  .navbar-brand-box{
-      background-color: $primary;
-      .logo-dark{
-          display: none;
-      }
-      .logo-light{
-          display: block;
-      }
+  .navbar-brand-box {
+    background-color: $primary;
+    .logo-dark {
+      display: none;
+    }
+    .logo-light {
+      display: block;
+    }
   }
 
   .mm-active {
+    color: $white !important;
+    > a {
       color: $white !important;
-      > a{
-          color: $white !important;
-          i {
-              color: $white !important;
-          }
+      i {
+        color: $white !important;
       }
-      > i, .active {
-          color: $white !important;
-      }
+    }
+    > i,
+    .active {
+      color: $white !important;
+    }
   }
 
   #sidebar-menu {
-      ul {
-          li {
-              &.menu-title{
-                  color: rgba($white, 0.6);
-              }
+    ul {
+      li {
+        &.menu-title {
+          color: rgba($white, 0.6);
+        }
 
-              a{
-                  color: rgba($white, 0.6);
-                  i{
-                      color: rgba($white, 0.6);
-                  }
-                  &.waves-effect {
-                      .waves-ripple {
-                        background: rgba($white, 0.1);
-                      }
-                  }
-
-                  &:hover {
-                      color: $white;
-  
-                      i {
-                          color: $white;
-                      }
-                  }
-              }
-
-              ul.sub-menu {
-                  li {
-                      a{
-                          color: rgba($white,.5);
-                          &:hover {
-                              color: $white;
-                          }
-                      }
-                  }
-              }
+        a {
+          color: rgba($white, 0.6);
+          i {
+            color: rgba($white, 0.6);
           }
+          &.waves-effect {
+            .waves-ripple {
+              background: rgba($white, 0.1);
+            }
+          }
+
+          &:hover {
+            color: $white;
+
+            i {
+              color: $white;
+            }
+          }
+        }
+
+        ul.sub-menu {
+          li {
+            a {
+              color: rgba($white, 0.5);
+              &:hover {
+                color: $white;
+              }
+            }
+          }
+        }
       }
+    }
   }
 
   &.vertical-collpsed {
-      .vertical-menu {
-          #sidebar-menu{
-              >ul{
-                  >li{
-                      &:hover>a{
-                          background-color: lighten($primary, 2%);
-                          color: $white;
-                          i{
-                              color: $white;
-                          }
-                      }
-                  }
+    .vertical-menu {
+      #sidebar-menu {
+        > ul {
+          > li {
+            &:hover > a {
+              background-color: lighten($primary, 2%);
+              color: $white;
+              i {
+                color: $white;
               }
-
-              ul{
-                  li{
-                      &.mm-active {
-                          .active{
-                              color: $sidebar-menu-item-active-color !important;
-                          }
-                      }
-
-                      ul.sub-menu {
-                          li {
-                              a{
-                                  &:hover {
-                                      color: $sidebar-menu-item-active-color;
-                                  }
-                              }
-                              &.mm-active {
-                                  color: $sidebar-menu-item-active-color !important;
-                                  > a{
-                                      color: $sidebar-menu-item-active-color !important;
-                                      i {
-                                          color: $sidebar-menu-item-active-color !important;
-                                      }
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
+            }
           }
+        }
+
+        ul {
+          li {
+            &.mm-active {
+              .active {
+                color: $sidebar-menu-item-active-color !important;
+              }
+            }
+
+            ul.sub-menu {
+              li {
+                a {
+                  &:hover {
+                    color: $sidebar-menu-item-active-color;
+                  }
+                }
+                &.mm-active {
+                  color: $sidebar-menu-item-active-color !important;
+                  > a {
+                    color: $sidebar-menu-item-active-color !important;
+                    i {
+                      color: $sidebar-menu-item-active-color !important;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
+    }
   }
 }

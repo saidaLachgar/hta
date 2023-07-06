@@ -1,7 +1,8 @@
-<div class="container-fluid">
+<form class="container-fluid pb-5 mb-5" [formGroup]="service.visiteForm">
   <!-- start page title -->
   <app-page-title
-    title="Nouveau visite"
+    title="Formulaire de visite"
+    [Loading]="service.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->
@@ -16,15 +17,21 @@
     </ngb-alert>
   </div>
 
-  <form class="row mt-4" [formGroup]="service.visiteForm" (ngSubmit)="service.onCreate()"> 
+  <div class="row mt-4"> 
+    <!-- visit -->
     <div class="col-12">
       <div class="card">
         <div class="card-body">
           <div class="mb-3 row">
             <label for="name-input" class="col-md-2 col-form-label">Date</label>
-            <div class="col-md-10">
-              <div class="input-group clockpicker">
-                <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="date" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
+            <div class="col-md-10 row">
+              <div class="col">
+                <div class="input-group clockpicker">
+                  <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="date" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
+                </div>
+              </div>
+              <div class="col-auto">
+                <ngb-timepicker [spinners]="false" seconds="true"  formControlName="time"></ngb-timepicker>
               </div>
             </div>
           </div>
@@ -38,7 +45,7 @@
               >
               <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
             </ng-select>
-            <div #postfeedback *ngIf="showError && !service.department.value" class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+            <div #postfeedback *ngIf="showError && !service.department.value" class="invalid-feedback d-block d-block">Ce champ est obligatoire.</div>
           </div>
           </div>
           <div class="mb-3 row">
@@ -57,7 +64,7 @@
                 </ng-select>
                 <div
                   *ngIf="service.submitted && service.ANode.errors"
-                  class="invalid-feedback">
+                  class="invalid-feedback d-block">
                   <span *ngIf="service.ANode.errors.required">Ce champ est obligatoire.</span>
                 </div>
             </div>
@@ -65,29 +72,6 @@
           <div class="mb-3 row">
             <label for="input-1" class="col-md-2 col-form-label">À</label>
             <div class="col-md-10" >
-              <ng-select [items]="service.ANode$ | async"
-                        formControlName="nodeA"
-                        bindLabel="titre"
-                        bindValue="@id"
-                        [minTermLength]="2" (click)="showError = true"
-                        [readonly]="!service.department.value"
-                        (open)="service.ANode.value && AlertANodeChange()"
-                        [loading]="service.ANodeLoading"
-                        [ngClass]="{'is-invalid':service.ANode.invalid && service.submitted}"
-                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
-                        [typeahead]="service.ANodeInput$">
-              </ng-select>
-              <div
-                *ngIf="service.submitted && service.ANode.errors"
-                class="invalid-feedback">
-                <span *ngIf="service.ANode.errors.required">Ce champ est obligatoire.</span>
-              </div>
-            </div>
-
-          </div>
-          <div class="mb-3 row">
-            <label for="name-input" class="col-md-2 col-form-label">Équipe</label>
-            <div class="col-md-10">
               <ng-select [items]="service.BNode$ | async"
                       formControlName="nodeB"
                       bindLabel="titre"
@@ -99,6 +83,26 @@
                       typeToSearchText="Veuillez saisir 2 caractères ou plus"
                       [typeahead]="service.BNodeInput$">
               </ng-select>
+              <div
+                *ngIf="service.submitted && service.BNode.errors"
+                class="invalid-feedback d-block">
+                <span *ngIf="service.BNode.errors.required">Ce champ est obligatoire.</span>
+              </div>
+            </div>
+
+          </div>
+          <div class="mb-3 row">
+            <label for="name-input" class="col-md-2 col-form-label">Équipe</label>
+            <div class="col-md-10">
+              <ng-select [items]="service.teams$ | async"
+                        formControlName="team"
+                        bindLabel="titre"
+                        bindValue="@id"
+                        [minTermLength]="2"
+                        [loading]="service.teamLoading"
+                        typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                        [typeahead]="service.teamInput$">
+              </ng-select>
             </div>
           </div>
         </div>
@@ -106,8 +110,7 @@
     </div>
     <!-- end col -->
 
-
-     <!-- list des anomalies -->
+    <!-- list des anomalies -->
     <div class="col-12">
       <div class="card card-body">
         <p class="card-title mb-3">Anomalies liées</p>
@@ -272,7 +275,6 @@
       </div>
     </div>
 
-    <!-- ajouter anomalies (juste pour les incidents) -->
     <div class="col-12">
       <div class="card card-body">
         <table class="table table-bordered table-striped mb-0" formArrayName="anomalies">  
@@ -310,12 +312,12 @@
                       (open)="!service.department.value && AlertEdgeChange()"
                       [readonly]="!service.department.value"
                       >
-                    <ng-option *ngFor="let edge of (anomalyService.edgesInRange$ | async)" [value]="'/api/edges/'+edge.id">{{edge.titre}}</ng-option>
+                    <ng-option *ngFor="let edge of (anomalyService.edgesInRange$ | async)" [value]="edge['@id']">{{edge.node_a.titre}} - {{edge.node_b.titre}}</ng-option>
                   </ng-select>
                   <div
-                    *ngIf="anomalyService.submitted && anomalyService.edge.errors"
-                    class="invalid-feedback">
-                    <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+                    *ngIf="service.submitted && anomaly.get('edge').errors"
+                    class="invalid-feedback d-block">
+                    <span *ngIf="anomaly.get('edge').errors.required">Ce champ est obligatoire.</span>
                   </div>
                 </div>
               </div>
@@ -330,10 +332,11 @@
                 type="text"
                 style="height: 115px;"
               ></textarea>
+              
               <div
-                *ngIf="anomalyService.submitted && anomalyService.edge.errors"
-                class="invalid-feedback">
-                <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+                *ngIf="service.submitted && anomaly.get('title').errors"
+                class="invalid-feedback d-block">
+                <span *ngIf="anomaly.get('title').errors.required">Ce champ est obligatoire.</span>
               </div>
               </div>  
             </td>  
@@ -372,7 +375,7 @@
 
     <button 
       [disabled]="(service.loading$ | async) || service.anomalyLoading"
-      [class.d-none]="!service.EditeMode || !service.interruption" 
+      [class.d-none]="!service.EditeMode || !service.existingVisit" 
       (click)="service.deleteItem()"
       type="button" class="btn text-danger float-end me-2 fw-medium btn-light">
       <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
@@ -381,5 +384,5 @@
   </div>
 
     <!-- end row -->
-</form>
 </div>
+</form>

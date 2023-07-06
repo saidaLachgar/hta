@@ -113,7 +113,7 @@ class MissionDataPersister implements DataPersisterInterface
         }
 
         // update objectives 
-        $newActions = $Mission->getActions();
+        $newActions = $Mission->getActions() ?: [];
         $removedActions = [];
         if ($previousData) {
             $oldActions = $previousData->getActions();

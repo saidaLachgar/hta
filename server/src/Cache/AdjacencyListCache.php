@@ -53,6 +53,8 @@ class AdjacencyListCache
         foreach ($nodes as $node) {
             $this->addNode($node->getId());
         }
+        // dump(array_map(fn($node) => $node->getId(), $nodes));
+        // dd(array_map(fn($edge) => $edge->getNodeA()->getId().$edge->getNodeB()->getId(), $edges));
         foreach ($edges as $edge) {
             $this->addEdge($edge->getNodeA()->getId(), $edge->getNodeB()->getId());
         }
@@ -69,7 +71,14 @@ class AdjacencyListCache
     // Add edge, undirected
     function addEdge($origin, $destination)
     {
-        array_push($this->adjacencyList["data"][$origin], $destination);
-        array_push($this->adjacencyList["data"][$destination], $origin);
+        // try {
+            array_push($this->adjacencyList["data"][$origin], $destination);
+            array_push($this->adjacencyList["data"][$destination], $origin);
+        // } catch (\Throwable $th) {
+        //     dump($origin);
+        //     dump($destination);
+        //     dd($this->adjacencyList["data"]);
+        // }
+        
     }
 }

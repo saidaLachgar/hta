@@ -49,16 +49,6 @@
               <tbody>
                 <!-- search -->
                 <tr valign="middle">
-
-                  <!-- severity -->
-                  <td>
-                    <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
-                      <ng-option *ngFor="let option of service.severityOptions" [value]="option.value">
-                        {{ option.label }}
-                      </ng-option>
-                    </ng-select>
-                  </td>
-                  
                   <!-- Status -->
                   <td>
                   <ng-select [searchable]="false" formControlName="status" placeholder="Statut..">
@@ -66,6 +56,16 @@
                     <ng-option value="false">En attente</ng-option>
                   </ng-select>
                   </td>
+
+                   <!-- severity -->
+                   <td>
+                    <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
+                      <ng-option *ngFor="let option of service.severityOptions" [value]="option.value">
+                        {{ option.label }}
+                      </ng-option>
+                    </ng-select>
+                  </td>
+
                   <!-- title -->
                   <td><input type="text" placeholder="Anomalie..." formControlName="title" #searchTitle class="form-control"></td>
                   <!-- Created by -->

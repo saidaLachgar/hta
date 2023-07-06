@@ -1,23 +1,25 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FormArray, FormGroup } from "@angular/forms";
+import { Router } from "@angular/router";
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { concat, Observable, of, Subject } from "rxjs";
+import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Node, Department, Pagination, Team, Visite } from "src/app/core/models";
+import { Department, Node, Pagination, Team, Visite } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
+import { anomalyService } from "../anomalies/anomaly.service";
 import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
-import { anomalyService } from "../anomalies/anomaly.service";
-import { Router } from "@angular/router";
 
-const formatDate = (date) => date !== "" ? date.year+"-"+date.month+"-"+("0" + date.day).slice(-2) : "";
+const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
+const DateTimeToString = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second).toISOString();
+const DateToString = (date) => date !== "" ? `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}` : "";
 
 @Injectable({
   providedIn: "root",
@@ -28,11 +30,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   visites$: Observable<Visite[]>;
   existingVisit: Visite | boolean = false;
   EditeMode: boolean = false;
-
-  departments$: Observable<Department[]>;
-  departmentLoading = false;
-  departmentInput$ = new Subject<string>();
-
+  
   ANode$: Observable<any[] | Node[]>;
   ANodeLoading = false;
   ANodeInput$ = new Subject<string>();
@@ -40,6 +38,10 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   BNode$: Observable<any[] | Node[]>;
   BNodeLoading = false;
   BNodeInput$ = new Subject<string>();
+  
+  departments$: Observable<Department[]>;
+  departmentLoading = false;
+  departmentInput$ = new Subject<string>();
 
   teams$: Observable<Team[]>;
   teamLoading = false;
@@ -56,12 +58,12 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     public departmentService: departmentService,
-    public nodeService: nodeService,
     public anomalyService: anomalyService,
     public communeService: communeService,
-    private router: Router,
+    public nodeService: nodeService,
+    private toast: HotToastService,
     private http: HttpClient,
-    private toast: HotToastService
+    private router: Router,
   ) {
     super("visites", serviceElementsFactory);
   }
@@ -164,15 +166,15 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
    * @param id visite id
    * @param target html element
    */
-  deleteItem(id: number, target: HTMLElement) {
+  deleteItem(id: number = null, target: HTMLElement = null) {
     this.confirmDialogService.setConfirmation("Vous êtes sûr de vouloir supprimer?", () => {
-      this.delete(id)
+      this.delete(id ? id : (this.existingVisit as Visite).id)
         .pipe(
           this.toast.observe({
             loading: "Suppression...",
             success: () => {
-              target.closest("tr").remove();
-              return "Visite supprimé avec succès";
+              target ? target.closest("tr").remove() : this.router.navigate(['/visites']);
+              return "supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",
           })
@@ -209,11 +211,11 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     let _this = this;
     let toast = this.toast;
     let visite = {
-      date: form.date ? form.date : null,
+      date: form.date ? DateTimeToString(form.date, form.time) : null,
       team: form.team ? form.team : null,
       department: form.department ? form.department : null,
-      nodeA: form.node_a ? form.node_a : null,
-      nodeB: form.node_b && form.node_b.length ? form.node_b : [],
+      nodeA: form.nodeA ? form.nodeA : null,
+      nodeB: form.nodeB && form.nodeB.length ? form.nodeB : [],
     };
     let anomalies = form.anomalies;
     this.anomalyLoading = true;
@@ -247,7 +249,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
 
     let anomalyFormArray = this.visiteForm.get("anomalies") as FormArray;
     while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
-    this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department);
+    this.anomalyService.getRelatedAnomalies(form.nodeA,form.nodeB,form.department);
   }
 
   /**
@@ -260,7 +262,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     // format date
     if(Object.keys(obj).length > 1){
       // console.log(obj);
-      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: formatDate(obj[key]) })[key];
+      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: DateToString(obj[key]) })[key];
       updateObj("before");updateObj("after");
     }
 

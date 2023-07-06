@@ -33,7 +33,7 @@
                 >
                 <ng-option *ngFor="let depar of (service.departments$ | async)" [value]="'/api/departments/'+depar.id">{{depar.titre}}</ng-option>
               </ng-select>
-              <div #postfeedback *ngIf="showError && !service.department.value" class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+              <div #postfeedback *ngIf="showError && !service.department.value" class="invalid-feedback d-block d-block">Ce champ est obligatoire.</div>
 
               <!-- node_a -->
               <label class="mt-3">Point coupure</label>
@@ -43,7 +43,7 @@
                         bindValue="@id"
                         [minTermLength]="2" (click)="showError = true"
                         [readonly]="!service.department.value"
-                        (open)="service.ANode.value && AlertANodeChange()"
+                        (open)="anomalies.controls.length && service.ANode.value && AlertANodeChange()"
                         [loading]="service.ANodeLoading"
                         [ngClass]="{'is-invalid':service.ANode.invalid && service.submitted}"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
@@ -51,7 +51,7 @@
               </ng-select>
               <div
                 *ngIf="service.submitted && service.ANode.errors"
-                class="invalid-feedback">
+                class="invalid-feedback d-block">
                 <span *ngIf="service.ANode.errors.required">Ce champ est obligatoire.</span>
               </div>
 
@@ -411,12 +411,12 @@
                       (open)="!service.department.value && AlertEdgeChange()"
                       [readonly]="!service.department.value"
                       >
-                    <ng-option *ngFor="let edge of (anomalyService.edgesInRange$ | async)" [value]="'/api/edges/'+edge.id">{{edge.titre}}</ng-option>
+                    <ng-option *ngFor="let edge of (anomalyService.edgesInRange$ | async)" [value]="edge['@id']">{{edge.node_a.titre}} - {{edge.node_b.titre}}</ng-option>
                   </ng-select>
                   <div
-                    *ngIf="anomalyService.submitted && anomalyService.edge.errors"
-                    class="invalid-feedback">
-                    <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+                    *ngIf="service.submitted && anomaly.get('edge').errors"
+                    class="invalid-feedback d-block">
+                    <span *ngIf="anomaly.get('edge').errors.required">Ce champ est obligatoire.</span>
                   </div>
                 </div>
               </div>
@@ -432,9 +432,9 @@
                 style="height: 115px;"
               ></textarea>
               <div
-                *ngIf="anomalyService.submitted && anomalyService.edge.errors"
-                class="invalid-feedback">
-                <span *ngIf="anomalyService.edge.errors.required">Ce champ est obligatoire.</span>
+                *ngIf="service.submitted && anomaly.get('title').errors"
+                class="invalid-feedback d-block">
+                <span *ngIf="anomaly.get('title').errors.required">Ce champ est obligatoire.</span>
               </div>
               </div>  
             </td>  

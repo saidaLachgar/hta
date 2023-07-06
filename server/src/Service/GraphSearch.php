@@ -25,6 +25,7 @@ class GraphSearch
     {
         // Get the adjacency list of the graph.
         $cachedData = $this->adjacencyListCache->getAdjacencyList($department);
+        // dd($cachedData);
         $adjacencyList = $cachedData["data"];
         $edges = $cachedData["edges"];
 

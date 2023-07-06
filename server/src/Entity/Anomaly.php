@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
-// use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
@@ -60,10 +60,10 @@ use App\Action\AnomalyAction;
  *          "title"=SearchFilter::STRATEGY_PARTIAL,
  *          "severity"=SearchFilter::STRATEGY_EXACT,
  *          "edge.id"=SearchFilter::STRATEGY_EXACT,
- *          "status"=SearchFilter::STRATEGY_EXACT,
  *          "edge.department.id"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
+ * @ApiFilter(BooleanFilter::class, properties={"status"})
  * @ApiFilter(PropertyFilter::class)
  * @ApiFilter(DateFilter::class, properties={"createdAt"})
  * @ORM\Entity(repositoryClass=AnomalyRepository::class)

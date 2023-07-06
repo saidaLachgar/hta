@@ -1,14 +1,14 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { FormGroup } from "@angular/forms";
-import { HttpClient } from "@angular/common/http";
 
 import { HotToastService } from "@ngneat/hot-toast";
 import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
-import { concat, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subject, concat, of } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Anomaly, Department, Edge, Pagination, SEVERITY_OPTIONS, User } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
@@ -35,7 +35,7 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
   usersLoading = false;
   usersInput$ = new Subject<string>();
 
-  edgesInRange$: Observable<Edge[]>;
+  edgesInRange$ = new BehaviorSubject<Edge[]>([]);
   edges$: Observable<Edge[]>;
   edgesLoading = false;
   edgesInput$ = new Subject<string>();
@@ -106,22 +106,23 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
   loadEdgesInRange(range, edgesInRange): void {
     let obj = { ...range };
     obj["id[]"] = edgesInRange;
-    obj["properties[]"] = ["id", "titre"];
+    obj["properties[]"] = "id";
+    obj["properties[node_a][]"] = "titre";
+    obj["properties[node_b][]"] = "titre";
     delete obj.node_a;
     obj.node_b && delete obj.node_b;
 
-    this.edgesInRange$ = this.edgeService.getWithQuery(obj);
-
-    this.edgesInRange$ = this.edgesInRange$.pipe(
-      shareReplay() // Use shareReplay to make the observable hot
-    );
+    this.edgeService.getWithQuery(obj).subscribe(edges => {
+      this.edgesInRange$.next(edges);
+    });
   }
 
   loadEdgesByDepar($event): void {
     this.edge.reset();
-    this.edgesInRange$ = of([]);
-    this.edgesInRange$ = 
-      this.edgeService.getWithQuery(`properties[]=id&properties[]=node_a&properties[]=node_b&itemsPerPage=1000&department.id=` + $event.match(/\d+/)[0]);
+    this.edgesInRange$.next([]);
+    this.edgeService.getWithQuery(`properties[]=id&properties[]=node_a&properties[]=node_b&itemsPerPage=1000&department.id=` + $event.match(/\d+/)[0]).subscribe(edges => {
+      this.edgesInRange$.next(edges);
+    });
   }
 
   /**

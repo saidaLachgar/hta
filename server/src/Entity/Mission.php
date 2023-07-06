@@ -6,7 +6,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+
 
 use App\Repository\MissionRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -44,11 +46,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
  *          "causes"=SearchFilter::STRATEGY_EXACT,
  *          "DMS"=SearchFilter::STRATEGY_EXACT,
- *          "IFS"=SearchFilter::STRATEGY_EXACT,
- *          "type"=SearchFilter::STRATEGY_EXACT
+ *          "IFS"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
  * 
+ * @ApiFilter(BooleanFilter::class, properties={"type"})
  * @ApiFilter(PropertyFilter::class)
  * @ApiFilter(DateFilter::class, properties={"dateStart"})
  * @ORM\Entity(repositoryClass=MissionRepository::class)

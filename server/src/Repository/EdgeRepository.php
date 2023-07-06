@@ -53,6 +53,7 @@ class EdgeRepository extends ServiceEntityRepository
         }
 
         $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
+        // dd($nodesInRange);
 
         $results = $this->createQueryBuilder('e')
             ->select("e.id")
