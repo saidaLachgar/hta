@@ -30,15 +30,15 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   visites$: Observable<Visite[]>;
   existingVisit: Visite | boolean = false;
   EditeMode: boolean = false;
-  
+
   ANode$: Observable<any[] | Node[]>;
   ANodeLoading = false;
   ANodeInput$ = new Subject<string>();
-  
+
   BNode$: Observable<any[] | Node[]>;
   BNodeLoading = false;
   BNodeInput$ = new Subject<string>();
-  
+
   departments$: Observable<Department[]>;
   departmentLoading = false;
   departmentInput$ = new Subject<string>();
@@ -49,7 +49,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
 
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
-  page:number = 1;
+  page: number = 1;
   anomalyLoading: boolean = false;
   lastSearchedParams;
   public visiteForm: FormGroup;
@@ -74,28 +74,28 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   findAll(): void {
     this.findByCriteria({ page: 1 });
   }
-  
-  loadTeams(defaultVal = []) : void{
+
+  loadTeams(defaultVal = []): void {
     this.teams$ = concat(
       of(defaultVal), // default items
       this.teamInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.teamLoading = true),
-          switchMap(term => 
-            this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=`+term)
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.teamLoading = true),
+        switchMap(term =>
+          this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=` + term)
             .pipe(
               map(response => response["hydra:member"]),
               catchError(() => of([])), // empty list on error
               tap(() => this.teamLoading = false)
             )
-          )
+        )
       )
     );
   }
   loadDepartments(byTerm = true): void {
-    if(byTerm){
+    if (byTerm) {
       this.departments$ = concat(
         of([]), // default items
         this.departmentInput$.pipe(
@@ -113,40 +113,42 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
       this.departments$ = this.departmentService.getWithQuery("properties[]=id&properties[]=titre");
     }
   }
-  loadANodes(defaultVal = []) : void {
+  loadANodes(defaultVal = []): void {
     this.ANode$ = concat(
       of(defaultVal), // default items
       this.ANodeInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.ANodeLoading = true),
-          switchMap(term => this.nodeService.getWithQuery(
-            "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
-            ).pipe(
-            catchError(() => of([])), // empty list on error
-            tap(() => this.ANodeLoading = false)
-          ))
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.ANodeLoading = true),
+        switchMap(term => this.nodeService.getWithQuery(
+          "properties[]=id&properties[]=titre&titre=" + term +
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "") +
+          (this.departments ? "&properties[department][]=titre&" + this.departments.map(value => `department.id[]=${value}`).join('&') : "")
+        ).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.ANodeLoading = false)
+        ))
       )
     );
   }
-  
-  loadBNodes(defaultVal = []) : void {
+
+  loadBNodes(defaultVal = []): void {
     this.BNode$ = concat(
       of(defaultVal), // default items
       this.BNodeInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.BNodeLoading = true),
-          switchMap(term => this.nodeService.getWithQuery(
-            "properties[]=id&properties[]=titre&titre=" + term +
-            (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
-            ).pipe(
-            catchError(() => of([])), // empty list on error
-            tap(() => this.BNodeLoading = false)
-          ))
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.BNodeLoading = true),
+        switchMap(term => this.nodeService.getWithQuery(
+          "properties[]=id&properties[]=titre&titre=" + term +
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "") +
+          (this.departments ? "&properties[department][]=titre&" + this.departments.map(value => `department.id[]=${value}`).join('&') : "")
+        ).pipe(
+          catchError(() => of([])), // empty list on error
+          tap(() => this.BNodeLoading = false)
+        ))
       )
     );
   }
@@ -249,7 +251,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
 
     let anomalyFormArray = this.visiteForm.get("anomalies") as FormArray;
     while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
-    this.anomalyService.getRelatedAnomalies(form.nodeA,form.nodeB,form.department);
+    this.anomalyService.getRelatedAnomalies(form.nodeA, form.nodeB, form.department);
   }
 
   /**
@@ -260,10 +262,10 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     this.visites$ = of([]); // clear table
 
     // format date
-    if(Object.keys(obj).length > 1){
+    if (Object.keys(obj).length > 1) {
       // console.log(obj);
-      const updateObj = (key:string) => obj[key] && delete Object.assign(obj, {["createdAt["+key+"]"]: DateToString(obj[key]) })[key];
-      updateObj("before");updateObj("after");
+      const updateObj = (key: string) => obj[key] && delete Object.assign(obj, { ["createdAt[" + key + "]"]: DateToString(obj[key]) })[key];
+      updateObj("before"); updateObj("after");
     }
 
     // remove empty values
@@ -280,6 +282,10 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
    */
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
+  }
+  get departments() {
+    let departments = this.visiteForm.controls["node_a.department.id[]"];
+    return departments ? departments.value : null;
   }
   get designation() {
     return this.visiteForm.get("designation");

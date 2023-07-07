@@ -102,10 +102,11 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
         tap(() => this.ANodeLoading = true),
         switchMap(term => this.nodeService.getWithQuery(
           "properties[]=id&properties[]=titre&titre=" + term +
-          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")+
+          (this.departments ? "&properties[department][]=titre&"+this.departments.map(value => `department.id[]=${value}`).join('&') : "")
         ).pipe(
           catchError(() => of([])), // empty list on error
-          tap(() => this.ANodeLoading = false)
+          tap(() => this.ANodeLoading = false),
         ))
       )
     );
@@ -120,7 +121,8 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
         tap(() => this.BNodeLoading = true),
         switchMap(term => this.nodeService.getWithQuery(
           "properties[]=id&properties[]=titre&titre=" + term +
-          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")
+          (this.department ? "&department.id=" + this.department.value.match(/\d+/)[0] : "")+
+          (this.departments ? "&properties[department][]=titre&"+this.departments.map(value => `department.id[]=${value}`).join('&') : "")
         ).pipe(
           catchError(() => of([])), // empty list on error
           tap(() => this.BNodeLoading = false)
@@ -337,6 +339,10 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
   }
 
+  get departments() {
+    let departments = this.missionForm.controls["node_a.department.id[]"];
+    return departments ? departments.value : null;
+  }
   get department() {
     return this.missionForm.get("department");
   }

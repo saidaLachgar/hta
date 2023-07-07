@@ -173,14 +173,20 @@
             <ng-select [items]="service.ANode$ | async"
                 #searchANode
                 formControlName="node_a.id[]"
-                bindLabel="titre"
                 bindValue="id"
                 [multiple]="true"
                 [minTermLength]="2"
                 placeholder="De.."
+                [readonly]="!service.departments"
                 [loading]="service.ANodeLoading"
                 typeToSearchText="Veuillez saisir 2 caractères ou plus"
                 [typeahead]="service.ANodeInput$">
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item.titre }}<span *ngIf="service.departments && service.departments.length > 1"> - {{ item.department.titre }}</span>
+                </ng-template>
+                <ng-template ng-option-tmp let-item="item">
+                  {{ item.titre }}<span *ngIf="service.departments && service.departments.length > 1"> - {{ item.department.titre }}</span>
+                </ng-template>
             </ng-select>
           </div>
           <div class="col-4">
@@ -188,14 +194,20 @@
             <ng-select [items]="service.BNode$ | async"
                 #searchBNode
                 formControlName="node_b.id[]"
-                bindLabel="titre"
                 bindValue="id"
                 [multiple]="true"
                 [minTermLength]="2"
-                placeholder="De.."
+                placeholder="À.."
+                [readonly]="!service.departments"
                 [loading]="service.BNodeLoading"
                 typeToSearchText="Veuillez saisir 2 caractères ou plus"
                 [typeahead]="service.BNodeInput$">
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item.titre }}<span *ngIf="service.departments && service.departments.length > 1"> - {{ item.department.titre }}</span>
+                </ng-template>
+                <ng-template ng-option-tmp let-item="item">
+                  {{ item.titre }}<span *ngIf="service.departments && service.departments.length > 1"> - {{ item.department.titre }}</span>
+                </ng-template>
             </ng-select>
           </div>
           <div class="col-4">

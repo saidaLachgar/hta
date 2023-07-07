@@ -52,6 +52,7 @@ export class visitesListComponent {
     service.loadTeams();
     service.loadANodes();
     service.loadBNodes();
+    service.loadDepartments();
 
 
     service.visiteForm = fb.group({
