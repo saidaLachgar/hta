@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 
 import { ActivatedRoute } from "@angular/router";
-import { Lightbox } from "ngx-lightbox";
 import { Anomaly } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { anomalyService } from "../anomaly.service";
@@ -16,11 +15,10 @@ export class anomalyDetailsComponent {
 
   constructor(
     private route: ActivatedRoute,
-    public lightbox: Lightbox,
-    public anomalyService: anomalyService,
+    public service: anomalyService,
     public authService: AuthenticationService,
   ) {
     let id = route.snapshot.paramMap.get("id");
-    anomalyService.getByKey(id).subscribe(obj => this.anomaly = obj);
+    service.getByKey(id).subscribe(obj => this.anomaly = obj);
   }
 }

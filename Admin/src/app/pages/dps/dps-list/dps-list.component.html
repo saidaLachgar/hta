@@ -24,7 +24,7 @@
               <thead>
                 <tr>
                   <th>Titre</th>
-                  <th width="30%">Équipe</th>
+                  <th width="30%">Équipes</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -81,10 +81,11 @@
                   
                   
                   <td>
-                    <a 
-                      *ngIf="dps.team"
-                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', dps.team.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{dps.team.titre}}</a>
+                    <div *ngFor="let team of dps.team">
+                      <a 
+                        [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', team.id] : null"
+                        target="_blank" rel="noopener noreferrer">- {{team.titre}}</a>
+                    </div>
                   </td>
                   
                   

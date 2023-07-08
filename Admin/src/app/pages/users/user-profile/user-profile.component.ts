@@ -13,7 +13,7 @@ export class UserProfileComponent {
 
   constructor(private route: ActivatedRoute, public userService: UserService) {
     this.breadCrumbItems = [{ label: 'Utilisateurs' }, { label: 'Profile', active: true }];
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
+    this.id = JSON.parse(localStorage.getItem("currentUser")).id;
 
 
     userService.userForm = new FormGroup(
@@ -30,10 +30,9 @@ export class UserProfileComponent {
 
     this.userService.getByKey(this.id).subscribe((usr) => {
       userService.loadTeams([usr.team]);
-      userService.userForm.setValue({
+      userService.userForm.patchValue({
         fullName: usr.fullName,
         username: usr.username,
-        password: "",
         roles: usr.roles.join(''),
         team: usr.team ? usr.team["@id"] : null,
       });

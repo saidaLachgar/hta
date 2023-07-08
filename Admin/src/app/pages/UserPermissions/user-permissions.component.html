@@ -1,12 +1,12 @@
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title title="Autorisation des utilisateurs" [breadcrumbItems]="breadCrumbItems"></app-page-title>
-    <div class="alert alert-info mt-3">
+    <!-- <div class="alert alert-info mt-3">
         <h6 class="alert-heading">Les changements peuvent prendre un certain temps avant de prendre effet !</h6>
         Pour que les changements soient immédiatement pris en compte, l'utilisateur doit se déconnecter et s'authentifier à nouveau.<br>
         Sinon les changements seront effectués lorsque la session expire ou l'utilisateur n'est pas autorisé à une interface.<br>
         <small>La session de l'utilisateur est mise à jour chaque 24 heures</small>
-    </div>
+    </div> -->
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <fieldset class="col-12">

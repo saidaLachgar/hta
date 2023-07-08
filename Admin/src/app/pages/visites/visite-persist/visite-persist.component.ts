@@ -32,7 +32,7 @@ export class visitePersistComponent {
     public service: visiteService,
     public anomalyService: anomalyService,
     public authService: AuthenticationService) {
-    this.currentUser = authService.currentUserValue;
+    this.currentUser = authService.user;
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Fiche visite', active: true }];
     service.loadDepartments(false);
     service.loadANodes();

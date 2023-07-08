@@ -17,12 +17,13 @@
                 </td>
               </tr>
               <tr valign="middle">
-                <th scope="row">Équipe :</th>
+                <th scope="row">Équipes :</th>
                 <td>
-                  <a 
-                      *ngIf="dps.team"
-                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', dps.team.id] : null"
-                      target="_blank" rel="noopener noreferrer">{{dps.team.titre}}</a>
+                  <div *ngFor="let team of dps.team">
+                    <a 
+                      [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', team.id] : null"
+                      target="_blank" rel="noopener noreferrer">- {{team.titre}}</a>
+                  </div>
                 </td>
               </tr>
             </tbody>

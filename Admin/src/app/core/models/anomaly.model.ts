@@ -5,7 +5,7 @@ export interface Anomaly {
     status?: boolean,
     severity?:string
     title?: string,
-    createdBy?: string|User,
+    createdBy?: User,
     createdAt?: string;
     edge?: Edge;
 }

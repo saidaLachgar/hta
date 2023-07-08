@@ -2,32 +2,61 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DpsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource()
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+ /**
+ * @ApiResource(
+ *   order= {"id" = "DESC"},
+ *   normalizationContext={"groups"={"dps"}},
+ *   itemOperations={
+ *      "put"= {"access_control"="is_granted('hasPermission', 'dps_update')"},
+ *      "get"= {"access_control"="is_granted('hasPermission', 'dps_details')"},
+ *      "delete"= {"access_control"="is_granted('hasPermission', 'dps_delete')"},
+ *   },
+ *   collectionOperations={
+ *      "post"= {"access_control"="is_granted('hasPermission', 'dps_add')"},
+ *      "get"= { "access_control"="is_granted('hasPermission', 'dps_show')"},
+ *   },
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *          "titre"=SearchFilter::STRATEGY_PARTIAL,
+ *          "team.id"=SearchFilter::STRATEGY_EXACT,
+ *      }
+ *    )
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=DpsRepository::class)
  */
+
 class Dps
 {
+    public static $TRANSLATED_NAME = "DPS";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"dps"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"dps"})
      */
     private $titre;
 
     /**
      * @ORM\OneToMany(targetEntity=Team::class, mappedBy="dps")
+     * @Groups({"dps"})
      */
     private $team;
 
@@ -36,6 +65,10 @@ class Dps
         $this->team = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->titre;
+    }
     public function getId(): ?int
     {
         return $this->id;

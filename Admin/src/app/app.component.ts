@@ -8,7 +8,7 @@ import { AuthenticationService } from './core/services/auth.service';
 })
 export class AppComponent implements OnInit  {
   constructor(public authService: AuthenticationService,) { 
-    authService.isTokenExpired() && authService.logout();
+    // authService.isTokenExpired() && authService.logout();
   }
 
   ngOnInit() {

@@ -24,14 +24,14 @@ export class AuthenticationService {
     );
     this.currentUser = this.currentUserSubject.asObservable();
   }
-  get currentUserValue(): User {
+  get user(): User {
     return this.currentUserSubject.value;
   }
   getToken(): any {
-    return this.currentUserValue && this.currentUserValue.jwt;
+    return this.user && this.user.jwt;
   }
   getUserName(): string {
-    return this.currentUserValue.username;
+    return this.user.username;
   }
   decodeToken(token: string) {
     return JSON.parse(atob(token.split(".")[1]));
@@ -42,17 +42,7 @@ export class AuthenticationService {
         refresh_token: this.getToken().refresh_token,
       })
       .pipe(
-        tap((result) => {
-          this.roles = this.decodeToken(result.token).roles;
-          let user: User = {
-            username: this.currentUserValue.username,
-            jwt: result,
-            roles: this.roles,
-          };
-          // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem("currentUser", JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        }),
+        tap((result) => this.storeJWT(result, this.user.username)),
         switchMap(() => this.setPermissions(this.roles[0]))
       );
   }
@@ -73,23 +63,25 @@ export class AuthenticationService {
     return this.http
       .post<any>(`${this.server}/api/login`, { username, password })
       .pipe(
-        tap((result) => {
-          // login successful if there's a jwt token in the response
-          // get user role
-          const PAYLOAD = this.decodeToken(result.token);
-          this.roles = PAYLOAD.roles;
-          let user: User = {
-            id: PAYLOAD.id,
-            username: username,
-            jwt: result,
-            roles: this.roles,
-          };
-          // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem("currentUser", JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        }),
+        tap((result) => this.storeJWT(result, username)),
         switchMap(() => this.setPermissions(this.roles[0]))
       );
+  }
+
+  storeJWT(jwt, username) {
+    // login successful if there's a jwt token in the response
+    // get user role
+    const PAYLOAD = this.decodeToken(jwt.token);
+    this.roles = PAYLOAD.roles;
+    let user: User = {
+      id: PAYLOAD.id,
+      username: username,
+      jwt: jwt,
+      roles: this.roles,
+    };
+    // store user details and jwt token in local storage to keep user logged in between page refreshes
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    this.currentUserSubject.next(user);
   }
 
   logout() {

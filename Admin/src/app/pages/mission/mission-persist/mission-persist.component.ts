@@ -33,7 +33,7 @@ export class missionPersistComponent {
     public service: missionService,
     public anomalyService: anomalyService,
     public authService: AuthenticationService) {
-    this.currentUser = authService.currentUserValue;
+    this.currentUser = authService.user;
     this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupeur', active: true }];
     service.loadDepartments(false);
     service.loadActions();

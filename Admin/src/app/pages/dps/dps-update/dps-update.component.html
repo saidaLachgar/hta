@@ -28,12 +28,13 @@
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="name-input" class="col-md-2 col-form-label">Équipe</label>
+              <label for="name-input" class="col-md-2 col-form-label">Équipes</label>
               <div class="col-md-10">
                 <ng-select [items]="service.teams$ | async"
                         formControlName="team"
                         bindLabel="titre"
                         bindValue="@id"
+                        [multiple]="true"
                         [minTermLength]="2"
                         [loading]="service.teamLoading"
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"

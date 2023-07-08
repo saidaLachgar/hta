@@ -15,16 +15,17 @@ export class dpsUpdateComponent  {
   constructor(private route: ActivatedRoute, private fb: FormBuilder, public service: dpsService) {
     this.breadCrumbItems = [{ label: 'Dps' }, { label: 'Mise à jour du Dps', active: true }];
     this.id = Number(this.route.snapshot.paramMap.get('id'));
+    service.loadTeams();
     service.dpsForm = fb.group({
       titre: ["", Validators.required],
-      team: [""],
+      team: [[]],
     });
     service.getByKey(this.id).subscribe((obj) => {
-      service.loadTeams([obj.team]);
-
+      service.loadTeams(obj.team ? obj.team : []);
       service.dpsForm.setValue({
         titre: obj.titre,
         team: obj.team ? obj.team["@id"] : null,
+        membres : obj.team.length ? obj.team.map((e)=>e["@id"]) : [],
       });
     });
   }
