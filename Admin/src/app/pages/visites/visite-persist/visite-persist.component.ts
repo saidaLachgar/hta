@@ -21,8 +21,8 @@ interface Alert {
 export class visitePersistComponent {
   breadCrumbItems: Array<{}>;
   showError: boolean = false;
+  currentEdge: any;
   id: string;
-  currentUser: User;
   alert = window.alert;
   alerts: Alert[] = [];
 
@@ -30,9 +30,7 @@ export class visitePersistComponent {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public service: visiteService,
-    public anomalyService: anomalyService,
     public authService: AuthenticationService) {
-    this.currentUser = authService.user;
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Fiche visite', active: true }];
     service.loadDepartments(false);
     service.loadANodes();
@@ -76,8 +74,13 @@ export class visitePersistComponent {
           nodeA: obj.node_a ? obj.node_a["@id"] : null,
           nodeB: obj.node_b.length ? obj.node_b.map((e) => e["@id"]) : [],
         });
+        this.currentEdge = {
+          ANode: this.service.ANode.value,
+          BNode: this.service.BNode.value,
+          department: obj.node_a.department["@id"],
+          type: true
+        }
 
-        this.anomalyService.getRelatedAnomalies(this.service.ANode.value, this.service.BNode.value, obj.node_a.department["@id"]);
         this.formListeners();
       });
 
@@ -99,9 +102,7 @@ export class visitePersistComponent {
   AlertANodeChange() {
     this.addAlert("En changeant le PS, les champs tronçons d'anomalies seront réinitialisés.", "warning")
   }
-  AlertEdgeChange() {
-    this.addAlert('Vous devez choisir un Point coupure, pour pouvoir choisir un tronçon !', 'danger')
-  }
+ 
   AlertDeparChange() {
     let anode = this.service.ANode.value;
     let bnode = this.service.BNode.value;
@@ -129,29 +130,7 @@ export class visitePersistComponent {
       setTimeout(() => this.removeAlert(alert), 15000);
     }
   }
-  // Anomalies CRUD
-  newAnomaly(): FormGroup {
-    return this.fb.group({
-      severity: [""],
-      status: [false],
-      edge: ["", Validators.required],
-      title: ["", Validators.required],
-    })
-  }
-  addAnomaly() {
-    let na = this.service.ANode;
-    if (!na.value)
-      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.", "danger")
-    else {
-      let nb = this.service.BNode;
-      let dp = this.service.department;
-      this.anomalies.push(this.newAnomaly());
-      // this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value, true);
-    }
-  }
-  removeAnomaly(i: number) {
-    this.anomalies.removeAt(i);
-  }
+ 
   formListeners() {
     let na = this.service.ANode;
     let nb = this.service.BNode;
@@ -164,14 +143,22 @@ export class visitePersistComponent {
         control.get('edge').reset();
       });
       //  reload edges and anomalies
-      this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
+      this.currentEdge = {
+        ANode: na.value,
+        BNode: nb.value,
+        department: dp.value,
+        type: true
+      }
     });
 
     // on change BNode > reload edges and anomalies
     nb.valueChanges.subscribe(() => {
-      // if has ps
-      na.value && na.value.trim() !== '' &&
-        this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
+        na.value && na.value.trim() !== '' && (this.currentEdge = {
+          ANode: na.value,
+          BNode: nb.value,
+          department: dp.value,
+          type: true
+        });
     });
 
     // on change depar > reset edges  

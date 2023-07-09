@@ -9,8 +9,8 @@ import { missionDetailsComponent } from './mission-details/mission-details.compo
 import { missionListComponent } from './mission-list/mission-list.component';
 import { missionPersistComponent } from './mission-persist/mission-persist.component';
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
-import { UiSwitchModule } from 'ngx-ui-switch';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { relatedAnomaliesModule } from '../related-anomalies/related-anomalies.module';
 @NgModule({
   imports: [
     missionRoutingModule,
@@ -21,9 +21,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     NgApexchartsModule,
     NgbTooltipModule,
     NgbAlertModule,
-    UiSwitchModule.forRoot({
-      size: 'small',
-    }),
+    relatedAnomaliesModule
   ],
   declarations: [
     missionListComponent,

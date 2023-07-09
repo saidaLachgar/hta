@@ -9,7 +9,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { visitesListComponent } from './visites-list/visites-list.component';
 import { visitePersistComponent } from './visite-persist/visite-persist.component';
 import { visiteDetailsComponent } from './visite-details/visite-details.component';
-import { UiSwitchModule } from 'ngx-ui-switch';
+import { relatedAnomaliesModule } from '../related-anomalies/related-anomalies.module';
 
 @NgModule({
   imports: [
@@ -20,9 +20,7 @@ import { UiSwitchModule } from 'ngx-ui-switch';
     NgbPopoverModule,
     NgbAlertModule,
     NgApexchartsModule,
-    UiSwitchModule.forRoot({
-      size: 'small',
-    }),
+    relatedAnomaliesModule
   ],
   declarations: [
     visitesListComponent,

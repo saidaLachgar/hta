@@ -32,7 +32,6 @@ registerLocaleData(localeFr);
     LayoutsModule,
     AppRoutingModule,
     ExtrapagesModule,
-
     NgbAccordionModule,
     NgbNavModule,
     NgbTooltipModule,

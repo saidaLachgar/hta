@@ -1,9 +1,7 @@
-import { Component } from "@angular/core";
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { Component, Input } from "@angular/core";
+import { FormArray, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import { User } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
-import { anomalyService } from "../../anomalies/anomaly.service";
 import { missionService } from "../mission.service";
 
 const parseDate = d => new Date(Date.parse(d))
@@ -22,8 +20,8 @@ export class missionPersistComponent {
   breadCrumbItems: Array<{}>;
   showError: boolean = false;
   showAdvanced: boolean = false;
+  currentEdge: any;
   id: string;
-  currentUser: User;
   alert = window.alert;
   alerts: Alert[] = [];
 
@@ -31,9 +29,7 @@ export class missionPersistComponent {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public service: missionService,
-    public anomalyService: anomalyService,
     public authService: AuthenticationService) {
-    this.currentUser = authService.user;
     this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupeur', active: true }];
     service.loadDepartments(false);
     service.loadActions();
@@ -89,7 +85,12 @@ export class missionPersistComponent {
           // actions: obj.actions.length ? this.fb.array(obj.actions.map(val => new FormControl(parseInt(val)))) : [],
         });
         obj.actions.forEach(val => (service.actions as FormArray).push(new FormControl(parseInt(val))))
-        this.anomalyService.getRelatedAnomalies(obj.node_a,obj.node_b,obj.node_a.department["@id"]);
+        this.currentEdge = {
+          ANode: obj.node_a,
+          BNode: obj.node_b,
+          department: obj.node_a.department["@id"],
+          type: this.service.type.value
+        }
         this.formListeners();
       });
 
@@ -114,7 +115,6 @@ export class missionPersistComponent {
     const checkArray: FormArray = this.service.actions as FormArray;
     if (e.target.checked) {
       console.log(e.target.value);
-      
       checkArray.push(new FormControl(e.target.value));
     } else {
       let i: number = 0;
@@ -128,37 +128,11 @@ export class missionPersistComponent {
     }
   }
 
-
-  // Anomalies CRUD
-  newAnomaly(): FormGroup {
-    return this.fb.group({
-      severity: [""],
-      status: [false],
-      edge: ["", Validators.required],
-      title: ["", Validators.required],
-    })
-  }
-  addAnomaly() {
-    if (!this.service.ANode.value)
-      this.addAlert("Vous devez choisir un Point coupure, pour pouvoir créer une anomalie.", "danger")
-    else if (this.service.type.value == null)
-      this.addAlert("Vous devez choisir le type de coupure !", "danger")
-    else
-      this.anomalies.push(this.newAnomaly());
-  }
-  removeAnomaly(i: number) {
-    this.anomalies.removeAt(i);
-  }
-  
-
-
   // Validation && Alerts
   AlertANodeChange() {
     this.addAlert("En changeant le PS, les champs tronçons d'anomalies seront réinitialisés.", "warning")
   }
-  AlertEdgeChange() {
-    this.addAlert('Vous devez choisir un Point coupure, pour pouvoir choisir un tronçon !', 'danger')
-  }
+
   AlertDeparChange() {
     let anode = this.service.ANode.value;
     let bnode = this.service.BNode.value;
@@ -166,10 +140,12 @@ export class missionPersistComponent {
     let hasNonEmptyEdges = this.hasNonEmptyEdges;
     (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
   }
+
   formListeners() {
     let na = this.service.ANode;
     let nb = this.service.BNode;
     let dp = this.service.department;
+    let type = this.service.type;
     // on change ANode reset && reload edges aand anomalies
     na.valueChanges.subscribe(() => {
       // reset anomalies edges
@@ -177,15 +153,26 @@ export class missionPersistComponent {
         control.get('edge').reset();
       });
       //  reload edges and anomalies
-      this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
+      this.currentEdge = {
+        ANode: na.value,
+        BNode: nb.value,
+        department: dp.value,
+        type: this.service.type.value
+      }
     });
 
     // on change BNode reload edges aand anomalies
-    nb.valueChanges.subscribe(() => {
-      // if has ps
-      na.value && na.value.trim() !== '' &&
-        this.anomalyService.getRelatedAnomalies(na.value, nb.value, dp.value);
+    [nb,type].forEach(input => {
+      input.valueChanges.subscribe(() => {
+        na.value && na.value.trim() !== '' && (this.currentEdge = {
+          ANode: na.value,
+          BNode: nb.value,
+          department: dp.value,
+          type: type.value
+        });
+      });
     });
+    
     // reset edges on change on change depar 
     dp.valueChanges.subscribe(() => {
       na.reset();
