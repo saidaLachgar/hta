@@ -2,6 +2,7 @@
     <!-- start page title -->
     <app-page-title
       title="Détails de la poste"
+      [Loading]="service.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
@@ -19,7 +20,7 @@
               <tr valign="middle">
                 <th scope="row">Départ :</th>
                 <td>
-                  {{poste.node.department.titre}}
+                  {{poste.node && poste.node.department && poste.node.department.titre}}
                 </td>
               </tr>
               <tr valign="middle">
@@ -43,7 +44,7 @@
               <tr valign="middle">
                 <th scope="row">Commune :</th>
                 <td>
-                  {{poste.node.commune.titre}}
+                  {{poste.node && poste.node.commune && poste.node.commune.titre}}
                 </td>
               </tr>
               <tr valign="middle">
@@ -74,6 +75,12 @@
                 <th scope="row">N° serie :</th>
                 <td>
                   {{poste.n_serie}}
+                </td>
+              </tr>
+              <tr valign="middle">
+                <th scope="row">Origine :</th>
+                <td>
+                  {{poste.origine}}
                 </td>
               </tr>
             </tbody>

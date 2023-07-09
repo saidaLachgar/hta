@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 
 import { ActivatedRoute } from "@angular/router";
-import { Lightbox } from "ngx-lightbox";
 import { Visite } from "src/app/core/models";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { visiteService } from "../visite.service";
@@ -16,11 +15,10 @@ export class visiteDetailsComponent {
 
   constructor(
     private route: ActivatedRoute,
-    public lightbox: Lightbox,
-    public visiteService: visiteService,
+    public service: visiteService,
     public authService: AuthenticationService,
   ) {
     let id = route.snapshot.paramMap.get("id");
-    visiteService.getByKey(id).subscribe(obj => this.visite = obj);
+    service.getByKey(id).subscribe(obj => this.visite = obj);
   }
 }

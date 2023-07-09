@@ -1,81 +1,100 @@
+<style>
+.summary tr td:first-child {
+  white-space: nowrap;
+}
+.summary tr td:last-child {
+width: 99%;
+}
+</style>
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title
-      title="Détail de l'interruption"
+      title="Fiche d'incident / coupeur"
+      [Loading]="service.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
     <div class="card mt-4">
-      <div class="card-body pt-5">
+      <div class="card-body" *ngIf="mission">
+        <div 
+          *ngIf="mission.type != null"
+          [ngClass]="mission.type ? 'badge-soft-danger' : 'badge-soft-info'"
+          class="badge rounded-pill float-end fs-5">
+          {{mission.type ? "Incident" : "Coupeur" }}
+        </div>
+        <h2>{{mission.dateStart | date:'d MMMM yyyy':'Africa/Casablanca'}}</h2>
+
+        <div class="row my-5">
+          <div class="col-auto">
+            <div class="border-end pe-5"><p class="fw-medium mb-3">Durée</p><strong class="h2">{{service.getDiff(mission.dateStart, mission.dateEnd)}}&nbsp;</strong></div>
+          </div>
+          <div class="col-auto">
+            <div class="border-end pe-5"><p class="fw-medium mb-3">DMS</p><strong class="h2">{{mission.DMS?mission.DMS: "-"}}</strong></div>
+          </div>
+          <div class="col-auto">
+            <div><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
+          </div>
+        </div>
+
+
         <div class="table-responsive">
-          <table class="table table-nowrap mb-0">
-            <!-- <tbody *ngIf="mission">
+          <table class="table summary table-nowrap mb-0">
+            <tbody>
               <tr>
-                <th scope="row">Type :</th>
-                <td>
-                  <div 
-                    *ngIf="mission.type != null"
-                    [ngClass]="mission.type ? 'badge-soft-danger' : 'badge-soft-info'"
-                    class="badge rounded-pill">
-                    {{mission.type ? "Incident" : "Coupeur" }}
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Durée :</th>
-                <td>{{getDiff(mission.dateStart, mission.dateEnd)}}</td>
+                <th scope="row">Heure :</th>
+                <td>{{mission.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{mission.dateEnd ? (mission.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}</td>
               </tr>
               <tr>
                 <th scope="row">Départ :</th>
                 <td>
                   <a 
-                    *ngIf="mission.department"
-                    [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', mission.department.id] : null"
-                    target="_blank" rel="noopener noreferrer">{{mission.department.titre}}</a>
+                    *ngIf="mission.node_a.department"
+                    [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', mission.node_a.department.id] : null"
+                    target="_blank">{{mission.node_a.department.titre}}</a>
                 </td>
               </tr>
               <tr>
-                <th scope="row">Source :</th>
+                <th scope="row">Point coupure :</th>
                 <td>
                   <a 
-                    *ngIf="mission.node"
-                    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', mission.node.id] : null"
-                    target="_blank" rel="noopener noreferrer">{{mission.node.titre}}</a>
+                    *ngIf="mission.node_a"
+                    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', mission.node_a.id] : null"
+                    target="_blank">{{mission.node_a.titre}}</a>
                 </td>
               </tr>
               <tr>
                 <th scope="row">PS :</th>
                 <td>
-                  <div *ngFor="let ps of mission.ps">
+                  <div *ngFor="let node_b of mission.node_b">
                     <a 
-                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', ps.id] : null"
-                      target="_blank" rel="noopener noreferrer">- {{ps.titre}}</a>
+                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+                      target="_blank">- {{node_b.titre}}</a>
                   </div>
                 </td>
               </tr>
               <tr>
                 <th scope="row">Causes :</th>
-                <td>{{causesList[mission.causes + 3]}}</td>
+                <td>
+                  <ng-container *ngIf="mission.type != null && mission.type && mission.causes;">
+                    {{service.causesList[mission.causes + 3]}}
+                  </ng-container>
+                </td>
               </tr>
               <tr>
                 <th scope="row">Nb Clients interrompus :</th>
                 <td>{{mission.nbClients}}</td>
               </tr>
-              <tr>
-                <th scope="row">DMS :</th>
-                <td>{{mission.DMS}}</td>
-              </tr>
-              <tr>
-                <th scope="row">Anomalies réparées :</th>
-              </tr>
-              <tr>
-                <th scope="row">Date :</th>
-                <td>{{mission.dateStart  | date:'medium':'Africa/Casablanca'}}</td>
-              </tr>
-            </tbody> -->
+              
+            </tbody>
           </table>
         </div>
+        <button 
+          class="btn btn-primary mt-4 float-end ms-2" 
+          *ngIf="authService.isAuthorized('mission_update')"
+          [routerLink]="['persist', mission.id]"
+        ><i class="fas fa-edit me-1"></i>Modifier</button>
         <button class="btn btn-light mt-4 float-end" routerLink="/mission"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+        
       </div>
     </div>
   </div>

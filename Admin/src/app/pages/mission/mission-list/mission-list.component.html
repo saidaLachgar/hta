@@ -225,7 +225,7 @@
             <label>Causes</label>
             <select class="form-select" #searchCauses formControlName="causes" autocomplete="false">
               <option value="" selected>Causes...</option>
-              <option *ngFor="let cause of causesList.slice(causesList.length / 2); index as i" [value]="(i + 1)">{{ cause }}</option>
+              <option *ngFor="let cause of service.causesList.slice(service.causesList.length / 2); index as i" [value]="(i + 1)">{{ cause }}</option>
             </select>
           </div>
           <div class="col-4">
@@ -337,7 +337,7 @@
                       </td>
                       <td>
                         {{item.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{item.dateEnd ? (item.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}<br>
-                        <small class="text-muted" *ngIf="item.dateStart && item.dateEnd">Durée : {{getDiff(item.dateStart, item.dateEnd)}}</small>
+                        <small class="text-muted" *ngIf="item.dateStart && item.dateEnd">Durée : {{service.getDiff(item.dateStart, item.dateEnd)}}</small>
                       </td>
     
                       <!-- department -->
@@ -367,7 +367,7 @@
                       <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
                         <ng-container *ngIf="item.type != null && item.type && item.causes;">
                           <ngb-highlight
-                            [result]="causesList[item.causes + 3]"
+                            [result]="service.causesList[item.causes + 3]"
                             [term]="searchCauses.options[searchCauses.options.selectedIndex].text"
                           ></ngb-highlight>
                         </ng-container>

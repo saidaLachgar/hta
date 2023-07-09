@@ -12,4 +12,5 @@ export interface Poste {
   marque?: string;
   poste?: string;
   n_serie?: string;
+  origine?: string;
 }

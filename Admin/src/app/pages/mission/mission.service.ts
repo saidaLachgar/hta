@@ -9,13 +9,17 @@ import {
 } from "@ngrx/data";
 import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Department, Mission, Node, Pagination, Team } from "src/app/core/models";
+import { Department, Mission, Node, Pagination, Team,CausesList } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { anomalyService } from "../anomalies/anomaly.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
+import { differenceInMilliseconds, format, setDefaultOptions } from 'date-fns';
+import fr from 'date-fns/locale/fr';
+setDefaultOptions({ locale: fr });
 
+const parseDate = (date: string) => new Date(Date.parse(date))
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
 const DateTimeToString = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second).toISOString();
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
@@ -26,6 +30,7 @@ const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(da
 export class missionService extends EntityCollectionServiceBase<Mission> {
   readonly server = environment.serverURL;
   readonly pageSize = environment.pageSize;
+  causesList = Object.keys(CausesList);
   actions$: Observable<any[]>;
   mission$: Observable<Mission[]>;
   existingMission: Mission | boolean = false;
@@ -337,6 +342,13 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
    */
   onPaginate(page: number) {
     this.findByCriteria({ page: page, ...this.lastSearchedParams });
+  }
+
+  getDiff(date1, date2): string | void {
+    if (date1 && date2) {
+      let diff = differenceInMilliseconds(parseDate(date2), parseDate(date1));
+      return format(new Date(diff), 'H:mm:ss');
+    }
   }
 
   get departments() {

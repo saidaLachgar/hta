@@ -9,6 +9,7 @@ export interface Mission {
     causes?: number;
     nbClients?: string;
     DMS?: string;
+    IFS?: string;
     rowspan?: number;
     node_a?: Node;
     node_b?: Node[];

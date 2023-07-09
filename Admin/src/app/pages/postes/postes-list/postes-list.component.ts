@@ -50,6 +50,7 @@ export class postesListComponent {
       marque: [""],
       poste: [""],
       n_serie: [""],
+      orgine: [""],
       "node.department.id[]": [''],
       "node.commune.id[]": [''],
     });

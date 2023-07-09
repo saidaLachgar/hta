@@ -29,6 +29,7 @@ export class posteUpdateComponent {
       marque: [""],
       poste: [""],
       n_serie: [""],
+      origine: [""],
       node: ["", Validators.required],
     });
     this.posteService.getByKey(this.id).subscribe((obj) => {
@@ -45,6 +46,7 @@ export class posteUpdateComponent {
         marque : obj.marque,
         poste : obj.poste,
         n_serie : obj.n_serie,
+        origine : obj.origine,
         dateMst : date ? {
           year: date.getFullYear() ,
           month: date.getMonth() +1,

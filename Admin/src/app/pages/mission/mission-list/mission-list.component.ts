@@ -3,12 +3,10 @@ import { FormBuilder } from "@angular/forms";
 import { NgSelectConfig } from "@ng-select/ng-select";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { missionService } from "../mission.service";
-import { CausesList } from "src/app/core/models";
-import { differenceInMilliseconds, format, isSameDay, setDefaultOptions } from 'date-fns';
+import {  isSameDay, setDefaultOptions } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 setDefaultOptions({ locale: fr })
 
-let parseDate = (date: string) => new Date(Date.parse(date))
 @Component({
   selector: "app-mission-list",
   templateUrl: "./mission-list.component.html",
@@ -17,7 +15,6 @@ export class missionListComponent {
   breadCrumbItems: Array<{}>;
   ShowSearch: boolean = false;
   DMSMonthly: boolean;
-  causesList = Object.keys(CausesList);
   causesChart;
   typesChart;
   DMSChart;
@@ -54,7 +51,7 @@ export class missionListComponent {
         width: 400,
         type: "pie"
       },
-      labels: this.causesList.slice(this.causesList.length / 2),
+      labels: service.causesList.slice(service.causesList.length / 2),
       responsive: [
         {
           breakpoint: 480,
@@ -158,12 +155,7 @@ export class missionListComponent {
 
   }
 
-  getDiff(date1, date2): string | void {
-    if (date1 && date2) {
-      let diff = differenceInMilliseconds(parseDate(date2), parseDate(date1));
-      return format(new Date(diff), 'H:mm:ss');
-    }
-  }
+  
 
   isToday(date: string): boolean {
     return isSameDay(new Date(date), new Date());

@@ -25,6 +25,7 @@ export class posteCreateComponent {
       marque: [""],
       poste: [""],
       n_serie: [""],
+      origine: [""],
       node: ["", Validators.required],
     });
   }

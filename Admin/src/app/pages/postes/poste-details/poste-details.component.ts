@@ -13,9 +13,9 @@ export class posteDetailsComponent {
   poste: Poste;
   breadCrumbItems: Array<{}>;
 
-  constructor(private route: ActivatedRoute, public posteService: posteService) { 
+  constructor(private route: ActivatedRoute, public service: posteService) { 
     let id = this.route.snapshot.paramMap.get('id');
-    posteService.getByKey(id).subscribe(obj => this.poste = obj);
+    service.getByKey(id).subscribe(obj => this.poste = obj);
 
   }
 
