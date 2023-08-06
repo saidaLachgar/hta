@@ -19,6 +19,7 @@ export class departmentUpdateComponent  {
       titre: ["", Validators.required],
       team: [""],
       longueur: [null],
+      courantMax: [null],
     });
     service.getByKey(this.id).subscribe((obj) => {
       service.loadTeams([obj.team]);
@@ -26,6 +27,7 @@ export class departmentUpdateComponent  {
       service.uploadedFile = obj.visuel ? {id : obj.visuel.id, url: obj.visuel.contentUrl} : null;
       service.departmentForm.setValue({
         titre: obj.titre,
+        courantMax: obj.courantMax,
         longueur: obj.longueur,
         team: obj.team ? obj.team["@id"] : null,
       });

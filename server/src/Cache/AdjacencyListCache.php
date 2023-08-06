@@ -11,7 +11,6 @@ class AdjacencyListCache
 {
     private $cache;
     private $em;
-    private $adjacencyList = array();
 
     public function __construct(AdapterInterface $cache, EntityManagerInterface $em)
     {
@@ -22,63 +21,43 @@ class AdjacencyListCache
     // get adjacencyList from cache (if found)
     public function getAdjacencyList($departmentId, $reset = false):array
     {
-        if (count($this->adjacencyList) === 0) {
-            $cacheItem = $this->cache->getItem('adjacency_list_'.$departmentId);
+        $cacheKey = 'adjacency_list_' . $departmentId;
+        $adjacencyList = $this->cache->getItem($cacheKey);
 
-            if ($cacheItem->isHit() && !$reset) {
-                $this->adjacencyList = $cacheItem->get();
-            } else {
-                // Retrieve the adjacency list from the database and store it in the cache
-                $this->retrieveAdjacencyList($departmentId);
-                $cacheItem->set($this->adjacencyList);
-                // $cacheItem->expiresAfter(3600); // Cache for 1 hour
-                $this->cache->save($cacheItem);
-            }
+        if (!$adjacencyList->isHit() || $reset) {
+            // Retrieve the adjacency list from the database and store it in the cache
+            $adjacencyListData = $this->retrieveAdjacencyList($departmentId);
+            $adjacencyList->set($adjacencyListData);
+            // $cacheItem->expiresAfter(3600); // Cache for 1 hour
+            $this->cache->save($adjacencyList);
         }
 
-        
-
-        return $this->adjacencyList;
+        return $adjacencyList->get();
     }
 
     // retrieve AdjacencyList
-    private function retrieveAdjacencyList($departmentId)
+    private function retrieveAdjacencyList($departmentId): array
     {
         $department = $this->em->getReference(Department::class, $departmentId);
         // Retrieve the adjacency list from the database and return it
         $nodes = $this->em->getRepository(Node::class)->findBy(['department' => $department]);
         $edges = $this->em->getRepository(Edge::class)->findBy(['department' => $department]);
+        $adjacencyList = [];
 
         // Create the Graph
         foreach ($nodes as $node) {
-            $this->addNode($node->getId());
+            $adjacencyList["data"][$node->getId()] = [];
         }
         // dump(array_map(fn($node) => $node->getId(), $nodes));
         // dd(array_map(fn($edge) => $edge->getNodeA()->getId().$edge->getNodeB()->getId(), $edges));
+
         foreach ($edges as $edge) {
-            $this->addEdge($edge->getNodeA()->getId(), $edge->getNodeB()->getId());
+            $origin = $edge->getNodeA()->getId();
+            $destination = $edge->getNodeB()->getId();
+            $adjacencyList["data"][$origin][] = $destination;
+            $adjacencyList["data"][$destination][] = $origin;
+            $adjacencyList["edges"][] = $origin.$destination;
         }
-
-        $this->adjacencyList["edges"] = array_map(fn($edge) => $edge->getNodeA()->getId().$edge->getNodeB()->getId(), $edges);
-    }
-
-    // Add node
-    function addNode($node)
-    {
-        $this->adjacencyList["data"][$node] = array();
-    }
-
-    // Add edge, undirected
-    function addEdge($origin, $destination)
-    {
-        // try {
-            array_push($this->adjacencyList["data"][$origin], $destination);
-            array_push($this->adjacencyList["data"][$destination], $origin);
-        // } catch (\Throwable $th) {
-        //     dump($origin);
-        //     dump($destination);
-        //     dd($this->adjacencyList["data"]);
-        // }
-        
+        return $adjacencyList;
     }
 }

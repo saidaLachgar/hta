@@ -30,11 +30,6 @@ services:
         class: App\Utility\DbProcessor
         tags:
             - {name: monolog.processor, handler: dbHandler}
-
-    doctrine.doctrineSubscriber:
-        class: App\EventListener\DoctrineSubscriber
-        tags:
-            - {name: doctrine.event_subscriber}
             
     acme_api.event.jwt_created_listener:
         class: App\EventListener\JWTCreatedListener
@@ -45,6 +40,10 @@ services:
     App\Action\AnomalyAction:
         tags: ['controller.service_arguments']
 
-    App\DataProvider\MissionDataProvider:
-        arguments:
-            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+    App\EventListener\DoctrineSubscriber:
+        tags:
+            - {name: doctrine.event_subscriber}
+
+    App\EventListener\EdgeUpdateSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }

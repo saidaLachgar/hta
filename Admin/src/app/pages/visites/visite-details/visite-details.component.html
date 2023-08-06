@@ -6,53 +6,57 @@
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->
-  <div class="card mt-4">
-    <div class="card-body pt-5">
-      <div class="table-responsive">
-        <table class="table table-nowrap mb-0" *ngIf="visite">
-          <tbody>
-            <tr>
-              <th scope="row">Date :</th>
-              <td>{{visite.date | date:'medium':'Africa/Casablanca'}}</td>
-            </tr>
-            <tr>
-              <th scope="row">Départ :</th>
-              <td><a 
-                *ngIf="visite.node_a.department"
-                [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', visite.node_a.department.id] : null"
-                target="_blank">{{visite.node_a.department.titre}}</a></td>
-            </tr>
-            <tr>
-              <th scope="row">De :</th>
-              <td><a 
-                *ngIf="visite.node_a"
-                [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', visite.node_a.id] : null"
-                target="_blank">{{visite.node_a.titre}}</a></td>
-            </tr>
-            <tr>
-              <th scope="row">À :</th>
-              <td><div *ngFor="let node_b of visite.node_b">
-                <a 
-                  [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
-                  target="_blank">- {{node_b.titre}}</a>
-              </div></td>
-            </tr>
-            <tr>
-              <th scope="row">Longueur visitée :</th>
-              <td>{{visite.nbSupport}}</td>
-            </tr>
-            <tr>
-              <th scope="row">Équipe :</th>
-              <td><a 
-                *ngIf="visite.team"
-                [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', visite.team.id] : null"
-                target="_blank">{{visite.team.titre}}</a></td>
-            </tr>
-          </tbody>
-        </table>
+  <div class="row">
+    <div class="card mt-4">
+      <div class="card-body pt-5">
+        <div class="table-responsive">
+          <table class="table table-nowrap mb-0" *ngIf="visite">
+            <tbody>
+              <tr>
+                <th scope="row">Date :</th>
+                <td>{{visite.date | date:'medium':'Africa/Casablanca'}}</td>
+              </tr>
+              <tr>
+                <th scope="row">Départ :</th>
+                <td><a 
+                  *ngIf="visite.node_a.department"
+                  [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', visite.node_a.department.id] : null"
+                  target="_blank">{{visite.node_a.department.titre}}</a></td>
+              </tr>
+              <tr>
+                <th scope="row">De :</th>
+                <td><a 
+                  *ngIf="visite.node_a"
+                  [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', visite.node_a.id] : null"
+                  target="_blank">{{visite.node_a.titre}}</a></td>
+              </tr>
+              <tr>
+                <th scope="row">À :</th>
+                <td><div *ngFor="let node_b of visite.node_b">
+                  <a 
+                    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+                    target="_blank">- {{node_b.titre}}</a>
+                </div></td>
+              </tr>
+              <tr>
+                <th scope="row">Longueur visitée :</th>
+                <td><b>{{visite.nbSupport}}</b> <small class="text-muted">({{visite.nbSupport * 100}}/{{visite.edge_set_length}}km)</small></td>
+              </tr>
+              <tr>
+                <th scope="row">Équipe :</th>
+                <td><a 
+                  *ngIf="visite.team"
+                  [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', visite.team.id] : null"
+                  target="_blank">{{visite.team.titre}}</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-light mt-4 float-end" routerLink="/visite"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
       </div>
-      <button class="btn btn-light mt-4 float-end" routerLink="/visite"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
     </div>
   </div>
+
+  <app-related-anomalies  [currentEdge]="currentEdge"></app-related-anomalies>
 </div>
 

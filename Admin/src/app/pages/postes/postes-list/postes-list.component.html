@@ -19,6 +19,9 @@
       >
     </div>
   </div>
+  <style>
+    th{min-width: 120px;}
+  </style>
 
   <div class="row">
     <div class="col-12">
@@ -31,7 +34,7 @@
               <thead>
                 <tr>
                   <th>Designation</th>
-                  <th>Départ</th>
+                  <th style="min-width: 200px">Départ</th>
                   <th>MLE</th>
                   <th>P KVA</th>
                   <th>Nb de clients</th>
@@ -41,6 +44,7 @@
                   <th>Marque</th>
                   <th>Poste</th>
                   <th>N° serie</th>
+                  <th>Puis-appelée</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -64,7 +68,7 @@
                     </ng-select>
                   </td>
                   <td><input type="text" placeholder="MLE..." formControlName="MLE" #searchMLE class="form-control"></td>
-                  <td><input type="text" placeholder="P KVA..." formControlName="PKVA" #searchPKVA class="form-control"></td>
+                  <td><input type="number" step="1" placeholder="P KVA..." formControlName="PKVA" #searchPKVA class="form-control"></td>
                   <td><input type="text" placeholder="Nb de clients..." formControlName="nb_clients" #searchNbClients class="form-control"></td>
 
                   <td>
@@ -98,7 +102,7 @@
                   <td><input type="text" placeholder="Marque..." formControlName="marque" #searchMarque class="form-control"></td>
                   <td><input type="text" placeholder="Poste..." formControlName="poste" #searchPoste class="form-control"></td>
                   <td><input type="text" placeholder="N° serie..." formControlName="n_serie" #searchNSerie class="form-control"></td>
-
+                  <td><input type="number" step="1" placeholder="Puis-appelée..." formControlName="puissance" #searchPuissance class="form-control"></td>
 
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -197,6 +201,12 @@
                       [term]="searchNSerie.value"
                     ></ngb-highlight>
                   </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="poste.puissance"
+                      [term]="searchPuissance.value"
+                    ></ngb-highlight>
+                  </td>
                   
                   <td align="center">
                     <div ngbDropdown 
@@ -269,7 +279,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="service.page"
                     [pageSize]="service.pageSize"
-                    (pageChange)="service.onPaginate($event)"
+                    (pageChange)="service.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>
@@ -291,6 +301,9 @@
 	<div class="modal-body">
 		<form id="import-form" [formGroup]="service.importForm" (ngSubmit)="service.importSpreadSheet()">
       <div class="mb-3 row m-n2">
+        <div *ngIf="service.uploadResponse" class="col-12">
+          <div class="alert alert-warning" *ngFor="let msg of service.uploadResponse" [innerHTML]="msg"></div>
+        </div>
 
         <div class="col-lg-6 p-2">
           <div class="text-center border rounded-lg py-4 p-2 p-lg-5 h-100">
@@ -381,7 +394,7 @@
         <div class="mb-3 row">
             <label for="export-4" class="col-md-2 col-form-label">P KVA</label>
             <div class="col-md-10">
-              <input type="text" placeholder="P KVA..." formControlName="PKVA"  class="form-control">
+              <input type="number" step="1" placeholder="P KVA..." formControlName="PKVA"  class="form-control">
             </div>
         </div>
         <!-- Nb de clients -->

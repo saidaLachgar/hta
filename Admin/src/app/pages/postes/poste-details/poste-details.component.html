@@ -3,7 +3,7 @@
     <app-page-title
       title="Détails de la poste"
       [Loading]="service.loading$ | async"
-      [breadcrumbItems]="breadCrumbItems"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
     <div class="card mt-4">
@@ -81,6 +81,12 @@
                 <th scope="row">Origine :</th>
                 <td>
                   {{poste.origine}}
+                </td>
+              </tr>
+              <tr valign="middle">
+                <th scope="row">Puis-appelée :</th>
+                <td>
+                  {{poste.puissance}}
                 </td>
               </tr>
             </tbody>

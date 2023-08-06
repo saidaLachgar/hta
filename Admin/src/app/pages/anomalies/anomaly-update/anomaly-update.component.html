@@ -2,7 +2,8 @@
     <!-- start page title -->
     <app-page-title
       title="Mettre à jour de anomaly"
-      [breadcrumbItems]="breadCrumbItems"
+      [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="service.anomalyForm" (ngSubmit)="service.onUpdate(id)">

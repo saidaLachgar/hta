@@ -90,7 +90,7 @@ export class DefaultComponent implements OnInit {
     this.AnomaliesPerTeamChart = {
       series: [
         {
-          name: "Réparé",
+          name: "Réaliser",
           data: [44, 55, 41]
         },
         {

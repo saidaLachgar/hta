@@ -1,125 +1,154 @@
 .vertical-collpsed .navbar-brand-box div {
-    font-size: 9px !important;
-  }
+  font-size: 9px !important;
+}
+
 // dropdown
 .dropdown-toggle {
-    &:after {
-        display: none;
-    }
+  &:after {
+    display: none;
+  }
 }
 
 .c-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .pe-none {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .line-through {
-    text-decoration: line-through;
+  text-decoration: line-through;
 }
 
 @media (max-width: 767px) {
-    .table-responsive .dropdown-menu {
-        position: static !important;
-    }
+  .table-responsive .dropdown-menu {
+    position: static !important;
+  }
 }
 
-@media (min-width: 768px) {
-    .table-responsive {
-        overflow: inherit;
-    }
+// @media (min-width: 768px) {
+//     .table-responsive {
+//         overflow: inherit;
+//     }
+// }
+
+.table-responsive tbody tr:nth-last-child(-n + 3) .dropdown-menu-end {
+  top: unset !important;
+  right: 100% !important;
+  bottom: 0 !important;
 }
 
 .ng-select.disabled {
-    pointer-events: none;
-    opacity: .7;
+  pointer-events: none;
+  opacity: 0.7;
 }
 
 .custom-select {
-    color: #333;
-    background-color: #fff;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+  color: #333;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 .sticky-actions {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    right: 0;
-    padding: 1rem;
-    z-index: 100;
-    border-top: 1px solid #ebebeb;
-    box-shadow: 0 -0.125rem 1.25rem rgba(0, 0, 0, 0.025) !important;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  right: 0;
+  padding: 1rem;
+  z-index: 100;
+  border-top: 1px solid #ebebeb;
+  box-shadow: 0 -0.125rem 1.25rem rgba(0, 0, 0, 0.025) !important;
 }
 
 .collapse-cta {
+  position: relative;
+
+  > span {
+    background-color: #fff;
     position: relative;
+    z-index: 1;
+    padding-right: 1rem;
+  }
 
-    >span {
-        background-color: #fff;
-        position: relative;
-        z-index: 1;
-        padding-right: 1rem;
-
-    }
-
-    &:after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 0.5em;
-        bottom: 3px;
-        border-top: 1px solid #ccc;
-        z-index: 0;
-    }
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0.5em;
+    bottom: 3px;
+    border-top: 1px solid #ccc;
+    z-index: 0;
+  }
 }
 
 .ngb-tp {
-    position: static;
-    box-shadow: none !important;
-    padding: 0 !important;
+  position: static;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .border-deem,
 .border-deem th,
 .border-deem td {
-    border: 1px solid #ddd;
+  border: 1px solid #ddd;
 }
 
-
-
 .ngb-dp-weekdays {
-    margin-bottom: 0.6rem !important;
+  margin-bottom: 0.6rem !important;
 }
 
 .ngb-dp-month:first-child .ngb-dp-week {
-    padding-left: 0.85rem !important;
+  padding-left: 0.85rem !important;
 }
 
 .ngb-dp-month:last-child .ngb-dp-week {
-    padding-right: 0.85rem !important;
+  padding-right: 0.85rem !important;
 }
 
 fieldset:disabled {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
-
 .glow {
-    animation: glow 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) 3 backwards;
+  animation: glow 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 3 backwards;
 }
 
 @keyframes glow {
-    0% {
-        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-    }
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
 
-    100% {
-        box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
-    }
+  100% {
+    box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+  }
 }
+
+// .pagination li {
+//   /* Hide all pagination links first */
+//   display: none;
+//   /* Display active page and previous 4 links */
+//   &.active,
+//   &:nth-child(-n + 2),
+//   &:nth-last-child(-n + 2) ,
+//   &.active ~ li:nth-child(-n + 2),
+//   & ~ li:nth-last-child(-n + 2),
+//   &.active ~ li:nth-child(-n + 5) {
+//     display: block;
+//   }
+ 
+//   &:nth-last-child(5) {
+//     margin-left: 20px;
+//     position: relative;
+//     &::before {
+//       content: "...";
+//       position: absolute;
+//       top: 8px;
+//       line-height: 1;
+//       left: -16px;
+//     }
+//   }
+// }

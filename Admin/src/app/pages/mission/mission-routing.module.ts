@@ -5,7 +5,6 @@ import { missionDetailsComponent } from './mission-details/mission-details.compo
 import { missionListComponent } from './mission-list/mission-list.component';
 import { missionPersistComponent } from './mission-persist/mission-persist.component';
 
-
 const routes: Routes = [
   {path: '', component: missionListComponent, canActivate: [RoleGuard], data: {access: 'mission_show'}},
   {path: 'details/:id', component: missionDetailsComponent, canActivate: [RoleGuard], data: {access: 'mission_details'}},

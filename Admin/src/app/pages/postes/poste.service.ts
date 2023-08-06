@@ -205,7 +205,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
 
     if (this.importForm.invalid) return;
     
-    let url = `${this.server}/api/upload_spreadsheet`;
+    let url = `${this.server}/api/import_spreadsheet`;
     let that = this;
     let toast = this.toast;
     let body: FormData = new FormData();

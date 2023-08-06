@@ -2,6 +2,7 @@
     <!-- start page title -->
     <app-page-title
       title="Détails de l'utilisateur"
+      [Loading]="departmentService.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
@@ -42,6 +43,12 @@
                           *ngIf="department.team"
                           [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', department.team.id] : null"
                           target="_blank" rel="noopener noreferrer">{{department.team.titre}}</a>
+                    </td>
+                  </tr>
+                  <tr valign="middle">
+                    <th scope="row">Courant Max :</th>
+                    <td>
+                      {{department.courantMax}}
                     </td>
                   </tr>
                   <tr valign="middle">

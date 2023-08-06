@@ -214,8 +214,6 @@ class SpreadsheetService
                             $this->em->persist($nestedEntity);
                             $this->em->flush();
                             $entity->$setterName($nestedEntity);
-                            // dump($nestedEntity);
-
 
                             // store unfounded Association eg: nodes (app. cp)
                             array_key_exists("store", $field) && 
@@ -230,8 +228,9 @@ class SpreadsheetService
                             $value = \DateTime::createFromFormat('d/m/y', $value);
 
                         }
-                        $entity->$setterName($value);
+                        $value && $entity->$setterName($value);
                         // try {
+                        //     $entity->$setterName($value);
                         //     //code...
                         // } catch (\Throwable $th) {
                         //     //throw $th;
@@ -264,15 +263,23 @@ class SpreadsheetService
                         $attr = $column["attr"];
                         $is_association = $column["type"] == "association";
                         $value = $is_association ? $entity->$getter()->getId() : $entity->$getter();
-                        $selector = $is_association ? $attr . ".id" : $attr;
+                        $selector = $is_association ? $attr . ".id" : 'e.' .$attr;
 
+                        if ($is_association) {
+                            $queryBuilder->innerJoin('e.' . $attr, $attr);
+                        }
                         $queryBuilder
-                            ->innerJoin('e.' . $attr, $attr)
                             ->andWhere($selector . ' = :' . $attr . '_var')
-                            ->setParameter($attr . '_var', $value);
+                            ->setParameter($attr . '_var', $value)
+                            ->setMaxResults(1);
                     }
-
                     $foundedDuplicate = $queryBuilder->getQuery()->getOneOrNullResult();
+                    
+                    // try {
+                    //     $foundedDuplicate = $queryBuilder->getQuery()->getOneOrNullResult();
+                    // } catch (\Throwable $th) {
+                    //     dd($queryBuilder->getQuery()->getResult());
+                    // }
 
                     if ($foundedDuplicate) {
                         // dd($updateIfExist);
@@ -457,7 +464,7 @@ class SpreadsheetService
         $writer->save($filePath);
         // dd($filePath);
 
-        return "//" . $_SERVER['HTTP_HOST'] . "/api/files/" . $filename;
+        return "//" . $_SERVER['HTTP_HOST'] . "/uploads/" . $filename;
     }
 
     // this was made to keep the spread sheet columns name readable for the clients
@@ -534,7 +541,7 @@ class SpreadsheetService
 
             $cellValue === 'LCLCLC' &&
                 $fieldData = array_merge($fieldData, ["searchBy" => "identifier", "sort" => ["department",null,null,"node",null, "longueur", "section","commune"]]);
-            // todo [,"marque"] wach marque lifiha dik MET.. nzidha ftableux dyal les appareils yak machi tronçon omachi poste?
+            // @todo [,"marque"] wach marque lifiha dik MET.. nzidha ftableux dyal les appareils yak machi tronçon omachi poste?
 
             $fieldData && $fields[$column] = $fieldData;
         }

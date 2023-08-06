@@ -41,6 +41,7 @@ export class visitePersistComponent {
       date: [""],
       time: [""],
       team: [""],
+      nbSupport: [null],
       department: ["", Validators.required],
       nodeA: ["", Validators.required],
       nodeB: [[]],
@@ -72,6 +73,7 @@ export class visitePersistComponent {
           team: obj.team ? obj.team["@id"] : null,
           department: obj.node_a.department ? obj.node_a.department["@id"] : null,
           nodeA: obj.node_a ? obj.node_a["@id"] : null,
+          nbSupport: obj.nbSupport ? obj.nbSupport : 0,
           nodeB: obj.node_b.length ? obj.node_b.map((e) => e["@id"]) : [],
         });
         this.currentEdge = {

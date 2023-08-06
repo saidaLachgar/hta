@@ -164,7 +164,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="service.page"
                     [pageSize]="service.pageSize"
-                    (pageChange)="service.onPaginate($event)"
+                    (pageChange)="service.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

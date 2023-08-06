@@ -24,6 +24,7 @@ export class dpsListComponent {
 
     dpsService.dpsForm = fb.group({
       titre: [''],
+      nbClients: [null],
       "team.id[]": [''],
     });
 

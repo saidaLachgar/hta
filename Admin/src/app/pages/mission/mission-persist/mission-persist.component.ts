@@ -77,7 +77,7 @@ export class missionPersistComponent {
           date: dateObject(dateStrat),
           dateStart: TimeStart,
           dateEnd: TimeEnds,
-          causes: String(obj.causes), // ! not working !! 
+          causes: String(obj.causes), // @todo not working !! 
           type: String(obj.type),
           department: obj.node_a.department ? obj.node_a.department["@id"] : null,
           node_a: obj.node_a ? obj.node_a["@id"] : null,
@@ -86,8 +86,8 @@ export class missionPersistComponent {
         });
         obj.actions.forEach(val => (service.actions as FormArray).push(new FormControl(parseInt(val))))
         this.currentEdge = {
-          ANode: obj.node_a,
-          BNode: obj.node_b,
+          ANode: obj.node_a["@id"],
+          BNode: obj.node_b.map((e) => e["@id"]),
           department: obj.node_a.department["@id"],
           type: this.service.type.value
         }
@@ -152,24 +152,17 @@ export class missionPersistComponent {
       this.anomalies.controls.forEach((control) => {
         control.get('edge').reset();
       });
-      //  reload edges and anomalies
-      this.currentEdge = {
-        ANode: na.value,
-        BNode: nb.value,
-        department: dp.value,
-        type: this.service.type.value
-      }
     });
 
-    // on change BNode reload edges aand anomalies
-    [nb,type].forEach(input => {
+    // on change [nb,na,type] reload edges and anomalies
+    [nb,na,type].forEach(input => {
       input.valueChanges.subscribe(() => {
-        na.value && na.value.trim() !== '' && (this.currentEdge = {
+       this.currentEdge = {
           ANode: na.value,
           BNode: nb.value,
           department: dp.value,
           type: type.value
-        });
+        };
       });
     });
     

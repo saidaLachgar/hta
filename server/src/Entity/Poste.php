@@ -13,9 +13,12 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use App\Dto\PosteOutput;
+
 /**
  * @ApiResource(
  *   order= {"id" = "DESC"},
+ *   output=PosteOutput::class,
  *   normalizationContext={"groups"={"postes"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'postes_update')"},
@@ -71,7 +74,7 @@ class Poste
     private $MLE;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      * 
      * @Groups({"postes"})
      */
@@ -169,12 +172,12 @@ class Poste
         return $this;
     }
 
-    public function getPKVA(): ?string
+    public function getPKVA(): ?float
     {
         return $this->PKVA;
     }
 
-    public function setPKVA(?string $PKVA): self
+    public function setPKVA(?float $PKVA): self
     {
         $this->PKVA = $PKVA;
 

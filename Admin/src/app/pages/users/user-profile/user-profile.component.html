@@ -2,7 +2,8 @@
     <!-- start page title -->
     <app-page-title
       title="Profile"
-      [breadcrumbItems]="breadCrumbItems"
+      [Loading]="userService.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
   

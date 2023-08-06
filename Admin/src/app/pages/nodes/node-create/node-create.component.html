@@ -2,6 +2,7 @@
   <!-- start page title -->
   <app-page-title
     title="Nouvel appareil"
+    [Loading]="nodeService.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->

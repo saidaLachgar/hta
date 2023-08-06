@@ -11,7 +11,6 @@ import { anomalyService } from "../anomaly.service";
 })
 export class anomaliesListComponent {
   breadCrumbItems: Array<{}>;
-  public hideExport = true;
 
   constructor(
     public service: anomalyService,

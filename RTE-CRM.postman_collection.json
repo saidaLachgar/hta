@@ -47,6 +47,9 @@
 		{
 			"name": "refresh token",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -57,7 +60,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"refresh_token\": \"f39b29cc2d824b59180e51a384288b7ae1cabcdaa24f387d107f284ce99b9483754ec4123a069e64d620f43816c552541a73ee3b8b2c8371cce50febeaffa7d2\"}",
+					"raw": "{\"refresh_token\": \"924d7b06165b82003db27d8ea45be061a800549a907f0f13e38bbf49327bd67c396b4769954187a97e10afc17d6c01265d8bf2ee7c59ea3955285c437038d57a\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -606,7 +609,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"node_a\":\"/api/nodes/7\",\"node_b\":\"/api/nodes/5\",\"department\":\"/api/departments/1\",\"longueur\":10,\"section\":148.1,\"commune\":null,\"marque\":\"beltronsfo\",\"id\":1}",
+					"raw": "//{\"dateStart\":\"2023-06-24T09:37:06.000Z\",\"dateEnd\":null,\"type\":false,\"causes\":null,\"nodeA\":\"/api/nodes/3\",\"nodeB\":[],\"actions\":null}\r\n// {\r\n//     \"dateStart\":\"2023-01-01T14:11:21.110Z\",\r\n//     \"dateEnd\":\"2023-01-01T21:00:00.110Z\",\r\n//     \"type\":true,\r\n//     \"causes\":2,\r\n//     \"departement\":\"/api/departements/26\",\r\n//     \"appareil\":\"/api/appareil_coupeurs/4\",\r\n//     \"ps\":[\r\n//         \"/api/appareil_coupeurs/3\",\r\n//         \"/api/appareil_coupeurs/5\",\r\n//         \"/api/appareil_coupeurs/6\"\r\n//     ]\r\n// }\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -614,7 +617,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/nodes/7",
+					"raw": "http://127.0.0.1:8000/api/missions?page=2",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -625,8 +628,13 @@
 					"port": "8000",
 					"path": [
 						"api",
-						"nodes",
-						"7"
+						"missions"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						}
 					]
 				}
 			},
@@ -898,7 +906,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"dateStart\":\"2023-01-01T14:11:21.110Z\",\r\n    \"dateEnd\":\"2023-01-01T21:00:00.110Z\",\r\n    \"type\":true,\r\n    \"causes\":2,\r\n    \"departement\":\"/api/departements/26\",\r\n    \"appareil\":\"/api/appareil_coupeurs/4\",\r\n    \"ps\":[\r\n        \"/api/appareil_coupeurs/3\",\r\n        \"/api/appareil_coupeurs/5\",\r\n        \"/api/appareil_coupeurs/6\"\r\n    ]\r\n}",
+					"raw": "{\"dateStart\":\"2023-06-24T09:37:06.000Z\",\"dateEnd\":null,\"type\":false,\"causes\":null,\"nodeA\":\"/api/nodes/3\",\"nodeB\":[],\"actions\":null}\r\n// {\r\n//     \"dateStart\":\"2023-01-01T14:11:21.110Z\",\r\n//     \"dateEnd\":\"2023-01-01T21:00:00.110Z\",\r\n//     \"type\":true,\r\n//     \"causes\":2,\r\n//     \"departement\":\"/api/departements/26\",\r\n//     \"appareil\":\"/api/appareil_coupeurs/4\",\r\n//     \"ps\":[\r\n//         \"/api/appareil_coupeurs/3\",\r\n//         \"/api/appareil_coupeurs/5\",\r\n//         \"/api/appareil_coupeurs/6\"\r\n//     ]\r\n// }\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1323,9 +1331,9 @@
 			"response": []
 		},
 		{
-			"name": "edges Copy",
+			"name": "edges filter",
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [
 					{
 						"key": "Accept",
@@ -1333,17 +1341,8 @@
 						"type": "default"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"department\":\"/api/departments/1\",\"nodeA\":\"/api/nodes/7\",\"node_b\":\"/api/nodes/5\",\"longueur\":10,\"section\":148.1,\"commune\":\"\",\"marque\":\"beltronsfo\"}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/edges",
+					"raw": "http://127.0.0.1:8000/api/edges?page=1&properties[]=id&properties[node_a][]=titre&properties[node_b][]=titre",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1355,6 +1354,24 @@
 					"path": [
 						"api",
 						"edges"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "properties[]",
+							"value": "id"
+						},
+						{
+							"key": "properties[node_a][]",
+							"value": "titre"
+						},
+						{
+							"key": "properties[node_b][]",
+							"value": "titre"
+						}
 					]
 				}
 			},
@@ -1516,6 +1533,133 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "edges-by-range",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/ld+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/edges/by-range?depar=1&node_a=7&node_b=3",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"edges",
+						"by-range"
+					],
+					"query": [
+						{
+							"key": "depar",
+							"value": "1"
+						},
+						{
+							"key": "node_a",
+							"value": "7"
+						},
+						{
+							"key": "node_b",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "by-range Copy",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/ld+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/edges/by-range?depar=1&node_a=7&node_b=3",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"edges",
+						"by-range"
+					],
+					"query": [
+						{
+							"key": "depar",
+							"value": "1"
+						},
+						{
+							"key": "node_a",
+							"value": "7"
+						},
+						{
+							"key": "node_b",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mission-total-anomalies",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/ld+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/mission-total-anomalies/15",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"mission-total-anomalies",
+						"15"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -1523,7 +1667,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImN0eSI6IkpXVCJ9.eyJpYXQiOjE2ODY1MDcwNzEsImV4cCI6MTY4NjU5MzQ3MSwicm9sZXMiOlsiUk9MRV9TVVBFUl9BRE1JTiJdLCJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOjF9.RipZWLigmPZjVWgUCQTIAH-fYzAjhUGVJP3seGkuKZ4RJfn_7OsSuU2o5MI96F2mOPWwE2VxABRLvyxp8_UW0uw3opIkV7UQjnPeqLUG2h_8lwblmqIwCSm2FccrZ02H2wIEd7HqagVQCq014mg991Viid1UEcPRFsXDIwQGcGEXj4siUx1TsG8Yy5WOf08BOfzkA4QRGt4bawtT_-5lD-BC0krN_t5ugcNgmB-YZfBMW1AmZ__MxgKvDT9_at5FQyZbF-9ETiJ3dm4xjs0MY8CpB0reEgNBqaD5t012GsabXeDh7mm6RDyDu-lRsk0LUulybmKkk4BxM3_EWJPue7mZrc6pEex0V_SCoyd7-F95qyxv1OT-Dhj7SuLdFYyeu1XZBilY3VIjCczo5wMFsdlBKq79dSH9tyEcbTsL1mpQV5TJ-quSTQYHx85M4lT2d_rzSO6QJOzXTXfdBZbumPGh_K4XKFGG39Xp-92mnWJFsA0LHvxt8l62IDkPuVDj0YLav7qwILE8_H6LNDALghvwVwqvMru2aTiTeQ6zi3NxZ_pRx7DNEMCPijWbabkgbW3_PcdjahUw5jA3la8ArFcTfI5ZmFVsflsjA1KYIaJPnKec6ODQglZcDFvUPasdnXzot6Lv4xSmnxXuS98oGNFoH0c7HeWDPI6F_CFCz9k",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImN0eSI6IkpXVCJ9.eyJpYXQiOjE2ODk1NDMxMTUsImV4cCI6MTY5MDQwNzExNSwicm9sZXMiOlsiUk9MRV9TVVBFUl9BRE1JTiJdLCJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOjF9.AlTt40V3jqEUZGLqbx41cTgtEA6NSVv1L4we1UtYB7OLmOrr_lCTVgVeOxoNkm1H_38Fu_aZfuifjQ2Tl3UkWwczr3wpFrKMFLC943bG0PDuHr58qwgXBq62Qbsbf-NjhSxVQfzxAqJyTWl0eyArWc4JHzbbSG_zZOnxpKdCj1KhYWnRRHi8L1slO6frmuuEaP2qVEDQe_jls3U150NazX0skQt5PTJ9R9sDb4dZjorl8FU-iIbkulpPIq7NFzugdWBek1DaW-HKTV_fDlm5O0IUTGSkP9EfPiC1tobJbapXEyWNdD5uYDX2TvoJevrqv_01tGpcXrrqvNLZz3eLMHwcRRFPm_tAD0LMEbTrCLLTEcB2ZhHzPvHi6xCIotKQATuBerGkJbr_R-7WSm0YImKyQN-PRTFMvqdcQZoo19PM98cjMhVNZl6J7sAX7S_JAyAyw7Q7ZglGQAFtGjh3-CbAXdU0tnqW1I-hcgE_AWxR6tBbgn-Hk6cIX6YveUwf-U2XonP59nV9PjmHmResdTR9fYKPzSzQUS4dBbHqDESVc5B4_BNkIpcTB5OStWyv6FKl3u45pg8loy6wJVoYZW4wKZEAqHWoYL-x57CJPE20VBE76UlXMVseOtKwMgnbUNBZ2O0Te5g-Ug8IipR7KOpzJ5qDAGPJh-EpDNMhqvM",
 				"type": "string"
 			}
 		]

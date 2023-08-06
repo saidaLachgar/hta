@@ -15,6 +15,7 @@ let parseDate = (date:string) => new Date(Date.parse(date))
 })
 export class missionDetailsComponent {
   mission: Mission;
+  currentEdge: any;
   breadCrumbItems: Array<{}>;
   causesList = Object.keys(CausesList);
 
@@ -25,7 +26,15 @@ export class missionDetailsComponent {
     public service: missionService
   ) { 
     let id = this.route.snapshot.paramMap.get('id');
-    service.getByKey(id).subscribe(obj => this.mission = obj);
+    service.getByKey(id).subscribe(obj => {
+      this.mission = obj;
+      this.currentEdge = {
+        ANode: obj.node_a["@id"],
+        BNode: obj.node_b["@id"],
+        department: obj.node_a.department["@id"],
+        type: 'false'
+      }
+    });
   }
 
   getDiff(date1, date2) : string|void{

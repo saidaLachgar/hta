@@ -2,7 +2,8 @@
     <!-- start page title -->
     <app-page-title
       title="Mettre à jour Départ"
-      [breadcrumbItems]="breadCrumbItems"
+      [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="service.departmentForm" (ngSubmit)="service.onUpdate(id)">
@@ -39,6 +40,18 @@
                         typeToSearchText="Veuillez saisir 2 caractères ou plus"
                         [typeahead]="service.teamInput$">
                 </ng-select>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="courantMax-input" class="col-md-2 col-form-label">Courant Max</label>
+              <div class="col-md-10">
+                <input
+                  formControlName="courantMax"
+                  class="form-control"
+                  type="number"
+                  step="0.01" 
+                  id="courantMax-input"
+                />
               </div>
             </div>
             <div class="mb-3 row">

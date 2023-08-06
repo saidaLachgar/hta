@@ -11,6 +11,7 @@ import { missionPersistComponent } from './mission-persist/mission-persist.compo
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { relatedAnomaliesModule } from '../related-anomalies/related-anomalies.module';
+import { DecimalHourToTimePipe } from 'src/app/core/pipes';
 @NgModule({
   imports: [
     missionRoutingModule,
@@ -27,6 +28,7 @@ import { relatedAnomaliesModule } from '../related-anomalies/related-anomalies.m
     missionListComponent,
     missionPersistComponent,
     missionDetailsComponent,
+    DecimalHourToTimePipe
   ],
 })
 export class missionModule { }

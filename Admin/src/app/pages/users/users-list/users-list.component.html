@@ -180,7 +180,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="userService.page"
                     [pageSize]="userService.pageSize"
-                    (pageChange)="userService.onPaginate($event)"
+                    (pageChange)="userService.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

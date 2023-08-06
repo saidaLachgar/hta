@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title
-      title="Détails de l'utilisateur"
+      title="Détails de la direction provinciale"
       [Loading]="service.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
@@ -15,6 +15,12 @@
                 <th scope="row">Titre :</th>
                 <td>
                   {{dps.titre}}
+                </td>
+              </tr>
+              <tr valign="middle">
+                <th scope="row">System DMS <br><small class="text-muted">Nombre total de clients</small></th>
+                <td>
+                  {{dps.nbClients}}
                 </td>
               </tr>
               <tr valign="middle">

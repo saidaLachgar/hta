@@ -10,8 +10,9 @@ import { visiteService } from "../visite.service";
   templateUrl: "./visite-details.component.html",
 })
 export class visiteDetailsComponent {
-  visite: Visite;
   breadCrumbItems: Array<{}>;
+  visite: Visite;
+  currentEdge: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -19,6 +20,17 @@ export class visiteDetailsComponent {
     public authService: AuthenticationService,
   ) {
     let id = route.snapshot.paramMap.get("id");
-    service.getByKey(id).subscribe(obj => this.visite = obj);
+    service.getByKey(id).subscribe(obj => {
+      this.visite = obj;
+
+      // anomalies
+      this.currentEdge = {
+        ANode: obj.node_a["@id"],
+        BNode: obj.node_b["@id"],
+        department: obj.node_a.department["@id"],
+        type: 'false'
+      }
+    });
+    
   }
 }

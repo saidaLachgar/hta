@@ -24,8 +24,9 @@
               <thead>
                 <tr>
                   <th>Titre</th>
-                  <th width="30%">Équipe</th>
-                  <th width="30%">Longueur</th>
+                  <th>Équipe</th>
+                  <th>Courant Max </th>
+                  <th>Longueur</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -47,8 +48,8 @@
                               [typeahead]="departmentService.teamInput$">
                     </ng-select>
                   </td>
-                  <td><input type="text" placeholder="Longueur..." formControlName="longueur" #searchLongueur class="form-control"></td>
-                 
+                  <td><input type="number" step="0.01" placeholder="Courant Max..." formControlName="courantMax" #searchCourantMax class="form-control"></td>
+                  <td><input type="number" step="0.01" placeholder="Longueur..." formControlName="longueur" #searchLongueur class="form-control"></td>
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
                       <i class="bx bx-search me-1"></i>Rechercher
@@ -107,6 +108,12 @@
                       *ngIf="department.team"
                       [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', department.team.id] : null"
                       target="_blank" rel="noopener noreferrer">{{department.team.titre}}</a>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="department.courantMax"
+                      [term]="searchCourantMax.value"
+                    ></ngb-highlight>
                   </td>
                   <td>
                     <ngb-highlight
@@ -187,7 +194,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="departmentService.page"
                     [pageSize]="departmentService.pageSize"
-                    (pageChange)="departmentService.onPaginate($event)"
+                    (pageChange)="departmentService.onPaginate($event)"  [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

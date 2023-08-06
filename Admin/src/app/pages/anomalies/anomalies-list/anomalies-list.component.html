@@ -10,12 +10,6 @@
     </div>
     
     <div class="col-auto">
-      <button class="btn bg-light text-primary ms-2" 
-        data-toggle="collapse" *ngIf="authService.isAuthorized('anomalies_export')"
-        (click)="hideExport = !hideExport"
-        title="Exporter">
-        <i class="fas fa-upload"></i>
-      </button>
       <button class="btn bg-light text-primary ms-2" title="Importer" 
         *ngIf="authService.isAuthorized('anomalies_import')">
         <i class="fas fa-download"></i>
@@ -270,7 +264,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="service.page"
                     [pageSize]="service.pageSize"
-                    (pageChange)="service.onPaginate($event)"
+                    (pageChange)="service.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

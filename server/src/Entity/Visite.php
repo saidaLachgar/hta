@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Dto\VisiteOutput;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
@@ -18,6 +19,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 /**
  * @ApiResource(
  *  order= {"id" = "DESC"},
+ *  output=VisiteOutput::class,
  *  normalizationContext={"groups"={"visite"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'visites_update')"},
@@ -65,7 +67,7 @@ class Visite
      * @ORM\Column(type="float", nullable=true)
      * @Groups({"visite"})
      */
-    private $nbSupport;
+    private $nbSupport=0;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class)

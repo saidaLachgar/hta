@@ -183,7 +183,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="teamService.page"
                     [pageSize]="teamService.pageSize"
-                    (pageChange)="teamService.onPaginate($event)"
+                    (pageChange)="teamService.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

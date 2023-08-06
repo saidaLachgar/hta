@@ -144,6 +144,9 @@ export class teamService extends EntityCollectionServiceBase<Team> {
       error: () => toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
         teamForm.reset();
+        teamForm.setValue({
+          titre: [""],departments: [null], membres: [[]],
+        });
         toast.success("L'équipe ajouté avec succès");
       },
     });

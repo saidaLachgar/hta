@@ -215,6 +215,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     let visite = {
       date: form.date ? DateTimeToString(form.date, form.time) : null,
       team: form.team ? form.team : null,
+      nbSupport: form.nbSupport ? form.nbSupport : 0,
       department: form.department ? form.department : null,
       nodeA: form.nodeA ? form.nodeA : null,
       nodeB: form.nodeB && form.nodeB.length ? form.nodeB : [],
@@ -264,7 +265,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
     // format date
     if (Object.keys(obj).length > 1) {
       // console.log(obj);
-      const updateObj = (key: string) => obj[key] && delete Object.assign(obj, { ["createdAt[" + key + "]"]: DateToString(obj[key]) })[key];
+      const updateObj = (key: string) => obj[key] && delete Object.assign(obj, { ["date[" + key + "]"]: DateToString(obj[key]) })[key];
       updateObj("before"); updateObj("after");
     }
 

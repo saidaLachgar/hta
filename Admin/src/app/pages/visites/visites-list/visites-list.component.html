@@ -1,6 +1,4 @@
 <div class="container-fluid mb-5">
-  
-
   <!-- statistics -->
   <div class="row">
     <div class="col-6 d-flex flex-column">
@@ -66,16 +64,6 @@
     </div>
     
     <div class="col-auto">
-      <button class="btn bg-light text-primary ms-2" 
-        data-toggle="collapse" *ngIf="authService.isAuthorized('visites_export')"
-        (click)="hideExport = !hideExport"
-        title="Exporter">
-        <i class="fas fa-upload"></i>
-      </button>
-      <button class="btn bg-light text-primary ms-2" title="Importer" 
-        *ngIf="authService.isAuthorized('visites_import')">
-        <i class="fas fa-download"></i>
-      </button>
       <a routerLink="/visites/persist" class="btn btn-primary ms-2"
       *ngIf="authService.isAuthorized('visites_add')"
         ><i class="fas fa-plus-circle"></i> Ajouter</a
@@ -93,13 +81,13 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Départ</th>
-                  <th>De</th>
-                  <th>À</th>
-                  <th>Longueur visitée</th>
-                  <th>Équipe</th>
-                  <th>Anomalies</th>
+                  <th style="min-width: 200px;">Date</th>
+                  <th style="min-width: 200px;">Départ</th>
+                  <th style="min-width: 130px;">De</th>
+                  <th style="min-width: 130px;">À</th>
+                  <th style="min-width: 130px;">Longueur visitée</th>
+                  <th style="min-width: 130px;">Équipe</th>
+                  <th style="min-width: 130px;">Anomalies</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -256,10 +244,11 @@
                   
                   <!-- Longueur visitée -->
                   <td>
-                    <ngb-highlight
+                    <b><ngb-highlight
                       [result]="item.nbSupport"
                       [term]="searchNbSupport.value"
-                    ></ngb-highlight>
+                    ></ngb-highlight> Support</b><br>
+                    <small class="text-muted">({{item.nbSupport * 100}}/{{item.edge_set_length}}km)</small>
                   </td>
 
                   <!-- team -->
@@ -273,16 +262,29 @@
 
                   <!-- Anomalies -->
                   <td>
-                    <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
-                      <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
+                    <a
+                      href="javascript: void(0);"
+                      fragment="anomalies-list"
+                      [routerLink]="authService.isAuthorized('visites_details') ? ['details', item.id] : []"
+                    >
+                    <ng-container *ngIf="item.undone_anomalies > 0 && item.undone_anomalies != item.total_anomalies; else NoAnomalies">
+                      <div  class="badge badge-soft-danger c-pointer rounded-pill border-danger border px-3 py-2 font-size-13 w-100">
+                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.undone_anomalies}}/{{item.total_anomalies}} Anomalies</span>
                       </div>
                     </ng-container>
                     <ng-template #NoAnomalies>
-                      <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
-                      </div>
+                      <ng-container *ngIf="item.total_anomalies == 0; else AllResolved">
+                        <div class="badge badge-soft-info c-pointer rounded-pill border-info border px-3 py-2 font-size-13 w-100">
+                          <i class="fas fa-info-circle me-2"></i> <span class="text-body">Pas d'anomalies</span>
+                        </div>
+                      </ng-container>
+                      <ng-template #AllResolved>
+                        <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+                          <i class="fas fa-check-circle me-2"></i> <span class="text-body">Toutes résolues</span>
+                        </div>
+                      </ng-template>
                     </ng-template>
+                    </a>
                   </td>
 
                   <!-- actions -->
@@ -359,7 +361,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="service.page"
                     [pageSize]="service.pageSize"
-                    (pageChange)="service.onPaginate($event)"
+                    (pageChange)="service.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

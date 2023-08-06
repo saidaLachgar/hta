@@ -7,16 +7,16 @@ import {
   EntityCollectionServiceBase,
   EntityCollectionServiceElementsFactory
 } from "@ngrx/data";
+import { differenceInMilliseconds, format, setDefaultOptions } from 'date-fns';
+import fr from 'date-fns/locale/fr';
 import { Observable, Subject, concat, of } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
-import { Department, Mission, Node, Pagination, Team,CausesList } from "src/app/core/models";
+import { CausesList, Department, Mission, Node, Pagination, Team } from "src/app/core/models";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 import { anomalyService } from "../anomalies/anomaly.service";
 import { departmentService } from "../departments/department.service";
 import { nodeService } from "../nodes/node.service";
-import { differenceInMilliseconds, format, setDefaultOptions } from 'date-fns';
-import fr from 'date-fns/locale/fr';
 setDefaultOptions({ locale: fr });
 
 const parseDate = (date: string) => new Date(Date.parse(date))
@@ -232,20 +232,22 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       dateEnd: form.dateEnd ? DateTimeToString(form.date, form.dateEnd) : null,
       type: form.type != null ? JSON.parse(form.type) : null,
       causes: form.causes && JSON.parse(form.type) ? JSON.parse(form.causes) : null,
+      // team: form.team ? form.team : null,
       // department: form.department ? form.department : null,
       nodeA: form.node_a ? form.node_a : null,
       nodeB: form.node_b && form.node_b.length ? form.node_b : [],
       actions: form.actions.length ? form.actions : null,
     };
+
     let anomalies = form.anomalies;
-    this.anomalyLoading = true;
-
-    // console.log(form);
-    // console.log(mission);
-    // console.log(form.anomalies);
-    anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
-    this.anomalyLoading = false;
-
+    if(anomalies) {
+      this.anomalyLoading = true;
+      // console.log(form);
+      // console.log(mission);
+      // console.log(form.anomalies);
+      anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
+      this.anomalyLoading = false;
+    }
 
     // compare last query with the new one to avoid unnecessary requests
     if (id) {
@@ -295,45 +297,72 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
-    this.mission$ = this.getWithQuery(queryParams)
-      .pipe(
-        map((data) => {
-
-          let tempObj = {}; // temporary object to group data
-          data.forEach((v: Mission, index) => {
+    this.mission$ = this.getWithQuery(queryParams).pipe(
+        map((missions) => {
+          let tempObj = {}; // temporary object to group missions
+          // Sort the array using the custom comparison function
+          missions.sort(this.sortMissions);
+          missions.forEach((mission: Mission, index) => {
             // create an id by same date and department
             // only if type is true (Incident)
-            let key = v.type && v.node_a.department && v.dateStart ?
-              v.node_a.department.id + "-" + new Date(v.dateStart).toLocaleDateString() :
-              v.id
-              ;
+            let key = mission.type && mission.node_a.department && mission.dateStart ?
+              mission.node_a.department.id + "-" + new Date(mission.dateStart).toLocaleDateString() :
+              mission.id;
 
             // set when to concatenate same rows based on the same id
             if (tempObj[key]) { // if already exists (same date/depar)
-              tempObj[key].push(v); // group same rows
+              tempObj[key].push(mission); // group same rows
 
               // Find index of 1st row has same id    
-              let objIndex = data.findIndex(obj => obj.id === tempObj[key][0].id);
+              let objIndex = missions.findIndex(obj => obj.id === tempObj[key][0].id);
               // add new property to tell whether to merge next rows or not
               // property value is the amount of rows should be merged
 
-              let firstRow = Object.assign({}, data[objIndex]); //assign = merge (old, new) )
+              let firstRow = Object.assign({}, missions[objIndex]); //assign = merge (old, new) )
               firstRow.rowspan = tempObj[key].length;
-              data[objIndex] = firstRow;
+              missions[objIndex] = firstRow;
 
               // set rowspan to -1 to tell that this row should be merged with the above
-              let currentRow = Object.assign({}, v);
+              let currentRow = Object.assign({}, mission);
               currentRow.rowspan = -1;
-              data[index] = currentRow;
+              missions[index] = currentRow;
 
             } else {
-              tempObj[key] = [v]; // push new array
+              tempObj[key] = [mission]; // push new array
             }
           });
-          return data;
+          return missions;
         })
-      );
+    );
     this.getPagination();
+  }
+
+  sortMissions(a: Mission, b: Mission): number {
+    // Compare by dateStart (ignore time)
+    const dateA = new Date(a.dateStart).setHours(0, 0, 0, 0);
+    const dateB = new Date(b.dateStart).setHours(0, 0, 0, 0);
+    if (dateA !== dateB) {
+      return dateB - dateA;
+    }
+  
+    // Compare by department id
+    const departmentIdA = a.node_a.department.id;
+    const departmentIdB = b.node_a.department.id;
+    if (departmentIdA !== departmentIdB) {
+      return departmentIdA - departmentIdB;
+    }
+  
+    // Compare by type
+    const typeA = a.type;
+    const typeB = b.type;
+    if (typeA !== typeB) {
+      return typeA ? -1 : 1;
+    }
+  
+    // Compare by time of dateStart (ignore date)
+    const timeA = new Date(a.dateStart).getTime();
+    const timeB = new Date(b.dateStart).getTime();
+    return timeA - timeB;
   }
 
   /**
@@ -379,3 +408,101 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
 
 
 }
+
+
+
+// this.http.get(`${this.server}/api/mission-total-anomalies/${mission.id}`).pipe(
+//   map(anomaly => {
+//     let total = anomaly["total"];
+//     let undone = anomaly["undone"];
+//     missions.push({ 
+//       ...mission, 
+//       total_anomalies: total ? total : 0,
+//       undone_anomalies: undone ? undone : 0
+//     })
+//   })
+// ).subscribe();
+
+
+// this.authors$.subscribe(authors => {
+//   authors.forEach(author => {
+//     this.authorService.getTotalBooksCount(author.id).subscribe(totalBooks => {
+//       author.totalBooks = totalBooks; // Update the author object with the total books count
+//     });
+//   });
+// });
+
+/*
+const requests = missions.map(mission => this.http.get(`${this.server}/api/mission-total-anomalies/${mission.id}`));
+return forkJoin(requests).pipe(
+  map(anomalies => {
+    return missions.map((mission, index) => {
+      let total = anomalies[index]["total"];
+      let undone = anomalies[index]["undone"];
+      return { 
+        ...mission, 
+        total_anomalies: total ? total : 0,
+        undone_anomalies: undone ? undone : 0
+      };
+    });
+  })
+);
+
+
+getAuthors(): Observable<Author[]> {
+  return this.http.get<Author[]>('/api/authors').pipe(
+    switchMap(authors => {
+      const requests = authors.map(author =>
+        this.http.get<number>(`/api/authors/${author.id}/total-books`)
+      );
+      return forkJoin(requests).pipe(
+        map(totalBooks => {
+          return authors.map((author, index) => ({
+            ...author,
+            totalBooks: totalBooks[index],
+          }));
+        })
+      );
+    })
+  );
+
+    switchMap((data) => {
+      // Create an array of observables for the second HTTP requests
+      const requests = data.map((item) => this.http.get(`${this.server}/api/mission-total-anomalies/${item.id}`));
+  
+      // Use forkJoin to combine and wait for all the requests to complete
+      return forkJoin(requests).pipe(
+        map((anomalies) => 
+          data.map((item, index) => {
+            let total = anomalies[index]["total"];
+            let undone = anomalies[index]["undone"];
+            return { 
+              ...item, 
+              total_anomalies: total ? total : 0,
+              undone_anomalies: undone ? undone : 0
+            };
+            
+          })
+        )
+      );
+    }),*/
+
+    // switchMap((missions) => {
+      //   const requests = missions.map((mission: Mission) => {
+      //     return this.http.get(`${this.server}/api/mission-total-anomalies/${mission.id}`).pipe(
+      //       map(anomaly => {
+      //         let total = anomaly["total"];
+      //         return { 
+      //           ...mission, 
+      //           total_books: total ? total : 0,
+      //         };
+      //       })
+      //     );
+      //   });
+    
+      //   return forkJoin(requests).pipe(
+      //     map((updatedmissions) => {
+      //       return updatedmissions;
+      //     })
+      //   );
+      // }),

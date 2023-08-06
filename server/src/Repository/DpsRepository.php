@@ -38,6 +38,16 @@ class DpsRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function ClientTotalInDp($id): ?int
+    {
+        return $this->createQueryBuilder('dp')
+            ->select("dp.nbClients")
+            ->andWhere('dp.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
 
 //    /**
 //     * @return Dps[] Returns an array of Dps objects

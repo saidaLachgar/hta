@@ -14,6 +14,7 @@ export class dpsCreateComponent{
     service.loadTeams();
     service.dpsForm = this.fb.group({
       titre: ["", Validators.required],
+      nbClients: [null],
       team: [[]],
     });
   }

@@ -6,6 +6,7 @@ use App\Entity\Anomaly;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+
 /**
  * @extends ServiceEntityRepository<Anomaly>
  *
@@ -39,7 +40,29 @@ class AnomalyRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
+    public function getTotalAnomalies($edgesIds, $date)
+    {
+        $total = $this->createQueryBuilder('t')
+            ->select('t.status')
+            ->join('t.edge', 'e')
+            ->andWhere('e.id IN (:edges)')
+            ->setParameter('edges', $edgesIds)
+            ->andWhere('DATE(t.createdAt) = :date')
+            ->setParameter('date', $date->format('Y-m-d'))
+            ->getQuery()->getArrayResult();
+
+        $undone = array_filter($total, function ($item) {
+            return $item["status"] !== true;
+        });
+
+
+        return [
+            "total" => count($total),
+            "undone" => count($undone)
+        ];
+    }
+
+    //    /**
 //     * @return Anomaly[] Returns an array of Anomaly objects
 //     */
 //    public function findByExampleField($value): array
@@ -54,7 +77,7 @@ class AnomalyRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Anomaly
+    //    public function findOneBySomeField($value): ?Anomaly
 //    {
 //        return $this->createQueryBuilder('a')
 //            ->andWhere('a.exampleField = :val')

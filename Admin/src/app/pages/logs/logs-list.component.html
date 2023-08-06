@@ -141,7 +141,8 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="LogsService.page"
                     [pageSize]="LogsService.pageSize"
-                    (pageChange)="LogsService.onPaginate($event)"
+                    [maxSize]="5"
+                    (pageChange)="LogsService.onPaginate($event)" [maxSize]="5" 
                     >
                   </ngb-pagination>
                 </div>

@@ -16,6 +16,7 @@ export class departmentCreateComponent{
       titre: ["", Validators.required],
       team: [""],
       longueur: [null],
+      courantMax: [null],
     });
   }
 

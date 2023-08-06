@@ -108,7 +108,7 @@ export const MENU: MenuItem[] = [
         subItems: [
             {
                 id:22,
-                label: 'Dps',
+                label: 'DP',
                 link: '/dps',
                 checkPermissions: 'dps',
                 parentId: 15

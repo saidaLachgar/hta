@@ -33,7 +33,8 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      properties={
  *          "titre"=SearchFilter::STRATEGY_PARTIAL,
  *          "team.id"=SearchFilter::STRATEGY_EXACT,
- *          "longueur"=SearchFilter::STRATEGY_EXACT
+ *          "longueur"=SearchFilter::STRATEGY_EXACT,
+ *          "courantMax"=SearchFilter::STRATEGY_EXACT
  *      }
  * )
  * @ApiFilter(PropertyFilter::class)
@@ -70,7 +71,7 @@ class Department
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="departments")
      * 
-     * @Groups({"depar"})
+     * @Groups({"depar", "missions"})
      */
     private $team;
 
@@ -85,6 +86,11 @@ class Department
      * @ORM\OneToMany(targetEntity=Edge::class, mappedBy="department", orphanRemoval=true)
      */
     private $edges;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $courantMax;
 
     public function __construct()
     {
@@ -177,6 +183,18 @@ class Department
                 $edge->setDepartment(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCourantMax(): ?float
+    {
+        return $this->courantMax;
+    }
+
+    public function setCourantMax(?float $courantMax): self
+    {
+        $this->courantMax = $courantMax;
 
         return $this;
     }

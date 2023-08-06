@@ -67,8 +67,8 @@ class DoctrineSubscriber implements EventSubscriber
                 $url = $_ENV['FRONTEND_URL']. // ex : "http://localhost/"
                     (
                     $class == "UserPermissions" ? "autorisation" :
-                    $class == "Objective" ? "objectives" :
-                    $class."/details/".$objectId
+                    ($class == "Objective" ? "objectives" :
+                    $class."/details/".$objectId)
                     ); // ex : "users/details/:id"
                 $urlHtml =  '<p class="mb-1">URL : <b><a href="'.$url.'">'.$url.'</a></b></p>';
             } else  $urlHtml="";

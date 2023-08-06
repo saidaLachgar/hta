@@ -7,10 +7,12 @@ namespace App\DataPersister;
 // use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 // use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Entity\Department;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Mission;
 use App\Repository\PosteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Proxies\__CG__\App\Entity\Dps;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\Poste;
 use App\Entity\Objective;
@@ -45,8 +47,7 @@ class MissionDataPersister implements DataPersisterInterface
 
         $DateStart = $Mission->getDateStart();
         $DateEnd = $Mission->getDateEnd();
-        $NodeB = $Mission->getNodeB();
-        $NodeA = $Mission->getNodeA();
+       
 
         // add one day if date start smaller than date end
         if (!empty($DateEnd) && !empty($DateStart) && $this->dateToTime($DateEnd) < $this->dateToTime($DateStart)) {
@@ -55,7 +56,6 @@ class MissionDataPersister implements DataPersisterInterface
         }
 
         // CALC DMS IFS nbClients ---
-        // -> update only dms duration with the old CC && CI
 
         // Get the previous state of the entity
         $previousData = $context['previous_data'] ?? null;
@@ -63,42 +63,41 @@ class MissionDataPersister implements DataPersisterInterface
             // Compare the current and new states of the entity
             $changes = $this->HasChanges($previousData, $Mission);
         }
+        if(is_null($Mission->getDMS()) or ($changes && ($changes["major"] or $changes["time"]))) {
+            $NodeB = $Mission->getNodeB();
+            $NodeA = $Mission->getNodeA();
+            $Depar = $NodeA->getDepartment();
+            $nodesInRange = $this->nodesInRange($NodeB, $NodeA, $Depar);
+            // dd($nodesInRange);
+        }
 
-        if (is_null($Mission->getDMS()) or ($changes && $changes["major"])) { //  major change ||  Nodes / dates changed
+        if (is_null($Mission->getDMS()) or ($changes && $changes["major"])) { // dms is null or major change ->  Nodes
 
             /** @var PosteRepository $PostRepo */
             $PostRepo = $this->em->getRepository(Poste::class);
-            // Get Depar id
-            $DeparId = $NodeA->getDepartment()->getId();
+            $DpRepo = $this->em->getRepository(Dps::class);
+
             // Get clients connectés
-            $CC = $PostRepo->ClientTotalInDepart($DeparId);
-            // Get Clients interrompus 
-            if (is_null($NodeA) and $NodeB->isEmpty()) {
-                // source IS NULL & ps IS NULL
-                $CI = $CC;
-            } else {
+            $CC = $DpRepo->ClientTotalInDp($Depar->getTeam()->getDps()->getId());
+            // Get Clients interrompus : source IS NULL & ps IS NULL CI is CC else CI is ClientTotalByNodes
+            $CI = $nodesInRange ? ($PostRepo->ClientTotalByNodes($nodesInRange) ?: 0) : $CC;
 
-                // get IDs of selected destinations
-                $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(function ($obj) {
-                    return $obj->getId();
-                })->getValues();
-
-                
-                $nodesInRange = $this->GraphSearch->bfsNodesInRange($DeparId, $NodeA->getId(), $Destinations);
-                $CI = $PostRepo->ClientTotalByNodes($nodesInRange);
-            }
-
-            // set DMS value depending if date end exists or not
+            // set DMS/END value depending if date end exists or not
             if (!is_null($DateEnd)) {
                 $Mission->setDMS($this->calcDMS($DateEnd, $DateStart, $CI, $CC));
+                // set END value depending if nodes in a range were found
+                if ($nodesInRange) {
+                    $Mission->setEND($this->calcEND($DateEnd, $DateStart, $nodesInRange, $Depar->getId()));
+                }
             } else {
                 $Mission->setDMS(null);
+                $Mission->setEND(null);
             }
 
             $Mission->setNbClients($CI . "/" . $CC);
             $Mission->setIFS(round(($CI / $CC), 3));
 
-        } elseif ( $changes && $changes["time"] ) { // duration changed
+        } elseif ($changes && $changes["time"]) { // minor change -> duration changed
             // dd("timeChange");
             // calc DMS with the old clients count
             $NbClients = preg_split("#/#", $Mission->getNbClients());
@@ -110,6 +109,15 @@ class MissionDataPersister implements DataPersisterInterface
                     $NbClients[1]
                 )
             );
+            // set END value depending if nodes in a range were found
+            if ($nodesInRange) {
+                $Mission->setEND($this->calcEND(
+                    $DateEnd, 
+                    $DateStart, 
+                    $nodesInRange,
+                    $Depar->getId()
+                ));
+            }
         }
 
         // update objectives 
@@ -122,7 +130,7 @@ class MissionDataPersister implements DataPersisterInterface
             // Get the gloas that were added to the new mission
             $newActions = array_diff($newActions, $oldActions);
         }
-        
+
         $objectivesRepo = $this->em->getRepository(Objective::class);
         count($removedActions) && $objectivesRepo->UpdateAchievement($removedActions, true, $Mission->getDateStart());
         count($newActions) && $objectivesRepo->UpdateAchievement($newActions, false, $Mission->getDateStart());
@@ -153,6 +161,35 @@ class MissionDataPersister implements DataPersisterInterface
         $DMS = $differenceInSeconds * $CI / ($CC * 3600);
         return round($DMS, 3);
     }
+
+    public function calcEND($DateEnd, $DateStart, $nodesInRange, $Depar)
+    {
+        $PosteRepo = $this->em->getRepository(Poste::class);
+        $differenceInSeconds =
+            $this->dateToTime($DateEnd) -
+            $this->dateToTime($DateStart);
+
+        $END = $PosteRepo->getPostesPuissance($nodesInRange, $Depar) *
+            ($differenceInSeconds / 3600) * 0.9;
+
+        return round($END, 4);
+
+    }
+
+    function nodesInRange($NodeB, $NodeA, $Depar){
+        if (is_null($NodeA) and $NodeB->isEmpty()) {
+            return false;
+        }
+        // get IDs of selected destinations
+        $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(function ($obj) {
+            return $obj->getId();
+        })->getValues();
+
+
+        return $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
+
+    }
+    
     private function dateToTime($date)
     {
         return strtotime($date->format('Y-m-d H:i:s'));

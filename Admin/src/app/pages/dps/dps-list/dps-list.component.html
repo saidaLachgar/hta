@@ -2,7 +2,7 @@
   <div class="row align-items-center justify-content-between mb-4">
     <div class="col-auto">
       <app-page-title
-        title="Les Dps"
+        title="Les directions provinciales"
         [breadcrumbItems]="breadCrumbItems"
       ></app-page-title>
     </div>
@@ -24,7 +24,8 @@
               <thead>
                 <tr>
                   <th>Titre</th>
-                  <th width="30%">Équipes</th>
+                  <th>System DMS</th>
+                  <th>Équipes</th>
                   <th width="123px"></th>
                 </tr>
               </thead>
@@ -32,6 +33,7 @@
                 <tr valign="middle" 
                 >
                   <td><input type="text" placeholder="Titre..." formControlName="titre" #searchTitre class="form-control"></td>
+                  <td><input type="number" step="1" placeholder="System DMS..." formControlName="nbClients" #searchNbClients class="form-control"></td>
                   <td>
                     <ng-select [items]="dpsService.teams$ | async"
                               #searchTeam
@@ -76,6 +78,12 @@
                     <ngb-highlight
                       [result]="dps.titre"
                       [term]="searchTitre.value"
+                    ></ngb-highlight>
+                  </td>
+                  <td>
+                    <ngb-highlight
+                      [result]="dps.nbClients"
+                      [term]="searchNbClients.value"
                     ></ngb-highlight>
                   </td>
                   
@@ -160,7 +168,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="dpsService.page"
                     [pageSize]="dpsService.pageSize"
-                    (pageChange)="dpsService.onPaginate($event)"
+                    (pageChange)="dpsService.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

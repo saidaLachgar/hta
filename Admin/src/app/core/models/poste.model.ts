@@ -4,7 +4,8 @@ export interface Poste {
   id?: number;
   designation?: string;
   MLE?: string;
-  PKVA?: string;
+  PKVA?: number;
+  puissance?: number;
   nb_clients?: number;
   date_mst?: string;
   node?: Node;

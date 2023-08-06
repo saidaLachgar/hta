@@ -1,4 +1,4 @@
-import { Node } from ".";
+import { Node, Team } from ".";
 
 export enum CausesList {"Défauts matériels","Telescopare","Intenpaire","Cause inconnue"};
 export interface Mission {
@@ -8,9 +8,13 @@ export interface Mission {
     type?: boolean;
     causes?: number;
     nbClients?: string;
-    DMS?: string;
-    IFS?: string;
+    DMS?: number;
+    IFS?: number;
+    END?: number;
     rowspan?: number;
+    total_anomalies?: number;
+    undone_anomalies?: number;
+    team?:Team;
     node_a?: Node;
     node_b?: Node[];
     actions?: string[];

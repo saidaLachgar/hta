@@ -25,40 +25,48 @@
           <div class="row">
             <div class="col-12 ps-4">
               <ul class="list-unstyled mb-0 megamenu-list">
-                <li>
-                  <a href="javascript:void(0);">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Mission</a>
+                <li *ngIf="authService.isAuthorized('mission_add')">
+                  <a href="javascript:void(0);" routerLink="/mission/persist">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Travaux</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('anomalies_add')">
+                  <a href="javascript:void(0);" routerLink="/anomalies/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Anomalies</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('visites_add')">
+                  <a href="javascript:void(0);" routerLink="/visites/persist">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Visites</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('postes_add')">
+                  <a href="javascript:void(0);" routerLink="/postes/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Postes de distribution</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('teams_add')">
+                  <a href="javascript:void(0);" routerLink="/teams/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Équipes</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('users_add')">
+                  <a href="javascript:void(0);" routerLink="/users/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Members</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('departments_add')">
+                  <a href="javascript:void(0);" routerLink="/departments/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Départ</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('dps_add')">
+                  <a href="javascript:void(0);" routerLink="/dps/add">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Dps</a>
+                </li>
+                <li *ngIf="authService.isAuthorized('edges_add')">
+                  <a href="javascript:void(0);" routerLink="/edges/add">
+                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Tronçons</a>
+                </li>
+                <li *ngIf="authService.isAuthorized('nodes_add')">
+                  <a href="javascript:void(0);" routerLink="/nodes/add">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Appareils coupeur</a>
                 </li>
-                <li>
-                  <a href="javascript:void(0);">
+                <li *ngIf="authService.isAuthorized('communes_add')">
+                  <a href="javascript:void(0);" routerLink="/communes">
                     <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Commune</a>
                 </li>
                 

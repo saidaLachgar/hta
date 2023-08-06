@@ -2,6 +2,7 @@
   <!-- start page title -->
   <app-page-title
     title="Détails de la commune"
+    [Loading]="communeService.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->

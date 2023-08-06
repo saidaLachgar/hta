@@ -10,16 +10,19 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 
-use App\Repository\MissionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Repository\MissionRepository;
+use App\Dto\MissionOutput;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
  * @ApiResource(
+ *  order= {"id" = "DESC"},
+ *  output=MissionOutput::class,
  *  normalizationContext={"groups"={"missions"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'missions_update')"},
@@ -41,7 +44,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
+ *          "team.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.department.id"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.department.team.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_b.id"=SearchFilter::STRATEGY_EXACT,
  *          "causes"=SearchFilter::STRATEGY_EXACT,
@@ -99,15 +104,20 @@ class Mission
     private $causes;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"missions"})
      */
     private $DMS;
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"missions"})
      */
     private $IFS;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $END;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -117,7 +127,7 @@ class Mission
 
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="a_missions")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"missions"})
      */
     private $node_a;
@@ -200,25 +210,36 @@ class Mission
     }
 
      
-    public function getDMS(): ?string
+    public function getDMS(): ?float
     {
         return $this->DMS;
     }
 
-    public function setDMS(?string $DMS): self
+    public function setDMS(?float $DMS): self
     {
         $this->DMS = $DMS;
 
         return $this;
     }
-    public function getIFS(): ?string
+    public function getIFS(): ?float
     {
         return $this->IFS;
     }
 
-    public function setIFS(?string $IFS): self
+    public function setIFS(?float $IFS): self
     {
         $this->IFS = $IFS;
+
+        return $this;
+    }
+    public function getEND(): ?float
+    {
+        return $this->END;
+    }
+
+    public function setEND(?float $END): self
+    {
+        $this->END = $END;
 
         return $this;
     }
@@ -250,7 +271,7 @@ class Mission
     /**
      * @return Collection<int, Node>
      */
-    public function getNodeB(): Collection
+    public function getNodeB(): ?Collection
     {
         return $this->node_b;
     }

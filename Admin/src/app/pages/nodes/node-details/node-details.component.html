@@ -2,6 +2,7 @@
     <!-- start page title -->
     <app-page-title
       title="Détails de l'appareil"
+      [Loading]="service.loading$ | async"
       [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->

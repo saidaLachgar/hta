@@ -1,8 +1,9 @@
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title
-      title="Mettre à jour Dps"
-      [breadcrumbItems]="breadCrumbItems"
+      title="Mise à jour de la direction provinciale"
+      [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="service.dpsForm" (ngSubmit)="service.onUpdate(id)">
@@ -25,6 +26,18 @@
                   class="invalid-feedback">
                   <span *ngIf="service.titre.errors.required">Ce champ est obligatoire.</span>
                 </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+            <label for="name-input" class="col-md-2 col-form-label pt-0">System DMS <br><small class="text-muted">Nombre total de clients</small></label>
+              <div class="col-md-10">
+                <input
+                  formControlName="nbClients"
+                  class="form-control"
+                  type="number"
+                  step="1" 
+                  id="name-input"
+                />
               </div>
             </div>
             <div class="mb-3 row">

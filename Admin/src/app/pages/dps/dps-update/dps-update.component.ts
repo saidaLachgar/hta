@@ -18,14 +18,15 @@ export class dpsUpdateComponent  {
     service.loadTeams();
     service.dpsForm = fb.group({
       titre: ["", Validators.required],
+      nbClients: [null],
       team: [[]],
     });
     service.getByKey(this.id).subscribe((obj) => {
       service.loadTeams(obj.team ? obj.team : []);
       service.dpsForm.setValue({
         titre: obj.titre,
-        team: obj.team ? obj.team["@id"] : null,
-        membres : obj.team.length ? obj.team.map((e)=>e["@id"]) : [],
+        team : obj.team.length ? obj.team.map((e)=>e["@id"]) : [],
+        nbClients: [obj.nbClients],
       });
     });
   }

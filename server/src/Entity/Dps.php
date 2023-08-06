@@ -30,6 +30,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *      SearchFilter::class,
  *      properties={
  *          "titre"=SearchFilter::STRATEGY_PARTIAL,
+ *          "nbClients"=SearchFilter::STRATEGY_PARTIAL,
  *          "team.id"=SearchFilter::STRATEGY_EXACT,
  *      }
  *    )
@@ -39,7 +40,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 class Dps
 {
-    public static $TRANSLATED_NAME = "DPS";
+    public static $TRANSLATED_NAME = "DP";
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -59,6 +60,11 @@ class Dps
      * @Groups({"dps"})
      */
     private $team;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $nbClients;
 
     public function __construct()
     {
@@ -112,6 +118,18 @@ class Dps
                 $team->setDps(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNbClients(): ?int
+    {
+        return $this->nbClients;
+    }
+
+    public function setNbClients(?int $nbClients): self
+    {
+        $this->nbClients = $nbClients;
 
         return $this;
     }

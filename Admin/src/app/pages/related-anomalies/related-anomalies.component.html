@@ -1,5 +1,5 @@
  <!-- list des anomalies -->
- <div class="col-12">
+ <div class="col-12" id="anomalies-list">
   <div class="card card-body">
     <p class="card-title mb-3">Anomalies liées</p>
     <div class="table-responsive">
@@ -152,7 +152,7 @@
               [collectionSize]="pagination.totalRecords"
               [(page)]="anomalyService.page"
               [pageSize]="anomalyService.pageSize"
-              (pageChange)="anomalyService.onPaginate($event)"
+              (pageChange)="anomalyService.onPaginate($event)" [maxSize]="5" 
             >
             </ngb-pagination>
           </div>

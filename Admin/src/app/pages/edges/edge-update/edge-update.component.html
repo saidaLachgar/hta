@@ -2,7 +2,8 @@
     <!-- start page title -->
     <app-page-title
       title="Mettre à jour le tronçon"
-      [breadcrumbItems]="breadCrumbItems"
+      [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
     ></app-page-title>
     <!-- end page title -->
   

@@ -29,6 +29,8 @@ class GraphSearch
         $adjacencyList = $cachedData["data"];
         $edges = $cachedData["edges"];
 
+        // echo json_encode($cachedData);
+        // exit;
         
         // Initialize the BFS algorithm.
         $visited = [];
@@ -47,7 +49,13 @@ class GraphSearch
                 $visited[] = $node;
 
                 // get node neighbors && remove visted ones
-                $neighbors = array_diff($adjacencyList[$node], $visited);
+                // try {
+                    $neighbors = array_diff($adjacencyList[$node], $visited);
+                // } catch (\Throwable $th) {
+                //     echo json_encode($this->adjacencyListCache->getAdjacencyList(16));
+                //     dump($node);
+                //     dd($department);
+                // }
 
                 // Filter out neighbors that are not connected in the right direction
                 count($neighbors) && $neighbors = array_filter($neighbors, function($neighbor) use ($node, $edges) {

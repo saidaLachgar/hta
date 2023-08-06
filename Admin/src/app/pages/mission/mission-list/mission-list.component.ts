@@ -26,6 +26,7 @@ export class missionListComponent {
     private config: NgSelectConfig
   ) {
     service.findAll();
+    service.loadTeams();
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
@@ -35,11 +36,13 @@ export class missionListComponent {
       "node_a.department.id[]": [''],
       "node_a.id[]": [''],
       "node_b.id[]": [''],
+      "node_a.department.team.id[]": [""],
       after: [null],
       before: [null],
       causes: [""],
       DMS: [null],
       IFS: [null],
+      END: [null],
       type: [null],
     });
 

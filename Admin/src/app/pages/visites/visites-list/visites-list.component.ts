@@ -39,7 +39,6 @@ export interface ChartType {
 })
 export class visitesListComponent {
   breadCrumbItems: Array<{}>;
-  public hideExport = true;
   Chartdata: ChartType;
 
   constructor(

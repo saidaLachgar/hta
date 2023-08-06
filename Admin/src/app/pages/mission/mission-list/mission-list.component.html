@@ -110,12 +110,6 @@
       ></app-page-title>
     </div>
     <div class="col-auto">
-    <button class="btn bg-light text-primary ms-2" title="Exporter">
-      <i class="fas fa-upload"></i>
-    </button>
-    <button class="btn bg-light text-primary ms-2" title="Importer">
-      <i class="fas fa-download"></i>
-    </button>
     <button class="btn btn-primary ms-2" (click)="ShowSearch = !ShowSearch"><i class="fas fa-filter me-1"></i>Filtres</button>
     <a routerLink="/mission/persist" class="btn btn-primary ms-2" *ngIf="authService.isAuthorized('mission_add')"><i class="fas fa-plus-circle"></i> Ajouter</a>
   </div>
@@ -236,6 +230,25 @@
             <label>DMS</label>
             <input type="text" placeholder="DMS..." formControlName="DMS" #searchDMS class="form-control">
           </div>
+          <div class="col-4">
+            <label>END</label>
+            <input type="text" placeholder="END..." formControlName="END" #searchEND class="form-control">
+          </div>
+          <div class="col-4">
+            <label>Équipe</label>
+            <ng-select [items]="service.teams$ | async"
+                #searchTeam
+                formControlName="node_a.department.team.id[]"
+                bindLabel="titre"
+                bindValue="id"
+                [multiple]="true"
+                [minTermLength]="2"
+                placeholder="Équipe.."
+                [loading]="service.teamLoading"
+                typeToSearchText="Veuillez saisir 2 caractères ou plus"
+                [typeahead]="service.teamInput$">
+            </ng-select>
+          </div>
           
           <div class="col d-flex justify-content-end align-items-end">
             <button class="btn btn-primary me-2" type="submit"><i class="fas fa-filter"></i> Filtrer</button>
@@ -262,14 +275,16 @@
                   <th width="20px"></th>
                   <th width="83px">Type</th>
                   <th width="83px">Date</th>
-                  <th>Heure</th>
-                  <th>Départ</th>
-                  <th>Point coupure</th>
-                  <th>PS</th>
+                  <th style="min-width: 130px;">Heure</th>
+                  <th style="min-width: 130px;">Départ</th>
+                  <th style="min-width: 130px;">Point coupure</th>
+                  <th style="min-width: 130px;">PS</th>
                   <th>Causes</th>
                   <th class="font-size-12">Nb Clients interrompus</th>
                   <th>IFS</th>
                   <th>DMS</th>
+                  <th>END</th>
+                  <th style="min-width: 130px;">Équipe</th>
                   <th class="font-size-12">Anomalies</th>
                   <th width="50px"></th>
                 </tr>
@@ -360,7 +375,7 @@
                         <div *ngFor="let node_b of item.node_b">
                           <a 
                             [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
-                            target="_blank">- {{node_b.titre}}</a>
+                            target="_blank">{{item.node_b.length==1 ? "": "- "}} {{node_b.titre}}</a>
                         </div>
                       </td>
                       <!-- causes -->
@@ -378,19 +393,40 @@
                       <!-- IFS -->
                       <td><ngb-highlight [result]="item.IFS" [term]="searchIFS.value"></ngb-highlight></td>
                       <!-- DMS -->
-                      <td><ngb-highlight [result]="item.DMS" [term]="searchDMS.value"></ngb-highlight></td>
-                      <!-- Anomalies -->
+                      <td title="{{item.DMS}}"><ngb-highlight [result]="item.DMS | decimalHourToTime" [term]="searchDMS.value"></ngb-highlight></td>
+                      <!-- DMS * 3600000 converts the DMS value from hours to milliseconds since date pipe expects milliseconds -->
+                      <td title="{{item.END}}"><ngb-highlight [result]="item.END | decimalHourToTime" [term]="searchEND.value"></ngb-highlight></td>
+                      <!-- team -->
                       <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
-                        <ng-container *ngIf="item.NbAnomalies != null && item.NbAnomalies > 0; else NoAnomalies">
-                          <div  class="badge badge-soft-warning c-pointer rounded-pill border-warning border px-3 py-2 font-size-13 w-100">
-                            <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.NbAnomalies}} Anomalies</span>
-                          </div>
-                        </ng-container>
-                        <ng-template #NoAnomalies>
-                          <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-                            <i class="fas fa-check-circle me-2"></i> <span class="text-body">Pas d'anomalie</span>
-                          </div>
-                        </ng-template>
+                        <a 
+                          *ngIf="item.node_a.department && item.node_a.department.team"
+                          [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', item.node_a.department.team.id] : null"
+                          target="_blank">{{item.node_a.department.team.titre}}</a>
+                      </td>
+                      
+                      <!-- Anomalies -->
+                      <td>
+                        <a
+                          href="javascript: void(0);"
+                          fragment="anomalies-list"
+                          [routerLink]="authService.isAuthorized('visites_details') ? ['details', item.id] : []"
+                        >
+                          <ng-container *ngIf="item.total_anomalies != 0 && item.undone_anomalies != 0">
+                            <div  class="badge badge-soft-danger c-pointer rounded-pill border-danger border px-3 py-2 font-size-13 w-100">
+                              <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.undone_anomalies}}/{{item.total_anomalies}} Anomalies</span>
+                            </div>
+                          </ng-container>
+                          <ng-container *ngIf="item.total_anomalies == 0;">
+                            <div class="badge badge-soft-info c-pointer rounded-pill border-info border px-3 py-2 font-size-13 w-100">
+                              <i class="fas fa-info-circle me-2"></i> <span class="text-body">Pas d'anomalies</span>
+                            </div>
+                          </ng-container>
+                          <ng-container *ngIf="item.total_anomalies!= 0 && item.undone_anomalies == 0">
+                            <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+                              <i class="fas fa-check-circle me-2"></i> <span class="text-body">Toutes résolues</span>
+                            </div>
+                          </ng-container>
+                        </a>
                       </td>
                       
                       <!-- actions -->
@@ -410,14 +446,14 @@
                             class="dropdown-menu dropdown-menu-end"
                             ngbDropdownMenu
                           >
-                            <a
+                            <!-- <a
                               class="dropdown-item bg-success bg-soft"
                               href="javascript: void(0);"
                               *ngIf="item.type && isToday(item.dateStart) && authService.isAuthorized('mission_update')"
                               [routerLink]="['persist', item.id, true]"
                               >
                               <i class="fas fa-play me-2 text-success"></i> Continuer
-                            </a>
+                            </a> -->
                             <a class="dropdown-item"
                               [routerLink]="['details', item.id]"
                               href="javascript: void(0);"
@@ -477,7 +513,7 @@
                     [collectionSize]="pagination.totalRecords"
                     [(page)]="service.page"
                     [pageSize]="service.pageSize"
-                    (pageChange)="service.onPaginate($event)"
+                    (pageChange)="service.onPaginate($event)" [maxSize]="5" 
                   >
                   </ngb-pagination>
                 </div>

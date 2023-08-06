@@ -25,6 +25,7 @@ export class departmentsListComponent {
     departmentService.departmentForm = fb.group({
       titre: [''],
       longueur: [null],
+      courantMax: [null],
       "team.id[]": [''],
     });
 

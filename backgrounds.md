@@ -13,21 +13,21 @@
 
 - nbSupport = longueur edges between two nodes
 
-## Clients interrompus
+## Clients interrompus (number)
 
 - CI = nb clients between two nodes (app. coupeur)
 
-## Clients connectés
+## Clients connectés (number)
 
-- CC = nb clients in a department
+- CC = nb clients in a directions provinciales
 
-## IFS
+## IFS ( System Interruption Frequency Index : the average number of interruptions per connected client)
 
 - ifs = round((CI / CC), 3)
 
-## DMS
+## DMS ( Duration of System Interruption : the average duration of interruption in *hours* for each connected client)
 
-- dms = $duration _ CI / (CC _ 3600)
+- dms = durationInSeconds * CI / (CC * 3600)
 
 ## Total anomalies
 

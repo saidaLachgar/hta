@@ -7,13 +7,14 @@ width: 99%;
 }
 </style>
 <div class="container-fluid">
-    <!-- start page title -->
-    <app-page-title
-      title="Fiche d'incident / coupeur"
-      [Loading]="service.loading$ | async"
-      [breadcrumbItems]="breadCrumbItems"
-    ></app-page-title>
-    <!-- end page title -->
+  <!-- start page title -->
+  <app-page-title
+    title="Fiche d'incident / coupeur"
+    [Loading]="service.loading$ | async"
+    [breadcrumbItems]="breadCrumbItems"
+  ></app-page-title>
+  <!-- end page title -->
+  <div class="row">
     <div class="card mt-4">
       <div class="card-body" *ngIf="mission">
         <div 
@@ -29,10 +30,13 @@ width: 99%;
             <div class="border-end pe-5"><p class="fw-medium mb-3">Durée</p><strong class="h2">{{service.getDiff(mission.dateStart, mission.dateEnd)}}&nbsp;</strong></div>
           </div>
           <div class="col-auto">
-            <div class="border-end pe-5"><p class="fw-medium mb-3">DMS</p><strong class="h2">{{mission.DMS?mission.DMS: "-"}}</strong></div>
+            <div class="border-end pe-5"><p class="fw-medium mb-3">DMS</p><strong class="h2" title="{{mission.DMS}}">{{mission.DMS?(mission.DMS | decimalHourToTime): "-"}}</strong></div>
           </div>
           <div class="col-auto">
-            <div><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
+            <div class="border-end pe-5"><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
+          </div>
+          <div class="col-auto">
+            <div><p class="fw-medium mb-3">END</p><strong class="h2" title="{{mission.END}}">{{mission.END?(mission.END | decimalHourToTime): "-"}}</strong></div>
           </div>
         </div>
 
@@ -68,7 +72,7 @@ width: 99%;
                   <div *ngFor="let node_b of mission.node_b">
                     <a 
                       [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
-                      target="_blank">- {{node_b.titre}}</a>
+                      target="_blank">{{mission.node_b.length==1 ? "": "- "}}{{node_b.titre}}</a>
                   </div>
                 </td>
               </tr>
@@ -84,6 +88,13 @@ width: 99%;
                 <th scope="row">Nb Clients interrompus :</th>
                 <td>{{mission.nbClients}}</td>
               </tr>
+              <tr>
+                <th scope="row">Équipe :</th>
+                <td><a 
+                  *ngIf="mission.team"
+                  [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', mission.team.id] : null"
+                  target="_blank">{{mission.team.titre}}</a></td>
+              </tr>
               
             </tbody>
           </table>
@@ -91,12 +102,14 @@ width: 99%;
         <button 
           class="btn btn-primary mt-4 float-end ms-2" 
           *ngIf="authService.isAuthorized('mission_update')"
-          [routerLink]="['persist', mission.id]"
+          routerLink="/mission/persist/{{mission.id}}"
         ><i class="fas fa-edit me-1"></i>Modifier</button>
         <button class="btn btn-light mt-4 float-end" routerLink="/mission"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
         
       </div>
     </div>
   </div>
+  <app-related-anomalies  [currentEdge]="currentEdge"></app-related-anomalies>
+</div>
 
   

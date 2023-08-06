@@ -6,6 +6,9 @@ export interface Visite {
     nbSupport?: number;
     team?:Team
     nbAnomalies?:number;
+    total_anomalies?: number;
+    edge_set_length?: number;
+    undone_anomalies?: number;
     node_a?: Node;
     node_b?: Node[];
 }
