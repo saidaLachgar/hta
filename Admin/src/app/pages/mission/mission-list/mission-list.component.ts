@@ -3,8 +3,12 @@ import { FormBuilder } from "@angular/forms";
 import { NgSelectConfig } from "@ng-select/ng-select";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { missionService } from "../mission.service";
-import {  isSameDay, setDefaultOptions } from 'date-fns';
+import { isSameDay, setDefaultOptions } from 'date-fns';
 import fr from 'date-fns/locale/fr';
+import { map } from "rxjs/operators";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "src/environments/environment";
+import { DecimalHourToTimePipe } from "src/app/core/pipes";
 setDefaultOptions({ locale: fr })
 
 @Component({
@@ -12,17 +16,19 @@ setDefaultOptions({ locale: fr })
   templateUrl: "./mission-list.component.html",
 })
 export class missionListComponent {
+  readonly server = environment.serverURL;
   breadCrumbItems: Array<{}>;
   ShowSearch: boolean = false;
   DMSMonthly: boolean;
   causesChart;
   typesChart;
-  DMSChart;
+  DMSChart$;
 
   constructor(
     public service: missionService,
     private fb: FormBuilder,
     public authService: AuthenticationService,
+    private http: HttpClient,
     private config: NgSelectConfig
   ) {
     service.findAll();
@@ -30,8 +36,8 @@ export class missionListComponent {
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
-    this.ReportDMS(true);
-
+    this.ReportDMS();
+    config.notFoundText = 'Aucune donnée trouvée !';
     service.missionForm = fb.group({
       "node_a.department.id[]": [''],
       "node_a.id[]": [''],
@@ -46,7 +52,7 @@ export class missionListComponent {
       type: [null],
     });
 
-    config.notFoundText = 'Aucune donnée trouvée !';
+
 
     this.causesChart = {
       series: [44, 55, 13, 43],
@@ -117,48 +123,9 @@ export class missionListComponent {
       }
     };
 
-    this.DMSChart = {
-      series: [
-        {
-          name: "Equpe 1",
-          data: [0.31, 0.40, 0.28, 0.51, 0.42, 0.109, 0.100]
-        },
-        {
-          name: "Equpe 2",
-          data: [ 0.42, 0.109, 0.31, 0.40, 0.28, 0.51, 0.100]
-        },
-        {
-          name: "Equpe 3",
-          data: [0.51, 0.42, 0.109, 0.31, 0.40, 0.28, 0.100]
-        },
-        // {
-        //   name: "Equpe 4",
-        //   data: [0.28, 0.51, 0.42, 0.31, 0.40, 0.109, 0.100]
-        // },
-      ],
-      chart: {
-        height: 275,
-        type: "line"
-      },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        curve: "smooth"
-      },
-      xaxis: {categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']},
-      // colors: [
-      //   // "#FF4560",
-      //   "#008FFB",
-      //   '#F44336', '#E91E63'
-      //   , '#9C27B0'
-      // ],
-    };
-
-
   }
 
-  
+
 
   isToday(date: string): boolean {
     return isSameDay(new Date(date), new Date());
@@ -169,7 +136,63 @@ export class missionListComponent {
   // }
 
 
-  ReportDMS(DMSMonthly:boolean){
-    this.DMSMonthly = DMSMonthly;
+  ReportDMS(yearly: boolean = true) {
+    const decimalHourToTimePipe = new DecimalHourToTimePipe();
+    this.DMSMonthly = !yearly;
+    this.DMSChart$ = this.http.get(`${this.server}/api/analytics/teams-dms` + (yearly ? "" : "/month")).pipe(
+      map(data => {
+        const monthMap: { [key: string]: string } = {
+          "01": "JAN", "02": "FÉV", "03": "MAR", "04": "AVR",
+          "05": "MAI", "06": "JUN", "07": "JUL", "08": "AOÛ",
+          "09": "SEP", "10": "OCT", "11": "NOV", "12": "DÉC"
+        };
+
+        const statData = {
+          series: [],
+          chart: {
+            height: 275,
+            type: "line"
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          yaxis: {
+            labels: {
+              rotate: -45,
+              formatter: function (value) {
+                // return val.toFixed(3);
+                return decimalHourToTimePipe.transform(value);
+              }
+            },
+          },
+          stroke: {
+            curve: "smooth"
+          },
+          xaxis: {
+            labels: {
+              rotate: -45
+            },
+            categories: [],
+            ...(!yearly && {title: {text: '30 derniers jours'}}),
+          },
+        };
+        // console.log(data);
+
+        for (const teamName in data) {
+          statData.series.push({
+            name: teamName,
+            data: data[teamName].map(monthData => {
+              statData.xaxis.categories.push(
+                yearly ? monthMap[monthData["MONTH"]] : monthData["DAY"]
+              );
+              return monthData["DMS_TOTAL"];
+            })
+          });
+        }
+
+        return statData;
+      })
+    );
+
   }
 }

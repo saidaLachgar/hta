@@ -73,29 +73,47 @@
     <div class="col-4">
       <div class="card card-body">
         <div class="fw-bold mb-4">
-          DMS <small class="text-muted font-size-12">(Moyenne des interruptions de l'année en cours)</small>
+          DMS <small class="text-muted font-size-12">(Moyenne des interruptions {{DMSMonthly ? "des 30 derniers":"de l'année en cours"}})</small>
           <div class="float-end">
             <ul class="nav nav-pills">
               <li class="nav-item">
-                <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(false)"
+                <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(true)"
                 [ngClass]="{'active': !DMSMonthly}">Année</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(true)"
+                  <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(false)"
                       [ngClass]="{'active': DMSMonthly}">Mois</a>
               </li>
             </ul>
           </div>
         </div>
-        <apx-chart
-          [series]="DMSChart.series"
-          [chart]="DMSChart.chart"
-          [xaxis]="DMSChart.xaxis"
-          [stroke]="DMSChart.stroke"
-          [tooltip]="DMSChart.tooltip"
-          [dataLabels]="DMSChart.dataLabels"
-          [colors]="DMSChart.colors"
-        ></apx-chart>
+        
+        <ng-container *ngIf="DMSChart$ | async as DMSChart; else DMSloading">
+          <apx-chart
+            class="ms-n4 me-n1"
+            [series]="DMSChart.series"
+            [chart]="DMSChart.chart"
+            [xaxis]="DMSChart.xaxis"
+            [yaxis]="DMSChart.yaxis"
+            [stroke]="DMSChart.stroke"
+            [tooltip]="DMSChart.tooltip"
+            [dataLabels]="DMSChart.dataLabels"
+            [colors]="DMSChart.colors"
+          ></apx-chart>
+        </ng-container>
+        <ng-template #DMSloading>
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="285px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+            <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+            <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+            </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+            <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+            </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+            <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+            </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+            <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+            </rect></g>
+          </svg>
+        </ng-template>
       </div>
     </div>
   </div>

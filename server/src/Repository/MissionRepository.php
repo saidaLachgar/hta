@@ -109,8 +109,9 @@ class MissionRepository extends ServiceEntityRepository
         ;
 
     }
-    public function test(): array
+    public function getMissionsStats($year, $month): array
     {
+        // causes - type - Total - Average duration - last Average duration
         return $this->createQueryBuilder('t')
             ->groupBy('CAST(t.dateStart AS DATE)')
             ->getQuery()

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Team;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,18 +21,6 @@ class AnalyticsController extends AbstractController
   }
 
   /**
-   * @Route("/api/test-route", name="testes", options={"expose"=true})
-   */
-  public function testes(Request $request)
-  {
-    /** @var \App\Repository\MissionRepository $MissionRepo */
-    $MissionRepo = $this->em->getRepository(Mission::class);
-
-    $data = $MissionRepo->test();
-
-    return new JsonResponse($data);
-  }
-  /**
    * @Route("/api/analytics/dms-total", name="getTotalDMS", options={"expose"=true})
    */
   public function getTotalDMS(Request $request)
@@ -43,6 +32,7 @@ class AnalyticsController extends AbstractController
 
     return new JsonResponse($data);
   }
+
   /**
    * @Route("/api/analytics/interruptions-par-type", name="getInterruptionsParType", options={"expose"=true})
    */
@@ -52,6 +42,104 @@ class AnalyticsController extends AbstractController
     $MissionRepo = $this->em->getRepository(Mission::class);
 
     $data = $MissionRepo->getInterruptionsParType();
+
+    return new JsonResponse($data);
+  }
+  
+  /**
+   * @Route("/api/analytics/teams-data", name="getTeamsData", options={"expose"=true})
+   */
+  public function getTeamsData(Request $request)
+  {
+    /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $data = $TeamRepo->getTeamsData();
+
+    return new JsonResponse($data);
+  }
+  /**
+   * @Route("/api/analytics/teams-anomalies", name="getTeamsAnomalies", options={"expose"=true})
+   */
+  public function getTeamsAnomalies(Request $request)
+  {
+    /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $data = $TeamRepo->getTeamsAnomalies();
+
+    return new JsonResponse($data);
+  }
+  
+  /**
+   * @Route("/api/analytics/teams-monthly-data", name="getTeamsMonthlyData", options={"expose"=true})
+   */
+  public function getTeamsMonthlyData(Request $request)
+  {
+    /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $data = $TeamRepo->getTeamsMonthlyData();
+
+    return new JsonResponse($data);
+  }
+
+  /**
+   * @Route("/api/analytics/teams-dms/{timeframe}", name="getTeamsDMS", options={"expose"=true})
+   */
+  public function getTeamsDMS($timeframe = "year")
+  {
+    /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $data = $TeamRepo->getTeamsDMS($timeframe);
+
+    return new JsonResponse($data);
+  }
+
+  /**
+   * @Route("/api/analytics/mission-stats/{month}", name="getMissionsStats", options={"expose"=true})
+   */
+  public function getMissionsStats($year, $month = null)
+  {
+
+    // causes - type - Total - Average duration - last Average duration
+    /** @var \App\Repository\MissionRepository $MissionRepo */
+    $MissionRepo = $this->em->getRepository(Mission::class);
+
+    $data = $MissionRepo->getMissionsStats($year, $month);
+
+    return new JsonResponse($data);
+  }
+
+  /**
+   * @Route("/api/analytics/anomalies-stats", name="getAnomaliesStats", options={"expose"=true})
+   */
+  public function getAnomaliesStats()
+  {
+
+    // Anomalies (mois en cours) + la période précédente
+    /** @var \App\Repository\AnomalyRepository $AnomalyRepo */
+    $AnomalyRepo = $this->em->getRepository(Anomaly::class);
+
+    $data = $AnomalyRepo->getAnomaliesStats();
+
+    return new JsonResponse($data);
+  }
+
+  /**
+   * @Route("/api/analytics/visits-stats", name="getVisitsStats", options={"expose"=true})
+   */
+  public function getVisitsStats()
+  {
+    // Vistes par communes 
+    // Distance parcourue (Année courante + Mois en cours) + objectif annuel (km) 
+    // Total des visites (par objectif annuel) (78%)
+
+    /** @var \App\Repository\VisiteRepository $VisiteRepo */
+    $VisiteRepo = $this->em->getRepository(Visite::class);
+
+    $data = $VisiteRepo->getVisitsStats();
 
     return new JsonResponse($data);
   }

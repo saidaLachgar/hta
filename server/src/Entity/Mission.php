@@ -94,7 +94,7 @@ class Mission
      * @Groups({"missions"})
      */
     private $type; 
-    // Déclenchement true -- Coupeur / Ouverture false
+    // Déclenchement(Incident) true -- Coupeur / Ouverture(Coupeur) false
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
@@ -143,6 +143,11 @@ class Mission
      * @Groups({"missions"})
      */
     private $actions = [];
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $nbPostes;
 
 
     public function __construct()
@@ -300,6 +305,18 @@ class Mission
     public function setActions(?array $actions): self
     {
         $this->actions = $actions;
+
+        return $this;
+    }
+
+    public function getNbPostes(): ?int
+    {
+        return $this->nbPostes;
+    }
+
+    public function setNbPostes(?int $nbPostes): self
+    {
+        $this->nbPostes = $nbPostes;
 
         return $this;
     }

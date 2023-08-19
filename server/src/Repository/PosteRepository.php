@@ -77,6 +77,18 @@ class PosteRepository extends ServiceEntityRepository
         ;
     }
 
+    public function PostesTotalByNodes($nodes): ?int
+    {
+        return $this->createQueryBuilder('p')
+            ->select("count(p.id)")
+            ->andWhere('n.id IN (:nodes)')
+            ->setParameter('nodes', $nodes)
+            ->innerJoin('p.node', 'n')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
     private function totalPKVA($deparId)
     {
         $totalPKVA = $this->createQueryBuilder('p1')

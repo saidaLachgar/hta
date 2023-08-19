@@ -4,474 +4,98 @@
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
                 <p class="mb-0 h4">Tableau de bord</p>
-                <button class="btn btn-outline-info">Télécharger CSV</button>
+                <!-- <button class="btn btn-outline-info">Télécharger CSV</button> -->
             </div>
         </div>
     </div>
     <!-- end page title -->
 
-
-
-    <div class="slide mt-4 mb-2">
-        <div class="slide-item">
-            <div class="card card-body">
-                <div class="card-title"><i class="fas fa-circle me-1 text-info"></i> Equipe 1</div>
-
-                <table class="table table-centered align-middle table-nowrap">
-                <tbody>
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('visites_show') ? '/visites': null">Visite au sol</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">1800 km</h5>
-                        <!-- each visit has edges - each edge has a length -->
-                        <!-- get sum of length of visits of this team (all time ? month) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Anomalies réalisées</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">20%</h5>
-                        <!-- each team has a visites - each visit has anomalies -->
-                        <!-- get total anomalies with status true of this team (all time) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">
-                            <a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Nombre d'incidents
-                            <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small>
-                            <span role="status" class="spinner-grow text-danger ms-1" style="width: 0.4rem; height: 0.4rem;vertical-align: 0.475em;"></span>
-                            </a>
-                        </p>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:true of this team of this month -->
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:false of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post - each post has clients count -->
-                        <!-- get sum of clients count of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post -->
-                        <!-- get sum of post  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.45</h5>
-                        <!-- each mission has DMS -->
-                        <!-- get sum of DMS  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.32</h5>
-                        <!-- each mission has IFS -->
-                        <!-- get sum of IFS  of this team of this month -->
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="slide-item">
-            <div class="card card-body">
-                <div class="card-title"><i class="fas fa-circle me-1 text-success"></i> Equipe 2</div>
-
-                <table class="table table-centered align-middle table-nowrap">
-                <tbody>
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('visites_show') ? '/visites': null">Visite au sol</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">1800 km</h5>
-                        <!-- each visit has edges - each edge has a length -->
-                        <!-- get sum of length of visits of this team (all time ? month) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Anomalies réalisées</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">20%</h5>
-                        <!-- each team has a visites - each visit has anomalies -->
-                        <!-- get total anomalies with status true of this team (all time) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">
-                            <a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Nombre d'incidents
-                            <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small>
-                            <span role="status" class="spinner-grow text-danger ms-1" style="width: 0.4rem; height: 0.4rem;vertical-align: 0.475em;"></span>
-                            </a>
-                        </p>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:true of this team of this month -->
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:false of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post - each post has clients count -->
-                        <!-- get sum of clients count of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post -->
-                        <!-- get sum of post  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.45</h5>
-                        <!-- each mission has DMS -->
-                        <!-- get sum of DMS  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.32</h5>
-                        <!-- each mission has IFS -->
-                        <!-- get sum of IFS  of this team of this month -->
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="slide-item">
-            <div class="card card-body">
-                <div class="card-title"><i class="fas fa-circle me-1 text-warning"></i> Equipe 3</div>
-
-                <table class="table table-centered align-middle table-nowrap">
-                <tbody>
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('visites_show') ? '/visites': null">Visite au sol</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">1800 km</h5>
-                        <!-- each visit has edges - each edge has a length -->
-                        <!-- get sum of length of visits of this team (all time ? month) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Anomalies réalisées</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">20%</h5>
-                        <!-- each team has a visites - each visit has anomalies -->
-                        <!-- get total anomalies with status true of this team (all time) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">
-                            <a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Nombre d'incidents
-                            <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small>
-                            <span role="status" class="spinner-grow text-danger ms-1" style="width: 0.4rem; height: 0.4rem;vertical-align: 0.475em;"></span>
-                            </a>
-                        </p>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:true of this team of this month -->
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:false of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post - each post has clients count -->
-                        <!-- get sum of clients count of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post -->
-                        <!-- get sum of post  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.45</h5>
-                        <!-- each mission has DMS -->
-                        <!-- get sum of DMS  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.32</h5>
-                        <!-- each mission has IFS -->
-                        <!-- get sum of IFS  of this team of this month -->
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="slide-item">
-            <div class="card card-body">
-                <div class="card-title"><i class="fas fa-circle me-1 text-warning"></i> Equipe 4</div>
-
-                <table class="table table-centered align-middle table-nowrap">
-                <tbody>
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('visites_show') ? '/visites': null">Visite au sol</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">1800 km</h5>
-                        <!-- each visit has edges - each edge has a length -->
-                        <!-- get sum of length of visits of this team (all time ? month) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0"><a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Anomalies réalisées</a></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">20%</h5>
-                        <!-- each team has a visites - each visit has anomalies -->
-                        <!-- get total anomalies with status true of this team (all time) -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">
-                            <a class="text-body text-decoration-underline" [routerLink]="authService.isAuthorized('anomalies_show') ? '/anomalies': null">Nombre d'incidents
-                            <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small>
-                            <span role="status" class="spinner-grow text-danger ms-1" style="width: 0.4rem; height: 0.4rem;vertical-align: 0.475em;"></span>
-                            </a>
-                        </p>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:true of this team of this month -->
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a depar - each depar has a team -->
-                        <!-- get sum of mission type:false of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post - each post has clients count -->
-                        <!-- get sum of clients count of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">102</h5>
-                        <!-- each mission has a node - each node has a post -->
-                        <!-- get sum of post  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.45</h5>
-                        <!-- each mission has DMS -->
-                        <!-- get sum of DMS  of this team of this month -->
-                    </td>
-                    </tr>
-                    
-                    <tr>
-                    <td class="w-50">
-                        <p class="mb-0">IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></p>
-                    </td>
-                    <td class="w-50 text-end">
-                        <h5 class="mb-0">0.32</h5>
-                        <!-- each mission has IFS -->
-                        <!-- get sum of IFS  of this team of this month -->
-                    </td>
-                    </tr>
-                </tbody>
+    <div class="row mt-4 mb-2">
+        <div class="col-12">
+            <div class="card card-body p-2">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                          <th>Équipe</th>
+                          <th>Visite au sol</th>
+                          <th>Anomalies réalisées</th>
+                          <th>Nombre d'incidents <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>END <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                        </tr>
+                      </thead>
+                    <tbody *ngIf="teamsStats$ | async as teamsStats; else loading">
+                        <tr *ngFor="let team of teamsStats;" valign="middle">
+                            <td>{{team.TEAM}}</td>
+                            <td>{{team.VISIT_LENGTH}} km</td>
+                            <td>{{team.ACHIEVED_ANOMALIES ? (team.ACHIEVED_ANOMALIES / team.TOTAL_ANOMALIES)*100 : 0 }}%</td>
+                            <td>{{team.INCIDENTS_COUNT}}</td>
+                            <td>{{team.COUPEUR_COUNT}}</td>
+                            <td>{{team.CLIENTS_COUNT}}</td>
+                            <td>{{team.POSTES_TOTAL}}</td>
+                            <td>{{team.DMS_TOTAL | decimalHourToTime }}</td>
+                            <td>{{team.IFS_TOTAL}}</td>
+                            <td>{{team.END_TOTAL}}</td>
+                        </tr>
+                    </tbody>
+                    <ng-template #loading>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" colspan="10">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </ng-template>
                 </table>
             </div>
         </div>
     </div>
+
 
     <!-- charts -->
     <div class="row">
     
-    <div class="col-6">
-      <div class="card card-body">
-        <div class="fw-bold mb-4">
-          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
-        </div>
-        <apx-chart
-          [series]="DMSChart.series"
-          [chart]="DMSChart.chart"
-          [xaxis]="DMSChart.xaxis"
-          [stroke]="DMSChart.stroke"
-          [tooltip]="DMSChart.tooltip"
-          [dataLabels]="DMSChart.dataLabels"
-          [colors]="DMSChart.colors"
-        ></apx-chart>
+    <div class="col-6" *ngFor="let chart of teamsCharts$ | async;">
+        <div class="card card-body">
+            <div class="fw-bold mb-4">
+                <div *ngIf="chart.type == 'DMS_TOTAL'">
+                  DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
+                </div>
+                <div *ngIf="chart.type == 'IFS_TOTAL'">
+                  IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
+                </div>
+                <div *ngIf="chart.type == 'END_TOTAL'">
+                  END <small class="text-muted font-size-12">(année en cours)</small>
+                </div>
+            </div>
+            <apx-chart
+            [series]="chart.series"
+            [chart]="chart.chart"
+            [xaxis]="chart.xaxis"
+            [yaxis]="chart.yaxis"
+            [stroke]="chart.stroke"
+            [tooltip]="chart.tooltip"
+            [dataLabels]="chart.dataLabels"
+            [colors]="chart.colors"
+            ></apx-chart>
       </div>
     </div>
-    <div class="col-6">
+    
+    <div class="col-6" *ngIf="teamsAnomalies$ | async as teamsAnomalies">
       <div class="card card-body">
-        <div class="fw-bold mb-4">
-          IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
-        </div>
+        <div class="fw-bold mb-4">Taux de correction des anomalies</div>
         <apx-chart
-          [series]="IFSChart.series"
-          [chart]="IFSChart.chart"
-          [xaxis]="IFSChart.xaxis"
-          [stroke]="IFSChart.stroke"
-          [tooltip]="IFSChart.tooltip"
-          [dataLabels]="IFSChart.dataLabels"
-          [colors]="IFSChart.colors"
-        ></apx-chart>
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="card card-body">
-        <div class="fw-bold mb-4">
-        L'évolution taux de correction des anomalies
-        </div>
-        <apx-chart
-            [series]="AnomaliesPerTeamChart.series"
-            [chart]="AnomaliesPerTeamChart.chart"
-            [dataLabels]="AnomaliesPerTeamChart.dataLabels"
-            [plotOptions]="AnomaliesPerTeamChart.plotOptions"
-            [responsive]="AnomaliesPerTeamChart.responsive"
-            [xaxis]="AnomaliesPerTeamChart.xaxis"
-            [legend]="AnomaliesPerTeamChart.legend"
-            [fill]="AnomaliesPerTeamChart.fill"
+            [series]="teamsAnomalies.series"
+            [chart]="teamsAnomalies.chart"
+            [dataLabels]="teamsAnomalies.dataLabels"
+            [plotOptions]="teamsAnomalies.plotOptions"
+            [responsive]="teamsAnomalies.responsive"
+            [xaxis]="teamsAnomalies.xaxis"
+            [legend]="teamsAnomalies.legend"
+            [fill]="teamsAnomalies.fill"
         ></apx-chart>
          
       </div>

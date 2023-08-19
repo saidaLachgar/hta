@@ -81,6 +81,8 @@ class MissionDataPersister implements DataPersisterInterface
             $CC = $DpRepo->ClientTotalInDp($Depar->getTeam()->getDps()->getId());
             // Get Clients interrompus : source IS NULL & ps IS NULL CI is CC else CI is ClientTotalByNodes
             $CI = $nodesInRange ? ($PostRepo->ClientTotalByNodes($nodesInRange) ?: 0) : $CC;
+            // get total interrupted postes between two nodes else in all department 
+            $nbPostes = $PostRepo->PostesTotalByNodes( $nodesInRange ? $nodesInRange : $Depar->getId()) ?: 0;
 
             // set DMS/END value depending if date end exists or not
             if (!is_null($DateEnd)) {
@@ -95,6 +97,7 @@ class MissionDataPersister implements DataPersisterInterface
             }
 
             $Mission->setNbClients($CI . "/" . $CC);
+            $Mission->setNbPostes($nbPostes);
             $Mission->setIFS(round(($CI / $CC), 3));
 
         } elseif ($changes && $changes["time"]) { // minor change -> duration changed

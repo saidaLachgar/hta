@@ -5,16 +5,18 @@ import { NgbPaginationModule, NgbTypeaheadModule, NgbDropdownModule, NgbCollapse
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from './components/confirm-dialog/confirm-dialog.module';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DecimalHourToTimePipe } from '../core/pipes';
 @NgModule({
   declarations: [
     // pipes and directives
+    DecimalHourToTimePipe
   ],
   imports: [
     // components
     CommonModule
   ],
   exports: [
-    // everything
+    // everything (declarations && imports)
     CommonModule,
     NgSelectModule,
     UIModule,
@@ -26,6 +28,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     NgbTypeaheadModule,
     NgbDropdownModule,
     NgbNavModule,
+    DecimalHourToTimePipe
   ]
 })
 
