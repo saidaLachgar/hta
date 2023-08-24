@@ -17,6 +17,7 @@ doctrine:
                 alias: App
         dql:
             string_functions:
+                # https://github.com/beberlei/DoctrineExtensions/tree/master/src/Query/Mysql
                 YEAR: DoctrineExtensions\Query\Mysql\Year
                 TIME: DoctrineExtensions\Query\Mysql\Time
                 DAY: DoctrineExtensions\Query\Mysql\Day
@@ -25,6 +26,7 @@ doctrine:
                 CAST: DoctrineExtensions\Query\Mysql\Cast
                 SUBSTRING_INDEX: DoctrineExtensions\Query\Mysql\SubstringIndex
                 DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
+                TIMESTAMPDIFF: DoctrineExtensions\Query\Mysql\TimestampDiff
 
 when@test:
     doctrine:

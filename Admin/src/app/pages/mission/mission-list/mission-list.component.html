@@ -16,11 +16,8 @@
         <div class="clearfix">
               <div class="float-end">
                   <div class="input-group input-group-sm">
-                      <select class="form-select form-select-sm">
-                          <option value="january" selected>Jan</option>
-                          <option value="december">Dec</option>
-                          <option value="november">Nov</option>
-                          <option value="october">Oct</option>
+                      <select [(ngModel)]="selectedMonth" (change)="ReportStats()" class="form-select form-select-sm">
+                        <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
                       </select>
                       <label class="input-group-text">Mois</label>
                   </div>
@@ -28,51 +25,72 @@
               <h4 class="card-title mb-4">Analyses mensuelles</h4>
         </div>
 
-        <div class="row justify-content-between">
-          <div class="col-3">
-            <div class="border p-3 rounded-3 mb-2">
-              <p class="fw-medium mb-3">Total des interruptions</p>
-              <strong class="h2">27</strong>
+        <ng-container *ngIf="missionsStats$ | async as missionsStats; else statsLoading">
+          <div class="row justify-content-between">
+            <div class="col-3">
+              <div class="border p-3 rounded-3 mb-2">
+                <p class="fw-medium mb-3">Total des interruptions</p>
+                <strong class="h2">{{missionsStats["Total"]}}</strong>
+              </div>
+              <div class="border p-3 rounded-3" *ngIf="missionsStats['Duration'] as duration">
+                <p class="fw-medium mb-2">Durée moyenne</p>
+                <!-- prevDuration -->
+                <p class="mt-2 mb-2" *ngIf="missionsStats['prevDuration'] as prevDuration">
+                  <ng-container *ngIf="prevDuration > 0;">
+                    <span class="badge badge-soft-success font-size-11 me-2"> {{ prevDuration.toFixed(1) }}% 
+                    <i class="mdi mdi-arrow-up"></i></span><small>De la période précédente</small>
+                  </ng-container>
+                  <ng-container *ngIf="prevDuration < 0">
+                    <span class="badge badge-soft-danger font-size-11 me-2"> {{ Math.abs(prevDuration).toFixed(1) }}% 
+                      <i class="mdi mdi-arrow-down"></i></span><small>De la période précédente</small>
+                  </ng-container>
+                </p>
+                <!-- duration -->
+                <strong class="h2 mb-0">{{ duration | decimalHourToTime:'long' }}</strong>
+              </div>
             </div>
-            <div class="border p-3 rounded-3">
-              <p class="fw-medium mb-2">Durée moyenne</p>
-              <p class="mt-2 mb-2">
-                <span class="badge badge-soft-success font-size-11 me-2"> 0.6% 
-                <i class="mdi mdi-arrow-up"></i></span><small>De la période précédente</small>
-              </p>
-              <strong class="h2 mb-0">1h 20min</strong>
+            <div class="col-6">
+              <p class="fw-bold mb-3">Causes des interruptions</p>
+              <ng-container *ngIf="missionsStats['causes'] as causes; else noCauses">
+                <apx-chart
+                  [series]="causes.series"
+                  [chart]="causes.chart"
+                  [labels]="causes.labels"
+                  [responsive]="causes.responsive"
+                ></apx-chart>
+              </ng-container>
+              <ng-template #noCauses>
+                <p class="alert alert-info">Aucune cause connue d'interruptions sur cette période donnée</p>
+              </ng-template>
+            </div>
+            <div class="col-3" *ngIf="missionsStats['types'] as types">
+              <p class="fw-bold mb-3">Interruptions par type</p>
+                <apx-chart
+                  [series]="types.series"
+                  [chart]="types.chart"
+                  [dataLabels]="types.dataLabels"
+                  [plotOptions]="types.plotOptions"
+                  [yaxis]="types.yaxis"
+                  [xaxis]="types.xaxis"
+                  [legend]="types.legend"
+                  [colors]="types.colors"
+                  [grid]="types.grid"
+                ></apx-chart>
             </div>
           </div>
-          <div class="col-6">
-            <p class="fw-bold mb-3">Causes des interruptions</p>
-              <apx-chart
-                [series]="causesChart.series"
-                [chart]="causesChart.chart"
-                [labels]="causesChart.labels"
-                [responsive]="causesChart.responsive"
-              ></apx-chart>
-          </div>
-          <div class="col-3">
-            <p class="fw-bold mb-3">Interruptions par type</p>
-              <apx-chart
-                [series]="typesChart.series"
-                [chart]="typesChart.chart"
-                [dataLabels]="typesChart.dataLabels"
-                [plotOptions]="typesChart.plotOptions"
-                [yaxis]="typesChart.yaxis"
-                [xaxis]="typesChart.xaxis"
-                [legend]="typesChart.legend"
-                [colors]="typesChart.colors"
-                [grid]="typesChart.grid"
-              ></apx-chart>
-          </div>
-        </div>
+        </ng-container>
+        <ng-template #statsLoading>
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="296px">
+            <g style="transform-origin: 50% 50% 0px; transform: rotate(0deg) scale(0.8);" class="ldl-scale"><g class="ldl-ani"><g class="ldl-layer"><g class="ldl-ani" style="transform-origin: 50px 50px 0px; transform: scale(0.91); animation: 2.63158s linear -1.97368s infinite normal forwards running breath-af4cf9cc-dd5b-4e06-80dd-6b6424e74632;"><path fill="#f8b26a" d="M11.5 50a38.478 38.478 0 0 0 4.436 17.934l32.564-18.8V11.529c-20.536.791-37 17.745-37 38.471z" style="fill: rgb(133, 162, 182);"></path></g></g><g class="ldl-layer"><g class="ldl-ani" style="transform-origin: 50px 50px 0px; transform: scale(0.91); animation: 2.63158s linear -2.63158s infinite normal forwards running breath-af4cf9cc-dd5b-4e06-80dd-6b6424e74632;"><path fill="#e15b64" d="M50 88.5c21.229 0 38.5-17.271 38.5-38.5 0-6.754-1.785-13.41-5.162-19.247-6.62-11.44-18.719-18.707-31.838-19.224v39.337L17.439 70.531C24.47 81.652 36.809 88.5 50 88.5z" style="fill: rgb(187, 206, 221);"></path></g></g></g></g>
+          </svg>
+        </ng-template>
         <!-- cards -->
       </div>
     </div>
     <div class="col-4">
       <div class="card card-body">
-        <div class="fw-bold mb-4">
+        
+        <div class="fw-bold">
           DMS <small class="text-muted font-size-12">(Moyenne des interruptions {{DMSMonthly ? "des 30 derniers":"de l'année en cours"}})</small>
           <div class="float-end">
             <ul class="nav nav-pills">
@@ -89,6 +107,9 @@
         </div>
         
         <ng-container *ngIf="DMSChart$ | async as DMSChart; else DMSloading">
+          <div class="fw-bold mb-4">
+           Total : {{ DMSChart.totalDMS | decimalHourToTime }}
+          </div>
           <apx-chart
             class="ms-n4 me-n1"
             [series]="DMSChart.series"
@@ -102,7 +123,7 @@
           ></apx-chart>
         </ng-container>
         <ng-template #DMSloading>
-            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="285px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
             <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
             <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
             </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">

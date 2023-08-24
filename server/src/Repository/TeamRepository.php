@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Commune;
 use App\Entity\Team;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -54,7 +56,7 @@ class TeamRepository extends ServiceEntityRepository
             ->select(
                 'IDENTITY(d.team) as TEAM',
                 'SUM(CASE WHEN a.status = true THEN 1 ELSE 0 END) as ACHIEVED_ANOMALIES',
-                'SUM(CASE WHEN a.status = false THEN 1 ELSE 0 END) as TOTAL_ANOMALIES'
+                'COUNT(a.id) as TOTAL_ANOMALIES'
             )
             ->from('App\Entity\Anomaly', 'a')
             ->innerJoin('a.edge', 'e')
@@ -283,7 +285,7 @@ class TeamRepository extends ServiceEntityRepository
             ->select(
                 'IDENTITY(d.team) as TEAM',
                 'SUM(CASE WHEN a.status = true THEN 1 ELSE 0 END) as ACHIEVED_ANOMALIES',
-                'SUM(CASE WHEN a.status = false THEN 1 ELSE 0 END) as TOTAL_ANOMALIES'
+                'COUNT(a.id) as TOTAL_ANOMALIES'
             )
             ->from('App\Entity\Anomaly', 'a')
             ->innerJoin('a.edge', 'e')
@@ -310,4 +312,318 @@ class TeamRepository extends ServiceEntityRepository
         return $teamsAnomalyStats;
     }
 
+
+    //  -> Total des interruptions -  Total des Vistes -  Total des anomalies
+    public function getTotalActivity($dateStart, $dateEnd, $team)
+    {
+        $anomalyTotal = $this->em->createQueryBuilder()
+            ->from('App\Entity\Anomaly', 'a')
+            ->select('COUNT(a.id)')
+            ->leftJoin('a.edge', 'e')
+            ->leftJoin('e.department', 'd')
+            ->where('a.createdAt BETWEEN :dateStart AND :dateEnd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('teamId', $team)
+            ->getQuery()->getSingleScalarResult();
+        $visitsTotal = $this->em->createQueryBuilder()
+            ->from('App\Entity\Visite', 'v')
+            ->select('COUNT(v.id)')
+            ->innerJoin('v.node_a', 'n')
+            ->leftJoin('n.department', 'd')
+            ->where('v.date BETWEEN :dateStart AND :dateEnd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('teamId', $team)
+            ->getQuery()->getSingleScalarResult();
+        $missionTotal = $this->em->createQueryBuilder()
+            ->from('App\Entity\Mission', 'm')
+            ->select('COUNT(m.id)')
+            ->innerJoin('m.node_a', 'n')
+            ->leftJoin('n.department', 'd')
+            ->where('m.dateStart BETWEEN :dateStart AND :dateEnd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('teamId', $team)
+            ->getQuery()->getSingleScalarResult();
+        return [
+            "Total des interruptions" => $anomalyTotal,
+            "Total des Vistes" => $visitsTotal,
+            "Total des anomalies" => $missionTotal
+        ];
+    }
+    //  -> CausesAndType -> Causes des interruptions + Interruptions par type
+    public function getCausesAndType($dateStart, $dateEnd, $team)
+    {
+        $queryBuilder = $this->em->createQueryBuilder()
+            ->select(
+                // Total missions count for each type 
+                'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) as Incident',
+                'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) as Coupeur',
+            )
+            ->from('App\Entity\Mission', 'm')
+            ->innerJoin('m.node_a', 'n')
+            ->leftJoin('n.department', 'd')
+            ->where('m.dateStart BETWEEN :dateStart AND :dateEnd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('teamId', $team);
+
+        // Total count of missions for each cause
+        $causesList = ["Défauts matériels", "Telescopare", "Intenpaire", "Cause inconnue"];
+        foreach ($causesList as $key => $cause) {
+            $queryBuilder->addSelect(
+                "SUM(CASE WHEN m.causes = :val_parm_{$key} THEN 1 ELSE 0 END) as Cause_{$key}"
+            )
+                ->setParameter("val_parm_" . $key, $key + 1);
+        }
+
+        $results = $queryBuilder->getQuery()->getResult()[0];
+        // dd($results);
+        return $results;
+
+    }
+    //  -> DMS, IFS, END
+    public function getInterruptionsPerformance($dateStart, $dateEnd, $team)
+    {
+
+        $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+        $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+        $departments = $this->em->createQueryBuilder()
+            ->select('d.id, d.titre')
+            ->from('App\Entity\Department', 'd')
+            ->where('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+
+        // Calculate the difference in days between the start and end dates
+        $dateInterval = $dateStart->diff($dateEnd);
+        $daysDifference = $dateInterval->days;
+
+        // Determine whether to group by month or by day
+        $groupByMonth = $daysDifference > 30;
+
+        $currentDate = clone $dateStart;
+
+        while ($currentDate <= $dateEnd) {
+            $groupKey = $groupByMonth ? $currentDate->format('Y-m') : $currentDate->format('Y-m-d');
+            $day = $currentDate->format('d');
+            $month = $currentDate->format('m');
+            $year = $currentDate->format('Y');
+            foreach ($departments as $department) {
+
+                $qb = $this->em->createQueryBuilder()
+                    ->select(
+                        'SUM(m.DMS) as DMS_TOTAL',
+                        'SUM(m.END) as END_TOTAL',
+                        'SUM(m.IFS) as IFS_TOTAL'
+                    )
+                    ->from('App\Entity\Mission', 'm')
+                    ->innerJoin('m.node_a', 'n')
+                    ->innerJoin('n.department', 'd')
+                    ->where('d.id = :department')
+                    ->andWhere('YEAR(m.dateStart) = :year')
+                    ->andWhere('MONTH(m.dateStart) = :month')
+                    ->setParameter('department', $department['id'])
+                    ->setParameter('year', $year)
+                    ->setParameter('month', $month);
+
+                if (!$groupByMonth) {
+                    $qb = $qb->andWhere('DAY(m.dateStart) = :day')
+                        ->setParameter('day', $day);
+                }
+
+                $qb = $qb->getQuery()->getResult();
+
+                $result[$department['titre']][] = [
+                    "TIMEFRAME" => $groupKey,
+                    "DMS_TOTAL" => $qb[0]['DMS_TOTAL'] ?? 0,
+                    "END_TOTAL" => $qb[0]['END_TOTAL'] ?? 0,
+                    "IFS_TOTAL" => $qb[0]['IFS_TOTAL'] ?? 0,
+                ];
+            }
+
+            $currentDate->add(new \DateInterval('P1' . ($groupByMonth ? 'M' : 'D')));
+        }
+        // dd($result);
+        return $result;
+
+    }
+    //  -> Taux de correction des anomalies
+    public function getAnomalyCorrection($dateStart, $dateEnd, $team)
+    {
+        $departments = $this->em->createQueryBuilder()
+            ->select('d.id, d.titre')
+            ->from('App\Entity\Department', 'd')
+            ->where('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->getQuery()
+            ->getResult();
+        $qb = $this->em->createQueryBuilder()
+            ->select('d.id as DEPARTMENT', 'SUM(CASE WHEN a.status = true THEN 1 ELSE 0 END) as ACHIEVED_ANOMALIES', 'COUNT(a.id) as TOTAL_ANOMALIES')
+            ->from('App\Entity\Anomaly', 'a')
+            ->innerJoin('a.edge', 'e')
+            ->innerJoin('e.department', 'd')
+            ->where('a.createdAt BETWEEN :dateStart AND :dateEnd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('teamId', $team)
+            ->groupBy('d.id')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+
+        foreach ($departments as $department) {
+            $data = array_filter($qb, function ($item) use ($department) {
+                return $item['DEPARTMENT'] === $department['id'];
+            });
+
+            $result[] = [
+                "DEPARTMENT" => $department['titre'],
+                "ACHIEVED_ANOMALIES" => $data[0]["ACHIEVED_ANOMALIES"] ?? 0,
+                "TOTAL_ANOMALIES" => $data[0]["TOTAL_ANOMALIES"] ?? 0,
+            ];
+        }
+
+        return $result;
+
+    }
+    //  -> Nombre de kilomètres visités par commune
+    public function getKMVisitedPerCommune($dateStart, $dateEnd, $team)
+    {
+        $Communes = $this->em->createQueryBuilder()
+            ->select(
+                'c.id as ID, c.titre as TITLE'
+            )
+            ->from('App\Entity\Commune', 'c')
+            ->join('App\Entity\Edge', 'e', Join::WITH, 'c = e.commune')
+            ->join('e.node_a', 'n')
+            ->join('n.department', 'd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->groupBy('c.id')
+            ->getQuery()
+            ->getResult();
+        $communesIds = array_map(function ($item) {
+            return isset($item["ID"]) ? $item["ID"] : null;
+        }, $Communes);
+
+        $nbSupport = $this->em->createQueryBuilder()
+            ->from('App\Entity\Visite', 'v')
+            ->select('c.id AS COMMUNE, SUM(v.nbSupport) as SUPPORTS')
+
+            ->join('v.node_a', 'n')
+            ->join('n.commune', 'c')
+
+            ->andWhere('c.id IN (:communesIds)')
+            ->andWhere('v.date BETWEEN :dateStart AND :dateEnd')
+
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('communesIds', $communesIds)
+
+            ->getQuery()
+            ->getResult();
+        $result = [];
+        foreach ($Communes as $Commune) {
+            $CommuneId = $Commune["ID"];
+
+            $data = array_filter($nbSupport, function ($item) use ($CommuneId) {
+                return $item['COMMUNE'] === $CommuneId;
+            });
+
+            $result[] = [
+                "COMMUNE" => $Commune["TITLE"],
+                "CLIENTS" => !empty($data) ? floatval($data[0]["CLIENTS"]) * 100 : 0,
+            ];
+        }
+        return $result;
+    }
+    //  -> Le nombre de clients coupés par communauté
+    public function getClientCutsByCommune($dateStart, $dateEnd, $team)
+    {
+        $Communes = $this->em->createQueryBuilder()
+            ->select(
+                'c.id as ID, c.titre as TITLE'
+            )
+            ->from('App\Entity\Commune', 'c')
+            ->join('App\Entity\Edge', 'e', Join::WITH, 'c = e.commune')
+            ->join('e.node_a', 'n')
+            ->join('n.department', 'd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->groupBy('c.id')
+            ->getQuery()
+            ->getResult();
+        $CommunesIds = array_map(function ($item) {
+            return isset($item["ID"]) ? $item["ID"] : null;
+        }, $Communes);
+
+
+        $MissionCommune = $this->em->createQueryBuilder()
+            ->from('App\Entity\MissionCommune', 'mc')
+            ->select('c.id AS COMMUNE, SUM(mc.clientCount) AS CLIENTS')
+
+            ->join('mc.Commune', 'c')
+            ->join('mc.mission', 'm')
+
+            ->andWhere('c.id IN (:communesIds)')
+            ->andWhere('m.dateStart BETWEEN :dateStart AND :dateEnd')
+
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('communesIds', $CommunesIds)
+
+            ->groupBy('c.id')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($Communes as $Commune) {
+            $CommuneId = $Commune["ID"];
+
+            $data = array_filter($MissionCommune, function ($item) use ($CommuneId) {
+                return $item['COMMUNE'] === $CommuneId;
+            });
+
+            $result[] = [
+                "COMMUNE" => $Commune["TITLE"],
+                "CLIENTS" => $data[0]["CLIENTS"] ?? 0,
+            ];
+        }
+        return $result;
+    }
+
+    // -> Le nombre des fois un post copée + nb des hours
+    public function getPostInterruptionInfo($dateStart, $dateEnd, $poste)
+    {
+        // stored posts of mission
+        return $this->em->createQueryBuilder()
+            ->from('App\Entity\MissionPostes', 'mp')
+            ->select(
+                // Le nombre des fois un post copée
+                'SUM(mp.poste) AS TIMES',
+                // nb des hours
+                'SUM(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as Duration',
+            )
+            
+            ->join('mp.mission', 'm')
+            ->andWhere('mp.poste = :poste')
+            ->andWhere('m.dateStart BETWEEN :dateStart AND :dateEnd')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->setParameter('poste', $poste)
+
+            ->getQuery()
+            ->getResult();
+    }
 }

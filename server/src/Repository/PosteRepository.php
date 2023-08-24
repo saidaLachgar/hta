@@ -40,31 +40,6 @@ class PosteRepository extends ServiceEntityRepository
         }
     }
 
-    //    /**
-//     * @return Poste[] Returns an array of Poste objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-    //    public function findOneBySomeField($value): ?Poste
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-
     public function ClientTotalByNodes($nodes): ?int
     {
         return $this->createQueryBuilder('p')
@@ -75,6 +50,17 @@ class PosteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult()
         ;
+    }
+    public function ClientTotalByCommune($id)
+    {
+        return $this->createQueryBuilder('p')
+        ->select("sum(p.nb_clients)")
+        ->innerJoin('p.node', 'n')
+        ->innerJoin('n.commune', 'c')
+        ->andWhere('c.id = :id')
+        ->setParameter('id', $id)
+        ->getQuery()
+        ->getSingleScalarResult();
     }
 
     public function PostesTotalByNodes($nodes): ?int

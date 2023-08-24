@@ -17,11 +17,13 @@ setDefaultOptions({ locale: fr })
 })
 export class missionListComponent {
   readonly server = environment.serverURL;
+  Math = Math;
   breadCrumbItems: Array<{}>;
   ShowSearch: boolean = false;
   DMSMonthly: boolean;
-  causesChart;
-  typesChart;
+  months: { value: number, label: string }[] = [];
+  selectedMonth: number;
+  missionsStats$;
   DMSChart$;
 
   constructor(
@@ -36,7 +38,8 @@ export class missionListComponent {
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
-    this.ReportDMS();
+    this.generateMonths();
+    this.ReportDMS();    
     config.notFoundText = 'Aucune donnée trouvée !';
     service.missionForm = fb.group({
       "node_a.department.id[]": [''],
@@ -52,95 +55,125 @@ export class missionListComponent {
       type: [null],
     });
 
-
-
-    this.causesChart = {
-      series: [44, 55, 13, 43],
-      chart: {
-        width: 400,
-        type: "pie"
-      },
-      labels: service.causesList.slice(service.causesList.length / 2),
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-            legend: {
-              position: "bottom"
-            }
-          }
-        }
-      ]
-    };
-
-    this.typesChart = {
-      series: [
-        {
-          name: "distibuted",
-          data: [21, 10]
-        }
-      ],
-      chart: {
-        height: 250,
-        type: "bar",
-      },
-      colors: [
-        "#008FFB",
-        "#FF4560",
-      ],
-      plotOptions: {
-        bar: {
-          columnWidth: "45%",
-          distributed: true
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      legend: {
-        show: false
-      },
-      grid: {
-        show: false
-      },
-      xaxis: {
-        categories: [
-          'Incident',
-          'Coupeur',
-        ],
-        labels: {
-          style: {
-            colors: [
-              "#FF4560",
-              "#008FFB",
-            ],
-            fontSize: "12px"
-          }
-        }
-      }
-    };
-
   }
 
-
-
-  isToday(date: string): boolean {
-    return isSameDay(new Date(date), new Date());
+  private generateMonths() {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth()+1;
+    const monthMap = ["JAN", "FÉV", "MAR", "AVR","MAI", "JUN", "JUL", "AOÛ","SEP", "OCT", "NOV", "DÉC"];
+    for (let month = currentMonth; month >= 1; month--) {
+      this.months.push({
+        value: month,
+        label: monthMap[month-1]
+      });
+    }
+    this.selectedMonth = currentMonth;
+    this.ReportStats();
   }
 
-  // humanReadable(date){
-  //   return formatDistanceToNow(parseDate(date), { includeSeconds: true, addSuffix: true });  // "a day ago"
+  // isToday(date: string): boolean {
+  //   return isSameDay(new Date(date), new Date());
   // }
 
+  ReportStats() {
+    this.missionsStats$ = this.http.get(`${this.server}/api/analytics/mission-stats/` + this.selectedMonth).pipe(
+      map(data => {
+        let causes = Object.values(data)
+          .filter((v, i) => Object.keys(data)[i].includes("Cause_"))
+          .map(value => value ? parseInt(value, 10) : 0);
+        let previousDuration = data["prevDuration"] / 3600;
+        let currentDuration = data["Duration"] / 3600;
+        data["Duration"] = currentDuration;
+        // Calculate the percentage difference
+        if (previousDuration && currentDuration) {
+          data["prevDuration"] = ((currentDuration - previousDuration) / previousDuration) * 100;
+        }
+
+        data['causes'] = causes.reduce((a, b) => a + b, 0) === 0 ? null : {
+          series: causes,
+          chart: {
+            width: 400,
+            type: "pie"
+          },
+          labels: this.service.causesList.slice(this.service.causesList.length / 2),
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200
+                },
+                legend: {
+                  position: "bottom"
+                }
+              }
+            }
+          ]
+        };
+        data["types"] = {
+          series: [
+            {
+              name: "distibuted",
+              data: [parseInt(data["Incident"]), parseInt(data["Coupeur"])]
+            }
+          ],
+          chart: {
+            height: 250,
+            type: "bar",
+          },
+          colors: [
+            "#008FFB",
+            "#FF4560",
+          ],
+          plotOptions: {
+            bar: {
+              columnWidth: "45%",
+              distributed: true
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          legend: {
+            show: false
+          },
+          grid: {
+            show: false
+          },
+          yaxis: {
+            labels: {
+              formatter: value => Math.round(value)
+            },
+          },
+          xaxis: {
+            categories: [
+              'Incident',
+              'Coupeur',
+            ],
+            labels: {
+              style: {
+                colors: [
+                  "#FF4560",
+                  "#008FFB",
+                ],
+                fontSize: "12px"
+              }
+            }
+          }
+        };
+        console.log(data);
+        
+        return data;
+      })
+    )
+  }
 
   ReportDMS(yearly: boolean = true) {
     const decimalHourToTimePipe = new DecimalHourToTimePipe();
     this.DMSMonthly = !yearly;
     this.DMSChart$ = this.http.get(`${this.server}/api/analytics/teams-dms` + (yearly ? "" : "/month")).pipe(
       map(data => {
+        let totalDMS = 0;
         const monthMap: { [key: string]: string } = {
           "01": "JAN", "02": "FÉV", "03": "MAR", "04": "AVR",
           "05": "MAI", "06": "JUN", "07": "JUL", "08": "AOÛ",
@@ -150,7 +183,7 @@ export class missionListComponent {
         const statData = {
           series: [],
           chart: {
-            height: 275,
+            height: 256,
             type: "line"
           },
           dataLabels: {
@@ -173,7 +206,7 @@ export class missionListComponent {
               rotate: -45
             },
             categories: [],
-            ...(!yearly && {title: {text: '30 derniers jours'}}),
+            ...(!yearly && { title: { text: '30 derniers jours' } }),
           },
         };
         // console.log(data);
@@ -185,11 +218,15 @@ export class missionListComponent {
               statData.xaxis.categories.push(
                 yearly ? monthMap[monthData["MONTH"]] : monthData["DAY"]
               );
-              return monthData["DMS_TOTAL"];
+              let dms = parseFloat(monthData["DMS_TOTAL"]);
+              console.log(dms);
+              
+              dms && (totalDMS += dms)
+              return dms;
             })
           });
         }
-
+        statData["totalDMS"] = totalDMS;
         return statData;
       })
     );

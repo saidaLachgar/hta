@@ -149,10 +149,22 @@ class Mission
      */
     private $nbPostes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=MissionCommune::class, mappedBy="mission", orphanRemoval=true, cascade={"persist"})
+     */
+    private $missionCommunes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=MissionPoste::class, mappedBy="mission", orphanRemoval=true)
+     */
+    private $missionPostes;
+
 
     public function __construct()
     {
         $this->node_b = new ArrayCollection();
+        $this->missionCommunes = new ArrayCollection();
+        $this->missionPostes = new ArrayCollection();
     }
 
     public function __toString()
@@ -317,6 +329,66 @@ class Mission
     public function setNbPostes(?int $nbPostes): self
     {
         $this->nbPostes = $nbPostes;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MissionCommune>
+     */
+    public function getMissionCommunes(): Collection
+    {
+        return $this->missionCommunes;
+    }
+
+    public function addMissionCommune(MissionCommune $missionCommune): self
+    {
+        if (!$this->missionCommunes->contains($missionCommune)) {
+            $this->missionCommunes[] = $missionCommune;
+            $missionCommune->setMission($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMissionCommune(MissionCommune $missionCommune): self
+    {
+        if ($this->missionCommunes->removeElement($missionCommune)) {
+            // set the owning side to null (unless already changed)
+            if ($missionCommune->getMission() === $this) {
+                $missionCommune->setMission(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MissionPoste>
+     */
+    public function getMissionPostes(): Collection
+    {
+        return $this->missionPostes;
+    }
+
+    public function addMissionPoste(MissionPoste $missionPoste): self
+    {
+        if (!$this->missionPostes->contains($missionPoste)) {
+            $this->missionPostes[] = $missionPoste;
+            $missionPoste->setMission($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMissionPoste(MissionPoste $missionPoste): self
+    {
+        if ($this->missionPostes->removeElement($missionPoste)) {
+            // set the owning side to null (unless already changed)
+            if ($missionPoste->getMission() === $this) {
+                $missionPoste->setMission(null);
+            }
+        }
 
         return $this;
     }

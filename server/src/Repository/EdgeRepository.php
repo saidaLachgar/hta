@@ -102,9 +102,9 @@ class EdgeRepository extends ServiceEntityRepository
         foreach ($searchArgs as $search) {
             foreach ($search as $key => $value) {
                 $queryBuilder
-                    ->innerJoin('e.'.$key, $key)
-                    ->andWhere($key.'.id = :'.$key.'_id')
-                    ->setParameter($key.'_id', $value);
+                    ->innerJoin('e.' . $key, $key)
+                    ->andWhere($key . '.id = :' . $key . '_id')
+                    ->setParameter($key . '_id', $value);
 
             }
         }

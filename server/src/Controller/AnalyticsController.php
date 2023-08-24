@@ -58,6 +58,38 @@ class AnalyticsController extends AbstractController
 
     return new JsonResponse($data);
   }
+
+  /**
+   * @Route("/api/analytics/by-team", name="getAnalyticsByTeam", options={"expose"=true})
+   */
+  public function getAnalyticsByTeam(Request $request)
+  {
+    $q = $request->request;
+    $dateStart =  $q->get('date-start');
+    $dateEnd =  $q->get('date-end');
+    $team =  $q->get('team');
+    $stats =  $q->get('stats');
+
+    // * getTotalActivity -> Total des interruptions -  Total des Vistes -  Total des anomalies
+    // * CausesAndType -> Causes des interruptions + Interruptions par type
+    // * getInterruptionsPerformance -> DMS, IFS, END
+    // * getAnomalyCorrection -> Taux de correction des anomalies
+    // * getKMVisitedPerCommune -> Nombre de kilomètres visités par commune
+    // * getClientCutsByCommune -> Le nombre de clients coupés par communauté
+
+    /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $functionName = "get" . $stats;
+    if (method_exists($TeamRepo, $functionName)) {
+      $data = $TeamRepo->$functionName($dateStart, $dateEnd, $team);
+    } else {
+      $data = null;
+    }
+
+    return new JsonResponse($data);
+  }
+
   /**
    * @Route("/api/analytics/teams-anomalies", name="getTeamsAnomalies", options={"expose"=true})
    */
@@ -100,14 +132,13 @@ class AnalyticsController extends AbstractController
   /**
    * @Route("/api/analytics/mission-stats/{month}", name="getMissionsStats", options={"expose"=true})
    */
-  public function getMissionsStats($year, $month = null)
+  public function getMissionsStats($month)
   {
-
     // causes - type - Total - Average duration - last Average duration
     /** @var \App\Repository\MissionRepository $MissionRepo */
     $MissionRepo = $this->em->getRepository(Mission::class);
 
-    $data = $MissionRepo->getMissionsStats($year, $month);
+    $data = $MissionRepo->getMissionsStats($month);
 
     return new JsonResponse($data);
   }

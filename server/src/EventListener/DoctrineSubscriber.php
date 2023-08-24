@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\Log;
 use App\Entity\MediaObject;
+use App\Entity\MissionCommune;
 use App\Entity\RefreshToken;
 use Doctrine\ORM\Events;
 use Psr\Log\LoggerInterface;
@@ -56,7 +57,7 @@ class DoctrineSubscriber implements EventSubscriber
     public function log($args, $eventType)
     {
         $object = $args->getObject();
-        if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject)) {
+        if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject || $object instanceof MissionCommune)) {
             $objectString = (string)$object; // ex : fullName
             $className = get_class($object); // returns fully-qualified class name
             $class = strtolower(basename(str_replace('\\', '/', $className))); // Get the class "basename" of the given object / class

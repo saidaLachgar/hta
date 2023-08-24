@@ -137,6 +137,16 @@ class Poste
      */
     private $origine;
 
+    /**
+     * @ORM\OneToMany(targetEntity=MissionPoste::class, mappedBy="poste", orphanRemoval=true)
+     */
+    private $missionPostes;
+
+    public function __construct()
+    {
+        $this->missionPostes = new ArrayCollection();
+    }
+
 
     public function __toString()
     {
@@ -272,6 +282,36 @@ class Poste
     public function setOrigine(?string $origine): self
     {
         $this->origine = $origine;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MissionPoste>
+     */
+    public function getMissionPostes(): Collection
+    {
+        return $this->missionPostes;
+    }
+
+    public function addMissionPoste(MissionPoste $missionPoste): self
+    {
+        if (!$this->missionPostes->contains($missionPoste)) {
+            $this->missionPostes[] = $missionPoste;
+            $missionPoste->setPoste($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMissionPoste(MissionPoste $missionPoste): self
+    {
+        if ($this->missionPostes->removeElement($missionPoste)) {
+            // set the owning side to null (unless already changed)
+            if ($missionPoste->getPoste() === $this) {
+                $missionPoste->setPoste(null);
+            }
+        }
 
         return $this;
     }

@@ -7,7 +7,10 @@ namespace App\DataPersister;
 // use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 // use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Entity\Commune;
 use App\Entity\Department;
+use App\Entity\Edge;
+use App\Entity\MissionCommune;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Mission;
 use App\Repository\PosteRepository;
@@ -47,7 +50,7 @@ class MissionDataPersister implements DataPersisterInterface
 
         $DateStart = $Mission->getDateStart();
         $DateEnd = $Mission->getDateEnd();
-       
+
 
         // add one day if date start smaller than date end
         if (!empty($DateEnd) && !empty($DateStart) && $this->dateToTime($DateEnd) < $this->dateToTime($DateStart)) {
@@ -63,7 +66,7 @@ class MissionDataPersister implements DataPersisterInterface
             // Compare the current and new states of the entity
             $changes = $this->HasChanges($previousData, $Mission);
         }
-        if(is_null($Mission->getDMS()) or ($changes && ($changes["major"] or $changes["time"]))) {
+        if (is_null($Mission->getDMS()) or ($changes && ($changes["major"] or $changes["time"]))) {
             $NodeB = $Mission->getNodeB();
             $NodeA = $Mission->getNodeA();
             $Depar = $NodeA->getDepartment();
@@ -82,7 +85,7 @@ class MissionDataPersister implements DataPersisterInterface
             // Get Clients interrompus : source IS NULL & ps IS NULL CI is CC else CI is ClientTotalByNodes
             $CI = $nodesInRange ? ($PostRepo->ClientTotalByNodes($nodesInRange) ?: 0) : $CC;
             // get total interrupted postes between two nodes else in all department 
-            $nbPostes = $PostRepo->PostesTotalByNodes( $nodesInRange ? $nodesInRange : $Depar->getId()) ?: 0;
+            $nbPostes = $PostRepo->PostesTotalByNodes($nodesInRange ? $nodesInRange : $Depar->getId()) ?: 0;
 
             // set DMS/END value depending if date end exists or not
             if (!is_null($DateEnd)) {
@@ -95,8 +98,11 @@ class MissionDataPersister implements DataPersisterInterface
                 $Mission->setDMS(null);
                 $Mission->setEND(null);
             }
-
+            // store client count per community for this mission
+            $this->setMissionCommune($NodeB, $NodeA, $Depar, $Mission);
+            // store client total in this mission
             $Mission->setNbClients($CI . "/" . $CC);
+            // store posts total in this mission
             $Mission->setNbPostes($nbPostes);
             $Mission->setIFS(round(($CI / $CC), 3));
 
@@ -114,12 +120,14 @@ class MissionDataPersister implements DataPersisterInterface
             );
             // set END value depending if nodes in a range were found
             if ($nodesInRange) {
-                $Mission->setEND($this->calcEND(
-                    $DateEnd, 
-                    $DateStart, 
-                    $nodesInRange,
-                    $Depar->getId()
-                ));
+                $Mission->setEND(
+                    $this->calcEND(
+                        $DateEnd,
+                        $DateStart,
+                        $nodesInRange,
+                        $Depar->getId()
+                    )
+                );
             }
         }
 
@@ -143,18 +151,30 @@ class MissionDataPersister implements DataPersisterInterface
         $this->em->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($data, array $context = [])
+    public function setMissionCommune($NodeB, $NodeA, $Depar, $Mission)
     {
+        if (is_null($NodeA) and $NodeB->isEmpty()) {
+            return;
+        }
+        // get IDs of selected destinations
+        $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(function ($obj) {
+            return $obj->getId();
+        })->getValues();
 
-        // update objectives 
-        $this->em->getRepository(Objective::class)->UpdateAchievement($data->getActions(), true, $data->getDateStart());
+        $CommuneRepo = $this->em->getRepository(Commune::class);
+        $PosteRepo = $this->em->getRepository(Poste::class);
+        $Communes = $CommuneRepo->getCommunesByRange($Depar->getId(), $NodeA->getId(), $Destinations);
+        foreach ($Communes as $Commune) {
+            $clientCount = $PosteRepo->ClientTotalByCommune($Commune->getId());
 
-        $this->em->remove($data);
-        $this->em->flush();
+            $obj = new MissionCommune();
+            $obj->setCommune($Commune);
+            $obj->setClientCount($clientCount);
+            $Mission->addMissionCommune($obj); 
+        }
     }
+
+
     public function calcDMS($dateEnd, $dateStart, $CI, $CC)
     {
         $differenceInSeconds =
@@ -179,7 +199,8 @@ class MissionDataPersister implements DataPersisterInterface
 
     }
 
-    function nodesInRange($NodeB, $NodeA, $Depar){
+    function nodesInRange($NodeB, $NodeA, $Depar)
+    {
         if (is_null($NodeA) and $NodeB->isEmpty()) {
             return false;
         }
@@ -192,7 +213,18 @@ class MissionDataPersister implements DataPersisterInterface
         return $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
 
     }
-    
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($data, array $context = [])
+    {
+
+        // update objectives 
+        $this->em->getRepository(Objective::class)->UpdateAchievement($data->getActions(), true, $data->getDateStart());
+
+        $this->em->remove($data);
+        $this->em->flush();
+    }
     private function dateToTime($date)
     {
         return strtotime($date->format('Y-m-d H:i:s'));

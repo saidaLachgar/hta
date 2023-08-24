@@ -57,13 +57,13 @@ class Commune
     private $titre;
 
     /**
-     * @ORM\OneToMany(targetEntity=Poste::class, mappedBy="commune")
+     * @ORM\OneToMany(targetEntity=MissionCommune::class, mappedBy="Commune", orphanRemoval=true)
      */
-    private $postes;
+    private $missionCommunes;
 
     public function __construct()
     {
-        $this->postes = new ArrayCollection();
+        $this->missionCommunes = new ArrayCollection();
     }
 
     public function __toString()
@@ -89,29 +89,29 @@ class Commune
     }
 
     /**
-     * @return Collection<int, Poste>
+     * @return Collection<int, MissionCommune>
      */
-    public function getPostes(): Collection
+    public function getMissionCommunes(): Collection
     {
-        return $this->postes;
+        return $this->missionCommunes;
     }
 
-    public function addPoste(Poste $poste): self
+    public function addMissionCommune(MissionCommune $missionCommune): self
     {
-        if (!$this->postes->contains($poste)) {
-            $this->postes[] = $poste;
-            $poste->setCommune($this);
+        if (!$this->missionCommunes->contains($missionCommune)) {
+            $this->missionCommunes[] = $missionCommune;
+            $missionCommune->setCommune($this);
         }
 
         return $this;
     }
 
-    public function removePoste(Poste $poste): self
+    public function removeMissionCommune(MissionCommune $missionCommune): self
     {
-        if ($this->postes->removeElement($poste)) {
+        if ($this->missionCommunes->removeElement($missionCommune)) {
             // set the owning side to null (unless already changed)
-            if ($poste->getCommune() === $this) {
-                $poste->setCommune(null);
+            if ($missionCommune->getCommune() === $this) {
+                $missionCommune->setCommune(null);
             }
         }
 
