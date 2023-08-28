@@ -41,12 +41,12 @@ class GoalRepository extends ServiceEntityRepository
 
     public function getObjectivesByYear($year): array
     {
-        $results =  $this->createQueryBuilder('g')
+        $results = $this->createQueryBuilder('g')
             ->select("o.id, o.count as total_achievements,o.planned_count as planned_achievements, MONTH(o.date) AS month_achieved, gg.name as group_name,g.id as goal_id, g.name as goal_name, g.target_achievement ")
             ->andWhere('o.date is NULL or YEAR(o.date) = :year')
             ->andWhere('g.target_years is NULL or g.target_years LIKE :target_year')
             ->setParameter('year', $year)
-            ->setParameter('target_year', '%'.$year.'%')
+            ->setParameter('target_year', '%' . $year . '%')
             ->leftJoin('g.objectives', 'o')
             ->join('g.goal_group', 'gg')
             ->getQuery()
@@ -58,8 +58,8 @@ class GoalRepository extends ServiceEntityRepository
 
         // Restructure the result into a desired format
         $restructuredResult = [];
-        
-        foreach ($results as $result ) {
+
+        foreach ($results as $result) {
             $groupName = $result['group_name'];
             $goalName = $result['goal_name'];
             $goalId = $result['goal_id'];
@@ -102,7 +102,7 @@ class GoalRepository extends ServiceEntityRepository
 
     public function getGoals(): array
     {
-        $results =  $this->createQueryBuilder('g')
+        $results = $this->createQueryBuilder('g')
             ->select("gg.name as group_name,g.id as goal_id, g.name as goal_name")
             ->andWhere('gg.display_in_forms = :display_in_forms')
             ->setParameter('display_in_forms', true)
@@ -112,7 +112,7 @@ class GoalRepository extends ServiceEntityRepository
         ;
         // Restructure the result into a desired format
         $restructuredResult = [];
-        foreach ($results as $result ) {
+        foreach ($results as $result) {
             $groupName = $result['group_name'];
             $restructuredResult["data"][$groupName][] = [
                 'name' => $result['goal_name'],
@@ -121,5 +121,29 @@ class GoalRepository extends ServiceEntityRepository
         }
 
         return $restructuredResult;
+    }
+
+    public function getTarget($calc, $date = false)
+    {
+        if($date == false){
+            $date = new \DateTime();
+        }
+        
+        $year = $date->format('Y');
+        $query = $this->createQueryBuilder('g')
+        ->where('g.calc = :calc')
+        ->setParameter('calc', $calc);
+
+        $result =  $query
+            ->andWhere('g.target_years LIKE :target_year')
+            ->setParameter('target_year', '%' . $year . '%')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if(!$result) {
+            $result =  $query->getQuery()->getOneOrNullResult();
+        }
+
+        return $result;
     }
 }

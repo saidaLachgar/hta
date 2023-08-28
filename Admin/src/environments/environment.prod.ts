@@ -1,14 +1,5 @@
 export const environment = {
   production: true,
-  defaultauth: 'fackbackend',
-  firebaseConfig: {
-    apiKey: '',
-    authDomain: '',
-    databaseURL: '',
-    projectId: '',
-    storageBucket: '',
-    messagingSenderId: '',
-    appId: '',
-    measurementId: ''
-  }
+  serverURL: 'http://127.0.0.1:8000',
+  pageSize : 30
 };

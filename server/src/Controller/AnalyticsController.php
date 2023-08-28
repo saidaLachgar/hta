@@ -45,7 +45,7 @@ class AnalyticsController extends AbstractController
 
     return new JsonResponse($data);
   }
-  
+
   /**
    * @Route("/api/analytics/teams-data", name="getTeamsData", options={"expose"=true})
    */
@@ -64,18 +64,19 @@ class AnalyticsController extends AbstractController
    */
   public function getAnalyticsByTeam(Request $request)
   {
-    $q = $request->request;
-    $dateStart =  $q->get('date-start');
-    $dateEnd =  $q->get('date-end');
-    $team =  $q->get('team');
-    $stats =  $q->get('stats');
+    $q = json_decode($request->getContent(), true);
+    $dateStart = $q['dateStart'];
+    $dateEnd = $q['dateEnd'];
+    $team = $q['team'];
+    $stats = $q['stats'];
 
     // * getTotalActivity -> Total des interruptions -  Total des Vistes -  Total des anomalies
-    // * CausesAndType -> Causes des interruptions + Interruptions par type
+    // * getCausesAndType -> Causes des interruptions + Interruptions par type
     // * getInterruptionsPerformance -> DMS, IFS, END
     // * getAnomalyCorrection -> Taux de correction des anomalies
     // * getKMVisitedPerCommune -> Nombre de kilomètres visités par commune
     // * getClientCutsByCommune -> Le nombre de clients coupés par communauté
+    // * getPostInterruptionInfo -> Le nombre des fois un post copée + nb des hours
 
     /** @var \App\Repository\TeamRepository $TeamRepo */
     $TeamRepo = $this->em->getRepository(Team::class);
@@ -102,7 +103,7 @@ class AnalyticsController extends AbstractController
 
     return new JsonResponse($data);
   }
-  
+
   /**
    * @Route("/api/analytics/teams-monthly-data", name="getTeamsMonthlyData", options={"expose"=true})
    */

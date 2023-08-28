@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Commune;
 use App\Entity\Team;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
@@ -312,6 +311,20 @@ class TeamRepository extends ServiceEntityRepository
         return $teamsAnomalyStats;
     }
 
+    public function filterDate($query, $dateStart, $dateEnd, $attr)
+    {
+        if ($dateStart) {
+            $query
+                ->andWhere($attr . ' >= :dateStart')
+                ->setParameter('dateStart', $dateStart);
+        }
+        if ($dateStart) {
+            $query
+                ->andWhere($attr . ' <= :dateEnd')
+                ->setParameter('dateEnd', $dateEnd);
+        }
+        return $query;
+    }
 
     //  -> Total des interruptions -  Total des Vistes -  Total des anomalies
     public function getTotalActivity($dateStart, $dateEnd, $team)
@@ -321,40 +334,38 @@ class TeamRepository extends ServiceEntityRepository
             ->select('COUNT(a.id)')
             ->leftJoin('a.edge', 'e')
             ->leftJoin('e.department', 'd')
-            ->where('a.createdAt BETWEEN :dateStart AND :dateEnd')
             ->andWhere('d.team = :teamId')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('teamId', $team)
-            ->getQuery()->getSingleScalarResult();
+            ->setParameter('teamId', $team);
+        $anomalyTotal = $this->filterDate($anomalyTotal, $dateStart, $dateEnd, "t.createdAt");
+        $anomalyTotal = $anomalyTotal->getQuery()->getSingleScalarResult();
+
+
         $visitsTotal = $this->em->createQueryBuilder()
             ->from('App\Entity\Visite', 'v')
             ->select('COUNT(v.id)')
             ->innerJoin('v.node_a', 'n')
             ->leftJoin('n.department', 'd')
-            ->where('v.date BETWEEN :dateStart AND :dateEnd')
             ->andWhere('d.team = :teamId')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('teamId', $team)
-            ->getQuery()->getSingleScalarResult();
+            ->setParameter('teamId', $team);
+        $visitsTotal = $this->filterDate($visitsTotal, $dateStart, $dateEnd, "v.date");
+        $visitsTotal = $visitsTotal->getQuery()->getSingleScalarResult();
+
         $missionTotal = $this->em->createQueryBuilder()
             ->from('App\Entity\Mission', 'm')
             ->select('COUNT(m.id)')
             ->innerJoin('m.node_a', 'n')
             ->leftJoin('n.department', 'd')
-            ->where('m.dateStart BETWEEN :dateStart AND :dateEnd')
             ->andWhere('d.team = :teamId')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('teamId', $team)
-            ->getQuery()->getSingleScalarResult();
+            ->setParameter('teamId', $team);
+        $missionTotal = $this->filterDate($missionTotal, $dateStart, $dateEnd, "m.dateStart");
+        $missionTotal = $missionTotal->getQuery()->getSingleScalarResult();
         return [
             "Total des interruptions" => $anomalyTotal,
             "Total des Vistes" => $visitsTotal,
             "Total des anomalies" => $missionTotal
         ];
     }
+
     //  -> CausesAndType -> Causes des interruptions + Interruptions par type
     public function getCausesAndType($dateStart, $dateEnd, $team)
     {
@@ -367,11 +378,10 @@ class TeamRepository extends ServiceEntityRepository
             ->from('App\Entity\Mission', 'm')
             ->innerJoin('m.node_a', 'n')
             ->leftJoin('n.department', 'd')
-            ->where('m.dateStart BETWEEN :dateStart AND :dateEnd')
             ->andWhere('d.team = :teamId')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
             ->setParameter('teamId', $team);
+
+        $queryBuilder = $this->filterDate($queryBuilder, $dateStart, $dateEnd, "m.dateStart");
 
         // Total count of missions for each cause
         $causesList = ["Défauts matériels", "Telescopare", "Intenpaire", "Cause inconnue"];
@@ -391,8 +401,6 @@ class TeamRepository extends ServiceEntityRepository
     public function getInterruptionsPerformance($dateStart, $dateEnd, $team)
     {
 
-        $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
-        $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
         $departments = $this->em->createQueryBuilder()
             ->select('d.id, d.titre')
             ->from('App\Entity\Department', 'd')
@@ -400,8 +408,34 @@ class TeamRepository extends ServiceEntityRepository
             ->setParameter('teamId', $team)
             ->getQuery()
             ->getResult();
+        // dd($departments);
 
         $result = [];
+
+        // if only end date or start date get data of that date month only
+        // if none given get this year data
+        if ($dateStart && $dateEnd) {
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+        } elseif ($dateStart) {
+            //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
+
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = clone $dateStart;
+            // last day of the original month
+            $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
+        } elseif ($dateEnd) {
+            // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
+
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+            $dateStart = clone $dateEnd;
+            // 1st day of the same month
+            $dateStart->setDate($dateStart->format('Y'), $dateStart->format('m'), 1);
+        } else {
+            // if none was given, $dateStart is the 1st day of the current year and $dateEnd is the last day of current year
+            $dateStart = new \DateTime('first day of January this year');
+            $dateEnd = new \DateTime('last day of December this year');
+        }
 
         // Calculate the difference in days between the start and end dates
         $dateInterval = $dateStart->diff($dateEnd);
@@ -409,6 +443,10 @@ class TeamRepository extends ServiceEntityRepository
 
         // Determine whether to group by month or by day
         $groupByMonth = $daysDifference > 30;
+
+        // dump($daysDifference);
+        // dump($groupByMonth);
+        // exit;
 
         $currentDate = clone $dateStart;
 
@@ -471,14 +509,12 @@ class TeamRepository extends ServiceEntityRepository
             ->from('App\Entity\Anomaly', 'a')
             ->innerJoin('a.edge', 'e')
             ->innerJoin('e.department', 'd')
-            ->where('a.createdAt BETWEEN :dateStart AND :dateEnd')
             ->andWhere('d.team = :teamId')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
             ->setParameter('teamId', $team)
-            ->groupBy('d.id')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('d.id');
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "a.createdAt");
+        $qb = $qb->getQuery()->getResult();
+
 
         $result = [];
 
@@ -525,14 +561,11 @@ class TeamRepository extends ServiceEntityRepository
             ->join('n.commune', 'c')
 
             ->andWhere('c.id IN (:communesIds)')
-            ->andWhere('v.date BETWEEN :dateStart AND :dateEnd')
+            ->setParameter('communesIds', $communesIds);
 
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('communesIds', $communesIds)
+        $nbSupport = $this->filterDate($nbSupport, $dateStart, $dateEnd, "v.date");
+        $nbSupport = $nbSupport->getQuery()->getResult();
 
-            ->getQuery()
-            ->getResult();
         $result = [];
         foreach ($Communes as $Commune) {
             $CommuneId = $Commune["ID"];
@@ -577,15 +610,10 @@ class TeamRepository extends ServiceEntityRepository
             ->join('mc.mission', 'm')
 
             ->andWhere('c.id IN (:communesIds)')
-            ->andWhere('m.dateStart BETWEEN :dateStart AND :dateEnd')
+            ->setParameter('communesIds', $CommunesIds);
 
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('communesIds', $CommunesIds)
-
-            ->groupBy('c.id')
-            ->getQuery()
-            ->getResult();
+        $MissionCommune = $this->filterDate($MissionCommune, $dateStart, $dateEnd, "m.dateStart");
+        $MissionCommune = $MissionCommune->groupBy('c.id')->getQuery()->getResult();
 
         $result = [];
         foreach ($Communes as $Commune) {
@@ -607,7 +635,7 @@ class TeamRepository extends ServiceEntityRepository
     public function getPostInterruptionInfo($dateStart, $dateEnd, $poste)
     {
         // stored posts of mission
-        return $this->em->createQueryBuilder()
+        $qb = $this->em->createQueryBuilder()
             ->from('App\Entity\MissionPostes', 'mp')
             ->select(
                 // Le nombre des fois un post copée
@@ -615,15 +643,14 @@ class TeamRepository extends ServiceEntityRepository
                 // nb des hours
                 'SUM(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as Duration',
             )
-            
+
             ->join('mp.mission', 'm')
             ->andWhere('mp.poste = :poste')
-            ->andWhere('m.dateStart BETWEEN :dateStart AND :dateEnd')
-            ->setParameter('dateStart', $dateStart)
-            ->setParameter('dateEnd', $dateEnd)
-            ->setParameter('poste', $poste)
+            ->setParameter('poste', $poste);
 
-            ->getQuery()
-            ->getResult();
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateStart");
+        $qb = $qb->getQuery()->getResult();
+
+        return $qb;
     }
 }

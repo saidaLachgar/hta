@@ -161,7 +161,7 @@ export class missionListComponent {
             }
           }
         };
-        console.log(data);
+        // console.log(data);
         
         return data;
       })
@@ -219,7 +219,7 @@ export class missionListComponent {
                 yearly ? monthMap[monthData["MONTH"]] : monthData["DAY"]
               );
               let dms = parseFloat(monthData["DMS_TOTAL"]);
-              console.log(dms);
+              // console.log(dms);
               
               dms && (totalDMS += dms)
               return dms;

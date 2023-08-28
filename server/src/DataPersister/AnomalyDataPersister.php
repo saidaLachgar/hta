@@ -46,7 +46,7 @@ class AnomalyDataPersister implements ContextAwareDataPersisterInterface
                 ||( !$anomaly->isStatus() && $this->was_done($context)) // is not done and old value is done
             )
         ) {
-            $action = $this->em->getRepository(Goal::class)->findOneBy(['calc' => 'ANOMALY_VISIT_COUNT']);
+            $action = $this->em->getRepository(Goal::class)->getTarget("ANOMALY_VISIT_COUNT");
             $action && $this->em->getRepository(Objective::class)
                 ->UpdateAchievement([$action], !$anomaly->isStatus(), $anomaly->getCreatedAt() ? $anomaly->getCreatedAt() : new \DateTime());
         }
@@ -65,7 +65,9 @@ class AnomalyDataPersister implements ContextAwareDataPersisterInterface
             $this->has_associated_visit($anomaly) && 
             $anomaly->isStatus()) 
         {
-            $action = $this->em->getRepository(Goal::class)->findOneBy(['calc' => 'ANOMALY_VISIT_COUNT']);
+            $date = $anomaly->getCreatedAt();
+            $action = $this->em->getRepository(Goal::class)->getTarget("ANOMALY_VISIT_COUNT",$date);
+    
             $this->em->getRepository(Objective::class)->UpdateAchievement([$action], true, $anomaly->getCreatedAt());
         }
         $this->em->remove($anomaly);

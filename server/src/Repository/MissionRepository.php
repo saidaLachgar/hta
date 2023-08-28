@@ -113,10 +113,11 @@ class MissionRepository extends ServiceEntityRepository
     public function getMissionsStats(int $month): array
     {
         $currentYear = date('Y');
+        $prevYear = $currentYear;
         $prevMonth = $month - 1;
         if ($prevMonth === 0) {
             $prevMonth = 12;
-            $currentYear--;
+            $prevYear--;
         }
 
         // List of causes to consider
@@ -152,7 +153,7 @@ class MissionRepository extends ServiceEntityRepository
             )
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :prevMonth')
-            ->setParameter('year', $currentYear)
+            ->setParameter('year', $prevYear)
             ->setParameter('prevMonth', $prevMonth)
             ->getQuery()->getSingleScalarResult();
 

@@ -2,10 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Edge;
 use App\Entity\Visite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Repository\EdgeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @extends ServiceEntityRepository<Visite>
@@ -17,12 +18,12 @@ use App\Repository\EdgeRepository;
  */
 class VisiteRepository extends ServiceEntityRepository
 {
-    private $edgeRepository;
+    private $em;
 
-    public function __construct(ManagerRegistry $registry, EdgeRepository $edgeRepository)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Visite::class);
-        $this->edgeRepository = $edgeRepository;
+        $this->em = $entityManager;
     }
 
     public function add(Visite $entity, bool $flush = false): void
@@ -44,50 +45,130 @@ class VisiteRepository extends ServiceEntityRepository
     }
 
 
-   public function findByDeparAndDate($date, $depar)
-   {
-       return $this->createQueryBuilder('v')
+    public function findByDeparAndDate($date, $depar)
+    {
+        return $this->createQueryBuilder('v')
             ->innerJoin('v.node_a', "n")
             ->leftJoin('n.department', "d")
 
-           ->andWhere('DATE(v.date) = :date')
-           ->setParameter('date', $date)
-           
-           ->andWhere('d.id = :depar')
-           ->setParameter('depar', $depar)
+            ->andWhere('DATE(v.date) = :date')
+            ->setParameter('date', $date)
 
-           ->getQuery()
-           ->getResult()
-       ;
-   }
+            ->andWhere('d.id = :depar')
+            ->setParameter('depar', $depar)
+
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     public function checkAnomalyAssociatedVisit($anomaly): ?bool
     {
         // get all visites of the same date as anomaly also same depar
         // get each visit edges
         // check if edge include anomaly edge
+        $edgeRepo = $this->em->getRepository(Edge::class);
         $visits = $this->findByDeparAndDate(
             ($anomaly->getCreatedAt() ? $anomaly->getCreatedAt() : new \DateTime())->format('Y-m-d'),
             $anomaly->getEdge()->getDepartment()->getId()
         );
-        
+
         // dump(($anomaly->getCreatedAt() ? $anomaly->getCreatedAt() : new \DateTime())->format('Y-m-d'));exit;
-        
+
 
         foreach ($visits as $visit) {
 
-            $edges = $this->edgeRepository->getEdgesByRange(
+            $edges = $edgeRepo->getEdgesByRange(
                 $visit->getNodeA()->getDepartment()->getId(),
                 $visit->getNodeA()->getId(),
                 implode(',', $visit->getNodeB()->map(fn($node) => $node->getId())->toArray())
             );
-        
+
             if (in_array($anomaly->getEdge()->getId(), $edges)) {
                 return true;
             }
         }
-        
+
         return false;
 
     }
+
+    // Vistes par communes (année courante)
+    function VistesByCommune()
+    {
+        $currentDate = new \DateTime();
+        $year = $currentDate->format('Y');
+        return $this->createQueryBuilder('v')
+            ->select('c.titre AS COMMUNE, SUM(v.id) as VISTES')
+
+            ->join('v.node_a', 'n')
+            ->join('n.commune', 'c')
+
+            ->andWhere('YEAR(m.dateStart) = :year')
+            ->setParameter('year', $year)
+
+            ->groupBy("c.titre")
+            ->getQuery()
+            ->getResult();
+    }
+    function VisiteStats()
+    {
+        $currentDate = new \DateTime();
+        $month = $currentDate->format('m');
+        $year = $currentDate->format('Y');
+        $prevMonth = $month - 1;
+        $prevYear = $year;
+        if ($prevMonth === 0) {
+            $prevMonth = 12;
+            $prevYear--;
+        }
+        // Visite au sol (Km) -> all visites of this year
+        // $goal = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT", $currentDate);
+        // $targetDistance = $goal ? $goal->getTargetAchievement() : null;
+
+        // total anomalies (this month + last month) 
+        $anomalyQuery = $this->em->createQueryBuilder()
+            ->select(
+                'COUNT(a.id) as TOTAL_ANOMALIES'
+            )
+            ->from('App\Entity\Anomaly', 'a')
+            ->andWhere('YEAR(m.createdAt) = :year')
+            ->andWhere('MONTH(m.createdAt) = :month');
+
+        $anomaliesCurrent = $anomalyQuery
+            ->setParameter('year', $year)
+            ->setParameter('month', $month)
+            ->getQuery()->getSingleScalarResult();
+
+
+        $anomaliesPrev = $anomalyQuery
+            ->setParameter('year', $prevYear)
+            ->setParameter('month', $prevMonth)
+            ->getQuery()->getSingleScalarResult();
+
+
+        // Longueur visitée (year + month)
+        $nbSupportQuery = $this->em->createQueryBuilder()
+            ->from('App\Entity\Visite', 'v')
+            ->select('SUM(v.nbSupport) as SUPPORTS')
+            ->andWhere('YEAR(m.createdAt) = :year')
+            ->setParameter('year', $year);
+
+        $nbSupportMonth = $nbSupportQuery
+            ->andWhere('MONTH(m.createdAt) = :month')
+            ->setParameter('month', $month)
+            ->getQuery()->getSingleScalarResult();
+
+        $nbSupportYear = $nbSupportQuery->getQuery()->getSingleScalarResult();
+
+
+        return [
+            "nbSupportYear" => $nbSupportYear ? $nbSupportYear * 100 : 0,
+            "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth * 100 : 0,
+            "anomaliesCurrent" => $anomaliesCurrent ?? null,
+            "anomaliesPrev" => $anomaliesPrev ?? null,
+        ];
+
+    }
+
 }

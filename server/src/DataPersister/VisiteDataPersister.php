@@ -34,7 +34,7 @@ class VisiteDataPersister implements DataPersisterInterface
         // check if there is a no previous state of the entity
         if (!$prevVisite) {
             // Visite au sol (Km) -> all visites of this year
-            $action = $this->em->getRepository(Goal::class)->findOneBy(['calc' => 'ANNUAL_VISIT_COUNT']);
+            $action = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT");
             $action && $this->em->getRepository(Objective::class)->UpdateAchievement([$action],false, $Visite->getDate());
         }
 
@@ -47,7 +47,8 @@ class VisiteDataPersister implements DataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
-        $action = $this->em->getRepository(Goal::class)->findOneBy(['calc' => 'ANNUAL_VISIT_COUNT']);
+        $date = $data->getDate();
+        $action = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT",$date);
         $this->em->getRepository(Objective::class)->UpdateAchievement([$action], true, $data->getDate());
 
         $this->em->remove($data);
