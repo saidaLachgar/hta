@@ -576,7 +576,7 @@ class TeamRepository extends ServiceEntityRepository
 
             $result[] = [
                 "COMMUNE" => $Commune["TITLE"],
-                "CLIENTS" => !empty($data) ? floatval($data[0]["CLIENTS"]) * 100 : 0,
+                "DISTANCE" => !empty($data) ? floatval($data[0]["SUPPORTS"]) * 100 : 0,
             ];
         }
         return $result;

@@ -257,12 +257,14 @@ export class StatistiquesComponent {
       "stats": "KMVisitedPerCommune",
       ...(args)
     }).pipe(map(data => {
-
+      console.log(data.map(item => item.DISTANCE));
+      console.log(data.map(item => item.COMMUNE));
+      
       return {
         series: [
           {
             name: "distibuted",
-            data: data.map(item => item.CLIENTS)
+            data: data.map(item => item.DISTANCE)
           }
         ],
         chart: {
@@ -289,11 +291,10 @@ export class StatistiquesComponent {
         },
         yaxis: {
           labels: {
-            formatter: value => Math.round(value)
+            formatter: value => value.toFixed(2) +" km"
           },
         },
       };
-
     }));
     this.ClientCutsByCommune$ = this.http.post<[]>(url, {
       "stats": "ClientCutsByCommune",
