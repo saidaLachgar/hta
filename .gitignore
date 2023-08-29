@@ -16,7 +16,6 @@
 
 
 # Compiled output
-/admin/dist
 /admin/tmp
 /admin/out-tsc
 /admin/bazel-out

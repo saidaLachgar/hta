@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Redirect HTTP to HTTPS (optional)
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Rewrite rules for serving the Angular app from app/dist directory
+RewriteCond %{HTTP_HOST} ^sysglad-hta.site$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.sysglad-hta.site$
+RewriteCond %{REQUEST_URI} !^/Admin/dist/
+RewriteRule ^(.*)$ /Admin/dist/$1 [L]
