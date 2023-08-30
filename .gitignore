@@ -18,12 +18,12 @@
 
 
 # Compiled output
-/admin/tmp
-/admin/out-tsc
-/admin/bazel-out
+/client/tmp
+/client/out-tsc
+/client/bazel-out
 
 # Node
-/admin/node_modules
+/client/node_modules
 npm-debug.log
 yarn-error.log
 
@@ -46,13 +46,13 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/admin/.angular/cache
+/client/.angular/cache
 .sass-cache/
-/admin/connect.lock
-/admin/coverage
-/admin/libpeerconnection.log
+/client/connect.lock
+/client/coverage
+/client/libpeerconnection.log
 testem.log
-/admin/typings
+/client/typings
 
 # System files
 .DS_Store
