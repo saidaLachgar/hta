@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
       let that = this;
       this.authenticationService.login(this.f.username.value, this.f.password.value)
         .subscribe({
-          error: (error) => {this.error = error ? error : ''; this.loading = false;},
+          error: (error) => {this.error = error ? error.error.message : '';this.loading = false;},
           complete() {
             that.router.navigate(['/dashboard']);
             this.loading = false;
