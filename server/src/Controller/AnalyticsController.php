@@ -20,6 +20,20 @@ class AnalyticsController extends AbstractController
     $this->em = $em;
   }
 
+
+    /**
+     * @Route("/", name="index")
+     */
+    public function index( Request $request)
+    {
+       /** @var \App\Repository\TeamRepository $TeamRepo */
+    $TeamRepo = $this->em->getRepository(Team::class);
+
+    $data = $TeamRepo->getTeamsData();
+
+    return new JsonResponse($data);
+    } 
+
   /**
    * @Route("/api/analytics/dms-total", name="getTotalDMS", options={"expose"=true})
    */
