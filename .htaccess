@@ -1,13 +1,7 @@
-# .htaccess in the document root
-RewriteEngine On
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-# Redirect HTTP to HTTPS (optional)
-RewriteCond %{HTTPS} off
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Serve the Angular frontend for the root URL
-RewriteRule ^$ /client/dist/ [L]
-
-# Rewrite rules for serving the Symfony backend from /backend directory
-RewriteCond %{REQUEST_URI} !^/backend/
-RewriteRule ^(.*)$ /server/public/$1 [L]
+    # Rewrite to /client/dist/ for all requests except those starting with /client/dist/
+    RewriteCond %{REQUEST_URI} !^/client/dist/
+    RewriteRule ^(.*)$ /client/dist/$1 [L]
+</IfModule>

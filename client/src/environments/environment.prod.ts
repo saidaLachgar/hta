@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  serverURL: 'http://www.sysglad-hta.site/backend',
+  serverURL: 'https://core.sysglad-hta.site',
   pageSize : 30
 };
