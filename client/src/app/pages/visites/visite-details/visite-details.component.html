@@ -45,9 +45,9 @@
               <tr>
                 <th scope="row">Équipe :</th>
                 <td><a 
-                  *ngIf="visite.team"
-                  [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', visite.team.id] : null"
-                  target="_blank">{{visite.team.titre}}</a></td>
+                  *ngIf="visite.node_a.department.team"
+                  [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', visite.node_a.department.team.id] : null"
+                  target="_blank">{{visite.node_a.department.team.titre}}</a></td>
               </tr>
             </tbody>
           </table>

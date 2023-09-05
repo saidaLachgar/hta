@@ -104,14 +104,15 @@ class VisiteRepository extends ServiceEntityRepository
             ->join('v.node_a', 'n')
             ->join('n.commune', 'c')
 
-            ->andWhere('YEAR(m.dateStart) = :year')
+            ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year)
 
             ->groupBy("c.titre")
             ->getQuery()
             ->getResult();
     }
-    function VisiteStats()
+
+    function getVisitsStats()
     {
         $currentDate = new \DateTime();
         $month = $currentDate->format('m');
@@ -132,8 +133,8 @@ class VisiteRepository extends ServiceEntityRepository
                 'COUNT(a.id) as TOTAL_ANOMALIES'
             )
             ->from('App\Entity\Anomaly', 'a')
-            ->andWhere('YEAR(m.createdAt) = :year')
-            ->andWhere('MONTH(m.createdAt) = :month');
+            ->andWhere('YEAR(a.createdAt) = :year')
+            ->andWhere('MONTH(a.createdAt) = :month');
 
         $anomaliesCurrent = $anomalyQuery
             ->setParameter('year', $year)
@@ -151,11 +152,11 @@ class VisiteRepository extends ServiceEntityRepository
         $nbSupportQuery = $this->em->createQueryBuilder()
             ->from('App\Entity\Visite', 'v')
             ->select('SUM(v.nbSupport) as SUPPORTS')
-            ->andWhere('YEAR(m.createdAt) = :year')
+            ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year);
 
         $nbSupportMonth = $nbSupportQuery
-            ->andWhere('MONTH(m.createdAt) = :month')
+            ->andWhere('MONTH(v.date) = :month')
             ->setParameter('month', $month)
             ->getQuery()->getSingleScalarResult();
 
@@ -167,6 +168,7 @@ class VisiteRepository extends ServiceEntityRepository
             "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth * 100 : 0,
             "anomaliesCurrent" => $anomaliesCurrent ?? null,
             "anomaliesPrev" => $anomaliesPrev ?? null,
+            "VistesByCommune" => $this->VistesByCommune(),
         ];
 
     }

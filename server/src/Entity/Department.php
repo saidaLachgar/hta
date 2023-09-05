@@ -71,7 +71,7 @@ class Department
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="departments")
      * 
-     * @Groups({"depar", "missions"})
+     * @Groups({"depar", "missions","visite"})
      */
     private $team;
 

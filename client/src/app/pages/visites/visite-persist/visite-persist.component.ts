@@ -35,12 +35,12 @@ export class visitePersistComponent {
     service.loadDepartments(false);
     service.loadANodes();
     service.loadBNodes();
-    service.loadTeams();
+    // service.loadTeams();
     service.visiteForm = this.fb.group({
       anomalies: this.fb.array([]),
       date: [""],
       time: [""],
-      team: [""],
+      // team: [""],
       nbSupport: [null],
       department: ["", Validators.required],
       nodeA: ["", Validators.required],
@@ -55,7 +55,7 @@ export class visitePersistComponent {
         this.id = String(obj.id);
 
         // fill ng-select
-        service.loadTeams(obj.team ? [obj.team] : []);
+        // service.loadTeams(obj.team ? [obj.team] : []);
         service.loadANodes(obj.node_a ? [obj.node_a] : []);
         service.loadBNodes(obj.node_b ? obj.node_b : []);
 
@@ -70,7 +70,7 @@ export class visitePersistComponent {
         service.visiteForm.patchValue({
           date: dateObject(date),
           time: time,
-          team: obj.team ? obj.team["@id"] : null,
+          // team: obj.team ? obj.team["@id"] : null,
           department: obj.node_a.department ? obj.node_a.department["@id"] : null,
           nodeA: obj.node_a ? obj.node_a["@id"] : null,
           nbSupport: obj.nbSupport ? obj.nbSupport : 0,

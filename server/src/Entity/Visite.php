@@ -34,8 +34,8 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
- *          "team.id"=SearchFilter::STRATEGY_EXACT,
  *          "nbSupport"=SearchFilter::STRATEGY_EXACT,
+ *          "node_a.department.team.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.department.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_a.id"=SearchFilter::STRATEGY_EXACT,
  *          "node_b.id"=SearchFilter::STRATEGY_EXACT
@@ -68,12 +68,6 @@ class Visite
      * @Groups({"visite"})
      */
     private $nbSupport=0;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Team::class)
-     * @Groups({"visite"})
-     */
-    private $team;
 
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="a_visites")
@@ -123,18 +117,6 @@ class Visite
     public function setNbSupport(?float $nbSupport): self
     {
         $this->nbSupport = $nbSupport;
-
-        return $this;
-    }
-
-    public function getTeam(): ?Team
-    {
-        return $this->team;
-    }
-
-    public function setTeam(?Team $team): self
-    {
-        $this->team = $team;
 
         return $this;
     }

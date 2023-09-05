@@ -3,6 +3,9 @@ import { FormBuilder } from "@angular/forms";
 import { NgSelectConfig } from "@ng-select/ng-select";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { visiteService } from "../visite.service";
+import { environment } from "src/environments/environment";
+import { HttpClient } from "@angular/common/http";
+import { map } from "rxjs/operators";
 
 // Chart data
 export interface ChartType {
@@ -38,13 +41,16 @@ export interface ChartType {
   templateUrl: "./visites-list.component.html",
 })
 export class visitesListComponent {
+  readonly server = environment.serverURL;
   breadCrumbItems: Array<{}>;
   Chartdata: ChartType;
+  visitsStats$;
 
   constructor(
     public service: visiteService,
     private fb: FormBuilder,
     public authService: AuthenticationService,
+    private http: HttpClient,
     private config: NgSelectConfig,
   ) {
     service.findAll();
@@ -52,6 +58,7 @@ export class visitesListComponent {
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
+    this.ReportStats();
 
 
     service.visiteForm = fb.group({
@@ -61,7 +68,7 @@ export class visitesListComponent {
       "node_a.department.id[]": [""],
       "node_a.id[]": [''],
       "node_b.id[]": [''],
-      "team.id[]": [""],
+      "node_a.department.team.id[]": [""],
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';
@@ -95,5 +102,20 @@ export class visitesListComponent {
         borderColor: '#f1f1f1'
       },
     };
+  }
+
+  ReportStats() {
+    this.visitsStats$ = this.http.get(`${this.server}/api/analytics/visits-stats/`).pipe(
+      map(data => {
+        console.log(data);
+        let currentMonthTasks = data["anomaliesPrev"]*1;
+        let lastMonthTasks = data["anomaliesCurrent"]*1;
+        // Calculate the percentage change
+        data["percentageChange"] = ((currentMonthTasks - lastMonthTasks) / lastMonthTasks) * 100;
+
+        
+        return data;
+      })
+    )
   }
 }

@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Rewrite to /client/dist/ for all requests except those starting with /client/dist/
+    RewriteCond %{REQUEST_URI} !^/client/dist/
+    RewriteRule ^(.*)$ /client/dist/$1 [L]
+
+    # Block specific user agents
+    RewriteCond %{HTTP_USER_AGENT} (googlebot|bingbot|Baiduspider) [NC]
+    RewriteRule .* - [R=403,L]
+</IfModule>

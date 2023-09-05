@@ -9,7 +9,7 @@
 
   <!-- statistics -->
   <div class="row">
-    <div class="col">
+    <div class="col-xl">
       <div class="card card-body">
 
         <!-- title -->
@@ -27,7 +27,7 @@
 
         <ng-container *ngIf="missionsStats$ | async as missionsStats; else statsLoading">
           <div class="row justify-content-between">
-            <div class="col-3">
+            <div class="col-xl-3">
               <div class="border p-3 rounded-3 mb-2">
                 <p class="fw-medium mb-3">Total des interruptions</p>
                 <strong class="h2">{{missionsStats["Total"]}}</strong>
@@ -49,7 +49,7 @@
                 <strong class="h2 mb-0">{{ duration | decimalHourToTime:'long' }}</strong>
               </div>
             </div>
-            <div class="col-6">
+            <div class="col-xl-6 pt-4 pt-xl-0">
               <p class="fw-bold mb-3">Causes des interruptions</p>
               <ng-container *ngIf="missionsStats['causes'] as causes; else noCauses">
                 <apx-chart
@@ -63,7 +63,7 @@
                 <p class="alert alert-info">Aucune cause connue d'interruptions sur cette période donnée</p>
               </ng-template>
             </div>
-            <div class="col-3" *ngIf="missionsStats['types'] as types">
+            <div class="col-xl-3 pt-4 pt-xl-0" *ngIf="missionsStats['types'] as types">
               <p class="fw-bold mb-3">Interruptions par type</p>
                 <apx-chart
                   [series]="types.series"
@@ -87,7 +87,7 @@
         <!-- cards -->
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-xl-4">
       <div class="card card-body">
         
         <div class="fw-bold">
