@@ -1,12 +1,12 @@
+import { HttpClient } from "@angular/common/http";
 import { Component } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { AuthenticationService } from "src/app/core/services/auth.service";
-import { environment } from 'src/environments/environment';
-import { statistiquesService } from "./statistiques.service";
-import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { CausesList } from "src/app/core/models";
 import { DecimalHourToTimePipe } from "src/app/core/pipes";
+import { AuthenticationService } from "src/app/core/services/auth.service";
+import { environment } from 'src/environments/environment';
+import { statistiquesService } from "./statistiques.service";
 
 @Component({
   selector: "app-statistiques",
@@ -14,14 +14,19 @@ import { DecimalHourToTimePipe } from "src/app/core/pipes";
 })
 export class StatistiquesComponent {
   readonly server = environment.serverURL;
+  readonly url = `${this.server}/api/analytics/by-team`;
   causesList = Object.keys(CausesList);
   form: FormGroup;
   today: Date = new Date();
   submitted: boolean = false;
+  postesStatsSubmitted: boolean = false;
+  selectedPoste;
+  RelatedPostes$;
   TotalActivity$;
   CausesAndType$;
-  InterruptionsPerformance$;
   AnomalyCorrection$;
+  InterruptionsPerformance$;
+  PostInterruptionInfo$;
   KMVisitedPerCommune$;
   ClientCutsByCommune$;
 
@@ -44,15 +49,13 @@ export class StatistiquesComponent {
     if (form.invalid) return;
     this.submitted = true;
     // console.log(form.value);
-
-    let url = `${this.server}/api/analytics/by-team`;
     let args = form.value;
 
-    this.TotalActivity$ = this.http.post<[]>(url, {
+    this.TotalActivity$ = this.http.post<[]>(this.url, {
       "stats": "TotalActivity",
       ...(args)
     }).pipe();
-    this.CausesAndType$ = this.http.post<[]>(url, {
+    this.CausesAndType$ = this.http.post<[]>(this.url, {
       "stats": "CausesAndType",
       ...(args)
     }).pipe(map(data => {
@@ -71,9 +74,6 @@ export class StatistiquesComponent {
           {
             breakpoint: 480,
             options: {
-              chart: {
-                width: 200
-              },
               legend: {
                 position: "bottom"
               }
@@ -135,8 +135,7 @@ export class StatistiquesComponent {
 
       return data;
     }));
-
-    this.InterruptionsPerformance$ = this.http.post(url, {
+    this.InterruptionsPerformance$ = this.http.post(this.url, {
       "stats": "InterruptionsPerformance",
       ...(args)
     }).pipe(map(data => {
@@ -149,8 +148,19 @@ export class StatistiquesComponent {
           type: statType,
           total: 0,
           series: [],
+
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  height: "auto"
+                },
+              }
+            }
+          ],
           chart: {
-            height: 275,
+            height: 300,
             type: "line"
           },
           dataLabels: {
@@ -196,8 +206,7 @@ export class StatistiquesComponent {
       // console.log(structuredData);
       return structuredData;
     }));
-
-    this.AnomalyCorrection$ = this.http.post<any>(url, {
+    this.AnomalyCorrection$ = this.http.post<any>(this.url, {
       "stats": "AnomalyCorrection",
       ...(args)
     }).pipe(map(data => {
@@ -217,8 +226,9 @@ export class StatistiquesComponent {
           categories: data.map(item => item.DEPARTMENT)
         },
         chart: {
+
           type: "bar",
-          height: 275,
+          height: 300,
           stacked: true,
           toolbar: {
             show: true
@@ -231,6 +241,9 @@ export class StatistiquesComponent {
           {
             breakpoint: 480,
             options: {
+              chart: {
+                height: "auto"
+              },
               legend: {
                 position: "bottom",
                 offsetX: -10,
@@ -253,13 +266,12 @@ export class StatistiquesComponent {
         }
       };
     }));
-    this.KMVisitedPerCommune$ = this.http.post<any>(url, {
+    this.KMVisitedPerCommune$ = this.http.post<any>(this.url, {
       "stats": "KMVisitedPerCommune",
       ...(args)
     }).pipe(map(data => {
-      console.log(data.map(item => item.DISTANCE));
-      console.log(data.map(item => item.COMMUNE));
-      
+      // console.log(data.map(item => item.DISTANCE));
+      // console.log(data.map(item => item.COMMUNE));
       return {
         series: [
           {
@@ -267,8 +279,19 @@ export class StatistiquesComponent {
             data: data.map(item => item.DISTANCE)
           }
         ],
+
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                height: "auto"
+              },
+            }
+          }
+        ],
         chart: {
-          height: 275,
+          height: 300,
           type: "bar",
         },
         plotOptions: {
@@ -291,20 +314,85 @@ export class StatistiquesComponent {
         },
         yaxis: {
           labels: {
-            formatter: value => value.toFixed(2) +" km"
+            formatter: value => value.toFixed(2) + " km"
           },
         },
       };
     }));
-    this.ClientCutsByCommune$ = this.http.post<[]>(url, {
+    this.ClientCutsByCommune$ = this.http.post<any>(this.url, {
       "stats": "ClientCutsByCommune",
       ...(args)
+    }).pipe(map(data => {
+      // console.log(data.map(item => item.CLIENTS));
+      // console.log(data.map(item => item.COMMUNE));
+
+      return {
+        series: [
+          {
+            name: "distibuted",
+            data: data.map(item => item.CLIENTS)
+          }
+        ],
+
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                height: "auto"
+              },
+            }
+          }
+        ],
+        chart: {
+          height: 300,
+          type: "bar",
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: "45%",
+            distributed: true
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        legend: {
+          show: false
+        },
+        grid: {
+          show: false
+        },
+        xaxis: {
+          categories: data.map(item => item.COMMUNE),
+        },
+        yaxis: {
+          labels: {
+            formatter: value => Math.round(value)
+          },
+        },
+      };
+    }));
+    this.RelatedPostes$ = this.http.post<any>(this.url, {
+      "stats": "RelatedPostes",
+      ...(args)
     }).pipe();
-    // let getPostInterruptionInfo = this.http.post<[]>(url, {
+    // let getPostInterruptionInfo = this.http.post<[]>(this.url, {
     //   "stats": "getPostInterruptionInfo",
     //   ...(args)
     // }).pipe();
+  }
 
+  postesStats(): void {
+    let args = this.form.value;
+    this.postesStatsSubmitted = true;
+    args.team = this.selectedPoste;
+    console.log(args);
+
+    this.PostInterruptionInfo$ = this.http.post<any>(this.url, {
+      "stats": "PostInterruptionInfo",
+      ...(this.form.value)
+    }).pipe();
   }
 
   get dateStart() {

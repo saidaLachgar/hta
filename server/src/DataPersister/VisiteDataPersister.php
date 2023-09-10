@@ -35,7 +35,7 @@ class VisiteDataPersister implements DataPersisterInterface
         if (!$prevVisite) {
             // Visite au sol (Km) -> all visites of this year
             $action = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT");
-            $action && $this->em->getRepository(Objective::class)->UpdateAchievement([$action],false, $Visite->getDate());
+            $action && $this->em->getRepository(Objective::class)->UpdateAchievement([$action],false, $Visite->getDate(), $Visite->getNbSupport() * 100);
         }
 
         $this->em->persist($Visite);
@@ -45,13 +45,13 @@ class VisiteDataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($data, array $context = [])
+    public function remove($Visite, array $context = [])
     {
-        $date = $data->getDate();
+        $date = $Visite->getDate();
         $action = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT",$date);
-        $this->em->getRepository(Objective::class)->UpdateAchievement([$action], true, $data->getDate());
+        $this->em->getRepository(Objective::class)->UpdateAchievement([$action], true, $Visite->getDate(), $Visite->getNbSupport() * 100);
 
-        $this->em->remove($data);
+        $this->em->remove($Visite);
         $this->em->flush();
     }
 

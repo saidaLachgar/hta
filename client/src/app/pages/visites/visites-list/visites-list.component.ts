@@ -110,8 +110,11 @@ export class visitesListComponent {
         console.log(data);
         let currentMonthTasks = data["anomaliesPrev"]*1;
         let lastMonthTasks = data["anomaliesCurrent"]*1;
+        data["percentageChange"] = 0;
         // Calculate the percentage change
-        data["percentageChange"] = ((currentMonthTasks - lastMonthTasks) / lastMonthTasks) * 100;
+        if(lastMonthTasks){
+          data["percentageChange"] = ((currentMonthTasks - lastMonthTasks) / lastMonthTasks) * 100;
+        }
 
         
         return data;

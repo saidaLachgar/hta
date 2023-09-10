@@ -318,7 +318,7 @@ class TeamRepository extends ServiceEntityRepository
                 ->andWhere($attr . ' >= :dateStart')
                 ->setParameter('dateStart', $dateStart);
         }
-        if ($dateStart) {
+        if ($dateEnd) {
             $query
                 ->andWhere($attr . ' <= :dateEnd')
                 ->setParameter('dateEnd', $dateEnd);
@@ -336,7 +336,7 @@ class TeamRepository extends ServiceEntityRepository
             ->leftJoin('e.department', 'd')
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team);
-        $anomalyTotal = $this->filterDate($anomalyTotal, $dateStart, $dateEnd, "t.createdAt");
+        $anomalyTotal = $this->filterDate($anomalyTotal, $dateStart, $dateEnd, "a.createdAt");
         $anomalyTotal = $anomalyTotal->getQuery()->getSingleScalarResult();
 
 
@@ -636,7 +636,7 @@ class TeamRepository extends ServiceEntityRepository
     {
         // stored posts of mission
         $qb = $this->em->createQueryBuilder()
-            ->from('App\Entity\MissionPostes', 'mp')
+            ->from('App\Entity\MissionPoste', 'mp')
             ->select(
                 // Le nombre des fois un post copée
                 'SUM(mp.poste) AS TIMES',
@@ -652,5 +652,22 @@ class TeamRepository extends ServiceEntityRepository
         $qb = $qb->getQuery()->getResult();
 
         return $qb;
+    }
+
+    // get team's postes
+    public function getRelatedPostes($dateStart, $dateEnd, $team)
+    {
+
+        $qb = $this->em->createQueryBuilder();
+        $qb
+            ->select('p.id, p.designation')
+            ->from('App\Entity\Poste', 'p')
+            ->join('p.node', 'n')
+            ->join('n.department', 'd')
+            ->join('d.team', 't')
+            ->where('t.id = :teamId')
+            ->setParameter('teamId', $team);
+
+        return $qb->getQuery()->getResult();
     }
 }

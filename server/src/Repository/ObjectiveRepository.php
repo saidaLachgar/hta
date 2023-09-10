@@ -87,7 +87,7 @@ class ObjectiveRepository extends ServiceEntityRepository
 
         return $restructuredResult;
     }
-    public function UpdateAchievement(array $actions, bool $removed, \DateTimeInterface $date): void
+    public function UpdateAchievement(array $actions, bool $removed, \DateTimeInterface $date, $value = 1): void
     {
         if (count($actions) === 0):
             $query = [];
@@ -113,7 +113,7 @@ class ObjectiveRepository extends ServiceEntityRepository
             $goals = array_diff($actions, array_map(function ($o) {return $o->getGoal()->getId(); }, $query));
             foreach ($goals as $goal) {
                 $objective = new Objective;
-                $objective->setCount(1);
+                $objective->setCount($value);
                 $objective->setGoal($em->getRepository(Goal::class)->find($goal));
                 $objective->setDate($date);
                 $em->persist($objective);
@@ -124,7 +124,7 @@ class ObjectiveRepository extends ServiceEntityRepository
         foreach ($query as $objective) {
     
             $last_val = $objective->getCount() ? $objective->getCount() : 0;
-            $new_val = $last_val + ($removed ? -1 : 1);
+            $new_val = $last_val + ($removed ? -$value : $value);
             if (!$new_val && !$objective->getPlannedCount()) {
                 $em->remove($objective);
             } else {

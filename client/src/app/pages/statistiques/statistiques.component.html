@@ -14,24 +14,24 @@
             <form class="card card-body" [formGroup]="form" (ngSubmit)="getStatistics()">
                 <div class="row g-2 align-items-center justify-content-center">
 
-                <label class="col-auto">Date : </label>
-                <div class="col-auto clockpicker">
+                <label class="col-xl-auto">Date : </label>
+                <div class="col-xl-auto clockpicker">
                     <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="dateStart" class="form-control" (click)="ds.open()" #ds="ngbDatepicker">
                 </div>
-                <div class="col-auto clockpicker">
+                <div class="col-xl-auto clockpicker">
                     <input ngbDatepicker [minDate]="{year: 1900, month: 1, day: 1}" formControlName="dateEnd" class="form-control" (click)="de.open()" #de="ngbDatepicker">
                 </div>
                 
-                <span class="mx-3 my-0 text-muted w-auto">|</span>
+                <span class="mx-3 my-0 text-muted w-auto d-none d-xl-block">|</span>
 
-                <label class="col-auto" [ngClass]="{'text-danger':team.invalid && submitted}">Equipe * : </label>
-                <div class="col-2">
+                <label class="col-xl-auto mt-3 mt-xl-2" [ngClass]="{'text-danger':team.invalid && submitted}">Equipe * : </label>
+                <div class="col-xl-2">
                 <ng-select formControlName="team" placeholder="Equipe">
                     <ng-option *ngFor="let team of (service.teams$ | async)" [value]="team.id">{{team.titre}}</ng-option>
                 </ng-select>
                 </div>
                 
-                <span class="mx-3 my-0 text-muted w-auto">|</span>
+                <span class="mx-3 my-0 text-muted w-auto d-none d-xl-block">|</span>
                 <button class="btn btn-success w-auto">Appliquer</button>
 
                 </div>
@@ -52,7 +52,7 @@
     <!-- charts -->
     <div class="row" *ngIf="!team.invalid && submitted; else noFilter">
         <!-- Total des interruptions -  Total des Vistes -  Total des anomalies -->
-        <div class="col-4 pb-4">
+        <div class="col-lg-6 col-xl-3 pb-4">
             <div class="card card-body h-100">
                 <ng-container *ngIf="TotalActivity$ | async as data;else ActivityLoading">
                     <div class="border p-3 rounded-3 mb-2" *ngFor="let item of data | keyvalue">
@@ -70,10 +70,55 @@
             </div>
         </div>
 
+        <!-- Le nombre des fois un post copée + nb des hours -->
+        <div class="col-lg-6 col-xl-3 pb-4">
+            <div class="card card-body h-100">
+                <div class="fw-bold mb-2">
+                    Nombre de fois un poste est copié avec la durée
+                </div>
+
+                <ng-template #RelatedPostesLoading>
+                    <svg aria-labelledby="loading-8-aria" role="img" viewBox="0 0 340 84" width="190" height="50"><title id="loading-8-aria">Loading...</title><rect role="presentation" x="0" y="0" width="100%" height="100%" clip-path="url(#loading-8-diff)" style="fill:url(#loading-8-animated-diff)"></rect><defs><clipPath id="loading-8-diff"><rect x="9" y="4" rx="0" ry="0" width="320" height="22"></rect><rect x="18" y="14" rx="0" ry="0" width="303" height="6"></rect><rect x="11" y="33" rx="0" ry="0" width="108" height="13"></rect></clipPath><linearGradient id="loading-8-animated-diff"><stop offset="0%" stop-color="#f6f6ef" stop-opacity="1"><animate attributeName="offset" values="-2; -2; 1" keyTimes="0; 0.25; 1" dur="1s" repeatCount="indefinite"></animate></stop><stop offset="50%" stop-color="#e8e8e3" stop-opacity="1"><animate attributeName="offset" values="-1; -1; 2" keyTimes="0; 0.25; 1" dur="1s" repeatCount="indefinite"></animate></stop><stop offset="100%" stop-color="#f6f6ef" stop-opacity="1" style=""><animate attributeName="offset" values="0; 0; 3" keyTimes="0; 0.25; 1" dur="1s" repeatCount="indefinite"></animate></stop></linearGradient></defs></svg>
+                </ng-template>
+
+                <ng-container *ngIf="RelatedPostes$ | async as data;else RelatedPostesLoading">
+                    <div class="small text-muted mb-3">Veuillez sélectionner un poste pour voir ses statistiques</div>
+                    <label>Designation</label>
+                    <ng-select 
+                        [(ngModel)]="selectedPoste"
+                        placeholder="Designation..">
+                        <ng-option *ngFor="let item of data" [value]="item.id">{{item.designation}}</ng-option>
+                    </ng-select>
+                    <button class="btn btn-primary d-block ms-auto mt-3" (click)="postesStats()">Soumettre</button>
+                </ng-container>
+
+                <ng-container *ngIf="PostInterruptionInfo$ | async as data;else PostInterruptionInfoLoading">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="border p-3 rounded-3 mb-2">
+                                <p class="fw-medium mb-3">La durée de coupure</p>
+                                <strong class="h2">{{data.Duration ? data.Duration : 0}}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border p-3 rounded-3 mb-2">
+                                <p class="fw-medium mb-3">Nombre de fois</p>
+                                <strong class="h2">{{data.TIMES ? data.TIMES : 0}}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #PostInterruptionInfoLoading>
+                    <p *ngIf="postesStatsSubmitted">Chargement...</p>
+                </ng-template>
+
+            </div>
+        </div>
+
         <!-- Causes And Types -->
         <ng-container *ngIf="CausesAndType$ | async as data;else CausesAndTypeLoading">
             <!-- Causes des interruptions -->
-            <div class="col-4 pb-4">
+            <div class="col-lg-6 col-xl-4 pb-4">
                 <div class="card card-body h-100">
                     <div class="fw-bold mb-4">
                         Causes des interruptions
@@ -92,7 +137,7 @@
                 </div>
             </div>
             <!-- Interruptions par type -->
-            <div class="col-4 pb-4">
+            <div class="col-lg-6 col-xl-2 pb-4">
                 <div class="card card-body h-100">
                     <div class="fw-bold mb-4">
                         Interruptions par type
@@ -116,7 +161,7 @@
 
         <ng-template #CausesAndTypeLoading>
             <!-- Causes des interruptions -->
-            <div class="col-4">
+            <div class="col-lg-6 col-xl-4">
                 <div class="card card-body">
                     <div class="fw-bold mb-4">
                         Causes des interruptions
@@ -135,7 +180,7 @@
                 </div>
             </div>
              <!-- Interruptions par type -->
-            <div class="col-4">
+            <div class="col-lg-6 col-xl-2">
                 <div class="card card-body">
                     <div class="fw-bold mb-4">
                         Interruptions par type
@@ -194,9 +239,6 @@
                     <div class="fw-bold mb-4">
                     DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions par départ)</small>
                     </div>
-                    <div class="fw-bold mb-4">
-                        Total : 00:14:42
-                    </div>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
                         <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
                         <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
@@ -216,9 +258,6 @@
                     <div class="fw-bold mb-4">
                     END <small class="text-muted font-size-12">(L’énergie non distribuée par départ)</small>
                     </div>
-                    <div class="fw-bold mb-4">
-                        Total : 00:14:42
-                    </div>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
                         <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
                         <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
@@ -237,9 +276,6 @@
             <div class="card card-body">
                 <div class="fw-bold mb-4">
                 IFS <small class="text-muted font-size-12">(Fréquence des interruptions par départ)</small>
-                </div>
-                <div class="fw-bold mb-4">
-                    Total : 0.18
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
                     <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
@@ -330,17 +366,32 @@
                 <div class="fw-bold mb-4">
                     Le nombre de clients coupés par commune
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-                    <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
-                    <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
-                    </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
-                    <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
-                    </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
-                    <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
-                    </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
-                    <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
-                    </rect></g>
-                </svg>
+                <ng-template #ClientCutsByCommuneLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+                        </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+                        </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+                        </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+                        </rect></g>
+                    </svg>
+                </ng-template>
+
+                <ng-container *ngIf="ClientCutsByCommune$ | async as data; else ClientCutsByCommuneLoading">
+                    <apx-chart
+                        [series]="data.series"
+                        [chart]="data.chart"
+                        [dataLabels]="data.dataLabels"
+                        [plotOptions]="data.plotOptions"
+                        [yaxis]="data.yaxis"
+                        [xaxis]="data.xaxis"
+                        [legend]="data.legend"
+                        [grid]="data.grid"
+                    ></apx-chart>
+                </ng-container>
             </div>
         </div>
     </div>

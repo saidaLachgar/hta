@@ -7,7 +7,7 @@
     ></app-page-title>
     <!-- end page title -->
   
-    <form class="row mt-4" [formGroup]="userService.userForm" (ngSubmit)="userService.onUpdate(id)">
+    <form class="row mt-4" [formGroup]="userService.userForm" (ngSubmit)="userService.onUpdate(id,true)">
       <fieldset class="col-12" [disabled]="userService.loading$ | async">
         <div class="card card-body">
           <div class="row">
@@ -77,7 +77,7 @@
                   class="form-control"
                   [ngClass]="{'is-invalid':userService.password.invalid && userService.submitted}"
                   type="password"
-                  formControlName="password"
+                  formControlName="confirmPassword"
                   id="password-input"
                 />
                 <div
@@ -136,7 +136,7 @@
   
             <div class="row justify-content-end">
               <div class="col-auto">
-                <button class="btn btn-light me-2" routerLink="/users"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
+                <!-- <button class="btn btn-light me-2" routerLink="/users"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button> -->
                 <button class="btn btn-primary"><i class="bx bx-loader-alt fa-spin" *ngIf="userService.submitted && (userService.loading$ | async)"></i> Sauvegarder</button>
               </div>
             </div>

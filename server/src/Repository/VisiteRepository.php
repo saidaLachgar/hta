@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Edge;
+use App\Entity\Goal;
 use App\Entity\Visite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -123,9 +124,10 @@ class VisiteRepository extends ServiceEntityRepository
             $prevMonth = 12;
             $prevYear--;
         }
+        
         // Visite au sol (Km) -> all visites of this year
-        // $goal = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT", $currentDate);
-        // $targetDistance = $goal ? $goal->getTargetAchievement() : null;
+        $goal = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT", $currentDate);
+        $targetDistance = $goal ? $goal->getTargetAchievement() : null;
 
         // total anomalies (this month + last month) 
         $anomalyQuery = $this->em->createQueryBuilder()
@@ -168,6 +170,7 @@ class VisiteRepository extends ServiceEntityRepository
             "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth * 100 : 0,
             "anomaliesCurrent" => $anomaliesCurrent ?? null,
             "anomaliesPrev" => $anomaliesPrev ?? null,
+            "annualVisitLgth" => $targetDistance ?? 0,
             "VistesByCommune" => $this->VistesByCommune(),
         ];
 

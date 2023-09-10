@@ -24,7 +24,7 @@ export class UserService extends EntityCollectionServiceBase<User> {
   users$: Observable<User[]>;
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
-  page:number = 1;
+  page: number = 1;
   lastSearchedParams;
   public userForm: FormGroup;
 
@@ -44,22 +44,22 @@ export class UserService extends EntityCollectionServiceBase<User> {
     this.findByCriteria({ page: 1 });
   }
 
-  loadTeams(defaultVal = []) : void{
+  loadTeams(defaultVal = []): void {
     this.teams$ = concat(
       of(defaultVal), // default items
       this.teamInput$.pipe(
-          debounceTime(500),
-          distinctUntilChanged(),
-          filter((val) => val != null),
-          tap(() => this.teamLoading = true),
-          switchMap(term => 
-            this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=`+term)
+        debounceTime(500),
+        distinctUntilChanged(),
+        filter((val) => val != null),
+        tap(() => this.teamLoading = true),
+        switchMap(term =>
+          this.http.get<Team[]>(`${this.server}/api/teams?properties[]=id&properties[]=titre&titre=` + term)
             .pipe(
               map(response => response["hydra:member"]),
               catchError(() => of([])), // empty list on error
               tap(() => this.teamLoading = false)
             )
-          )
+        )
       )
     );
   }
@@ -130,22 +130,33 @@ export class UserService extends EntityCollectionServiceBase<User> {
   /**
    * Persist : update
    */
-  onUpdate(id:number): void {
+  onUpdate(id: number, ignoreEmpty = false): void {
     let userForm = this.userForm;
     this.submitted = true;
     if (userForm.invalid) return;
     this.submitted = false;
 
     let toast = this.toast;
-    let user:User = {...userForm.value};
+    let user: User = { ...userForm.value };
     user.id = id;
-    user.roles = [user.roles.toString()];
-      this.update(user).subscribe({
-        error: () => toast.error("un problème est survenu, veuillez réessayer"),
-        complete() {
-          toast.success("L'utilisateur a été mis à jour avec succès");
-        },
-      });
+
+    if (ignoreEmpty) {
+      user = Object.entries(user).reduce((acc, [key, value]) => {
+        if (value !== "" && value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+    } else {
+      user.roles = [user.roles.toString()];
+    }
+
+    this.update(user).subscribe({
+      error: () => toast.error("un problème est survenu, veuillez réessayer"),
+      complete() {
+        toast.success("L'utilisateur a été mis à jour avec succès");
+      },
+    });
   }
   get fullName() {
     return this.userForm.get("fullName");
