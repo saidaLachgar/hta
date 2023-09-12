@@ -84,11 +84,11 @@ export class AuthenticationService {
     this.currentUserSubject.next(user);
   }
 
-  logout() {
+  logout(redirect:boolean = true) {
     // remove user from local storage to log user out
     localStorage.clear();
     this.currentUserSubject && this.currentUserSubject.next(null);
-    this.router.navigate(["account/login"]);
+    redirect && this.router.navigate(["account/login"]);
   }
 
   setPermissions(role: string) {
@@ -103,6 +103,7 @@ export class AuthenticationService {
   }
 
   isAuthorized(access: string): boolean {
+    // console.log(this.getPermissions(), access);
     return this.getPermissions().includes(access);
   }
 }

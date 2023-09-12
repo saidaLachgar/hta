@@ -48,54 +48,45 @@
                                     <span class="d-none d-sm-block">{{r.label}}</span>
                                 </a>
                                 <ng-template ngbNavContent>
-                                    <div class="row">
-                                        <div class="col-6 mt-4" *ngFor="let access of EntitiesAccess; let i=index">
-                                            <h5 class="mb-3">{{access.name}}</h5>
-                                            <div class="ms-3">
-
-                                                <ng-container *ngIf="access.permissions === -1;else second">
-                                                    <div *ngFor="let permission of PermissionsIndex; let i=index">
-                                                        <label>
-                                                            <input type="checkbox" 
-                                                                [formArrayName]="r.role"
-                                                                (change)="onChange($event, r.role)"
-                                                                [value]="access.value+'_'+permission.value"
-                                                                [checked]="isChecked(access.value+'_'+permission.value, r.role)"
-                                                            >
-                                                            {{permission.name}}
-                                                        </label>
-                                                    </div>
-                                                </ng-container>
-                                                <ng-template #second>
-                                                    <ng-container
-                                                        *ngIf="(access.permissions | typeof) === 'number';else third">
-                                                        <label>
-                                                            <input type="checkbox"
-                                                                [formArrayName]="r.role"
-                                                                (change)="onChange($event, r.role)"
-                                                                [value]="access.value+'_'+PermissionsIndex[access.permissions].value"
-                                                                [checked]="isChecked(access.value+'_'+PermissionsIndex[access.permissions].value, r.role)"
-                                                            >
-                                                            {{PermissionsIndex[access.permissions].name}}
-                                                        </label>
-                                                    </ng-container>
-                                                </ng-template>
-                                                <ng-template #third>
-                                                    <div *ngFor="let key of access.permissions; let i=index">
-                                                        <label>
-                                                            <input type="checkbox"
-                                                                [formArrayName]="r.role"
-                                                                (change)="onChange($event, r.role)"
-                                                                [value]="access.value+'_'+PermissionsIndex[key].value"
-                                                                [checked]="isChecked(access.value+'_'+PermissionsIndex[key].value, r.role)"
-                                                            >
-                                                            {{PermissionsIndex[key].name}}
-                                                        </label>
-                                                    </div>
-                                                </ng-template>
-                                            </div>
-                                            <hr>
-                                        </div>
+                                    <div class="table-responsive mt-4">
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th *ngFor="let permission of PermissionsIndex; let i=index">{{permission.name}}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let access of EntitiesAccess; let i=index">
+                                                    <th>{{access.name}}</th>
+        
+                                                    <!-- full access -->
+                                                    <td *ngFor="let permission of PermissionsIndex; let i=index">
+                                                        <ng-container 
+                                                            *ngIf="
+                                                                access.permissions === -1 || 
+                                                                ((access.permissions | typeof) === 'number' && i == access.permissions) ||
+                                                                ((access.permissions | typeof) === 'object' && access.permissions.indexOf(i) > -1);
+                                                                else disabled
+                                                            ">
+                                                            <label title="{{permission.name}}">
+                                                                <input type="checkbox" 
+                                                                    [formArrayName]="r.role"
+                                                                    (change)="onChange($event, r.role)"
+                                                                    [value]="access.value+'_'+permission.value"
+                                                                    [checked]="isChecked(access.value+'_'+permission.value, r.role)"
+                                                                >
+                                                            </label>
+                                                        </ng-container>
+                                                        <ng-template #disabled>
+                                                            <label>
+                                                                <input style="opacity: 0.3;" type="checkbox" disabled>
+                                                            </label>
+                                                        </ng-template>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </ng-template>
                             </li>

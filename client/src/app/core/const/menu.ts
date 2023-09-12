@@ -16,19 +16,21 @@ export const MENU: MenuItem[] = [
         label: 'Travaux',
         icon: 'fas fa-hard-hat',
         link: '/mission',
+        checkPermissions: 'missions',
     },
     {
         id:4,
         label: 'Anomalies',
         link: '/anomalies',
         icon: 'bx bx-task',
+        checkPermissions: 'anomalies',
     },
     {
         id:5,
         label: 'Visites',
         link: '/visites',
         icon: 'bx bx-walk',
-        parentId: 3
+        checkPermissions: 'visites',
     },
     {
         id:7,
@@ -39,19 +41,25 @@ export const MENU: MenuItem[] = [
                 id:19,
                 label: 'État du suivi',
                 link: '/objectives',
-                parentId: 7
+                parentId: 7,
+                checkPermissions: 'objectives',
+
             },
             {
                 id:20,
                 label: 'Objectifs',
                 link: '/goals',
-                parentId: 7
+                parentId: 7,
+                checkPermissions: 'goals',
+
             },
             {
                 id:21,
                 label: 'Groupe d\'objectifs',
                 link: '/goal-group',
-                parentId: 7
+                parentId: 7,
+                checkPermissions: 'goal_groups',
+
             },
         ]
     },
@@ -60,12 +68,14 @@ export const MENU: MenuItem[] = [
         label: 'Postes de distribution',
         icon: 'fas fa-network-wired',
         link: '/postes',
+        checkPermissions: 'postes',
     },
     {
         id:9,
         label: 'Statistiques',
         icon: 'bx bx-line-chart',
         link: '/statistiques',
+        checkPermissions: 'statistiques',
     },
     {
         id:10,
@@ -97,7 +107,8 @@ export const MENU: MenuItem[] = [
                 id:14,
                 label: 'Historique',
                 link: '/historique',
-                parentId: 10
+                parentId: 10,
+                checkPermissions: 'logs',
             }
         ]
     },

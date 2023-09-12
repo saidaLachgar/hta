@@ -2,25 +2,49 @@ import { EntityAccess } from "../models";
 
 export const EntitiesAccess:EntityAccess[] = [
     {
-        name: "Anomalies",
-        value: "anomalies",
-        permissions: -1
-    },
-    {
         name: 'Mission',
         value: 'missions',
-        permissions: -1
+        permissions: [0, 1, 2, 3, 4]
     },
-
     {
-        name: 'Calendrier',
-        value: 'calendrier',
-        permissions: 4
+        name: "Anomalies",
+        value: "anomalies",
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Visites',
         value: 'visites',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Départ',
+        value: 'departments',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Dps',
+        value: 'dps',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Commune',
+        value: 'communes',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    {
+        name: 'Tronçon',
+        value: 'edges',
         permissions: -1
+    },
+    {
+        name: 'Postes',
+        value: 'postes',
+        permissions: -1
+    },
+    {
+        name: 'Appareils coupeur',
+        value: 'nodes',
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'État du suivi',
@@ -30,57 +54,29 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Groupe d\'objectif',
         value: 'goal_groups',
-        permissions: -1
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Objectives',
         value: 'goals',
-        permissions: -1
+        permissions: [0, 1, 2, 3, 4]
     },
+   
     {
-        name: 'Postes',
-        value: 'postes',
-        permissions: -1
+        name: 'Équipes',
+        value: 'teams',
+        permissions: [0, 1, 2, 3, 4]
+    },
+    
+    {
+        name: 'Members',
+        value: 'users',
+        permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Statistiques',
         value: 'statistiques',
         permissions: 4
-    },
-    {
-        name: 'Équipes',
-        value: 'teams',
-        permissions: -1
-    },
-    {
-        name: 'Départ',
-        value: 'departments',
-        permissions: -1
-    },
-    {
-        name: 'Dps',
-        value: 'dps',
-        permissions: -1
-    },
-    {
-        name: 'Commune',
-        value: 'communes',
-        permissions: -1
-    },
-    {
-        name: 'Tronçon',
-        value: 'edges',
-        permissions: -1
-    },
-    {
-        name: 'Appareils coupeur',
-        value: 'nodes',
-        permissions: -1
-    },
-    {
-        name: 'Members',
-        value: 'users',
-        permissions: -1
     },
     {
         name: 'Autorisation',
@@ -92,11 +88,6 @@ export const EntitiesAccess:EntityAccess[] = [
         value: 'logs',
         permissions: 4
     },
-    {
-        name: 'Source des données',
-        value: 'data',
-        permissions: 4
-    },
 ];
 
 export const PermissionsIndex = [ // has all checkboxes -> -1
@@ -105,7 +96,7 @@ export const PermissionsIndex = [ // has all checkboxes -> -1
     {name:'Ajouter', value: 'add'}, // -> 2
     {name:'Details', value: 'details'}, // -> 3
     {name:'Afficher', value: 'show'}, // -> 4
-    // {name:'Exporter', value: 'export'}, // -> 5
-    // {name:'Importer', value: 'import'}, // -> 6
+    {name:'Exporter', value: 'export'}, // -> 5
+    {name:'Importer', value: 'import'}, // -> 6
     // {name:'Profile', value: 'profile'}, // -> 7
 ]

@@ -20,7 +20,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   menu: any;
   data: any;
 
-  menuItems = [];
+  menuItems:any = [];
 
   @ViewChild('sideMenu') sideMenu: ElementRef;
 
@@ -104,7 +104,8 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
    * Initialize
    */
   initialize(): void {
-    this.menuItems = MENU;
+    this.menuItems = this.checkPermissions(MENU);
+    console.log(this.menuItems);
   }
 
   /**
@@ -116,12 +117,26 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   /**
-   * Returns true or false if given menu item has checkPermissions key
-   * @param item menuItem
+   * checks if menu items are authorized
+   * @param menu Menu
    */
-  checkPermissions(item: MenuItem) {
-    return "checkPermissions" in item ?
-      this.auth.isAuthorized(item.checkPermissions + '_show') : true;
+  checkPermissions(menu) {
+    return menu.filter(item => {
+      if (item.isTitle) {
+        return true; // Ignore isTitle items
+      }
+      
+      if (item.checkPermissions && this.auth.isAuthorized(item.checkPermissions + '_show')) {
+        return true; // Remove items with false permissions
+      }
+  
+      if ('subItems' in item && item.subItems) {
+        item.subItems = this.checkPermissions(item.subItems); // Recursively filter subItems
+        return item.subItems && item.subItems.length > 0; // Keep the parent item if subItems remain
+      }
+      
+      return false;
+    })
   }
 
 }

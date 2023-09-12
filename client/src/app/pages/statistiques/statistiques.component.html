@@ -53,7 +53,7 @@
     <div class="row" *ngIf="!team.invalid && submitted; else noFilter">
         <!-- Total des interruptions -  Total des Vistes -  Total des anomalies -->
         <div class="col-lg-6 col-xl-3 pb-4">
-            <div class="card card-body h-100">
+            <div class="card card-body pb-2 mb-0 h-100">
                 <ng-container *ngIf="TotalActivity$ | async as data;else ActivityLoading">
                     <div class="border p-3 rounded-3 mb-2" *ngFor="let item of data | keyvalue">
                         <p class="fw-medium mb-3">{{item.key}}</p>
@@ -72,7 +72,7 @@
 
         <!-- Le nombre des fois un post copée + nb des hours -->
         <div class="col-lg-6 col-xl-3 pb-4">
-            <div class="card card-body h-100">
+            <div class="card card-body pb-2 mb-0 h-100">
                 <div class="fw-bold mb-2">
                     Nombre de fois un poste est copié avec la durée
                 </div>
@@ -93,15 +93,15 @@
                 </ng-container>
 
                 <ng-container *ngIf="PostInterruptionInfo$ | async as data;else PostInterruptionInfoLoading">
-                    <div class="row">
+                    <div class="row pt-3">
                         <div class="col-6">
-                            <div class="border p-3 rounded-3 mb-2">
+                            <div class="border p-3 rounded-3 h-100">
                                 <p class="fw-medium mb-3">La durée de coupure</p>
                                 <strong class="h2">{{data.Duration ? data.Duration : 0}}</strong>
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="border p-3 rounded-3 mb-2">
+                            <div class="border p-3 rounded-3 h-100">
                                 <p class="fw-medium mb-3">Nombre de fois</p>
                                 <strong class="h2">{{data.TIMES ? data.TIMES : 0}}</strong>
                             </div>
@@ -119,7 +119,7 @@
         <ng-container *ngIf="CausesAndType$ | async as data;else CausesAndTypeLoading">
             <!-- Causes des interruptions -->
             <div class="col-lg-6 col-xl-4 pb-4">
-                <div class="card card-body h-100">
+                <div class="card card-body pb-2 mb-0 h-100">
                     <div class="fw-bold mb-4">
                         Causes des interruptions
                     </div>
@@ -138,7 +138,7 @@
             </div>
             <!-- Interruptions par type -->
             <div class="col-lg-6 col-xl-2 pb-4">
-                <div class="card card-body h-100">
+                <div class="card card-body pb-2 mb-0 h-100">
                     <div class="fw-bold mb-4">
                         Interruptions par type
                     </div>

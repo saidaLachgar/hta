@@ -9,6 +9,7 @@ import {
 import { concat, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from "rxjs/operators";
 import { Pagination, Team, User } from "src/app/core/models";
+import { AuthenticationService } from "src/app/core/services/auth.service";
 import { ConfirmDialogService } from "src/app/shared/components/confirm-dialog/confirm-dialog.service";
 import { environment } from "src/environments/environment";
 
@@ -18,12 +19,13 @@ import { environment } from "src/environments/environment";
 export class UserService extends EntityCollectionServiceBase<User> {
   readonly pageSize = environment.pageSize;
   private server = environment.serverURL;
-  teams$: Observable<Team[]>;
+  teams$: Observable<any[] | Team[]>;
   teamLoading = false;
   teamInput$ = new Subject<string>();
   users$: Observable<User[]>;
   pagination$: Observable<Pagination>;
   submitted: boolean = false;
+  loading: boolean = false;
   page: number = 1;
   lastSearchedParams;
   public userForm: FormGroup;
@@ -32,6 +34,7 @@ export class UserService extends EntityCollectionServiceBase<User> {
     private serviceElementsFactory: EntityCollectionServiceElementsFactory,
     private confirmDialogService: ConfirmDialogService,
     private http: HttpClient,
+    private authService: AuthenticationService,
     private toast: HotToastService
   ) {
     super("users", serviceElementsFactory);
@@ -131,12 +134,15 @@ export class UserService extends EntityCollectionServiceBase<User> {
    * Persist : update
    */
   onUpdate(id: number, ignoreEmpty = false): void {
+
     let userForm = this.userForm;
     this.submitted = true;
     if (userForm.invalid) return;
     this.submitted = false;
 
+    let that = this;
     let toast = this.toast;
+    let currentUser = this.authService.user;
     let user: User = { ...userForm.value };
     user.id = id;
 
@@ -154,7 +160,25 @@ export class UserService extends EntityCollectionServiceBase<User> {
     this.update(user).subscribe({
       error: () => toast.error("un problème est survenu, veuillez réessayer"),
       complete() {
-        toast.success("L'utilisateur a été mis à jour avec succès");
+        if (currentUser.id == id) {
+          that.loading = true;
+          that.authService.logout(false);
+          that.authService.login(user.username, user.password)
+            .subscribe({
+              error: (error) => {
+                error && toast.error(error.error.message);
+                that.loading = false;
+              },
+              complete() {
+                that.loading = false;
+                toast.success("L'utilisateur a été mis à jour avec succès");
+                setTimeout(() => window.location.reload(), 10);
+              },
+            })
+        } else {
+          toast.success("L'utilisateur a été mis à jour avec succès");
+        }
+
       },
     });
   }
