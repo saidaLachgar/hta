@@ -36,12 +36,14 @@
               "src/assets/scss/icons.scss"
             ],
             "scripts": [],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "aot": true,
+            "buildOptimizer": true,
+            "vendorChunk": true,
+            "commonChunk": true
           },
           "configurations": {
             "production": {
