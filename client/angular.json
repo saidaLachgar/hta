@@ -37,13 +37,13 @@
             ],
             "scripts": [],
             "extractLicenses": false,
-            "sourceMap": true,
+            "sourceMap": false,
             "optimization": false,
-            "namedChunks": true,
-            "aot": true,
-            "buildOptimizer": true,
+            "namedChunks": false,
             "vendorChunk": true,
-            "commonChunk": true
+            "commonChunk": true,
+            "statsJson": false,
+            "progress": false
           },
           "configurations": {
             "production": {
@@ -54,7 +54,7 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": false,
