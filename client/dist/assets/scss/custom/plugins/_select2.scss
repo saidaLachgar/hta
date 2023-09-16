@@ -1,0 +1,9 @@
+//
+// Select 2
+//
+
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-placeholder {
+  padding-top: 2px;
+}

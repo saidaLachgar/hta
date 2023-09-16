@@ -1,3 +1,12 @@
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^sysglad-hta.site$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.sysglad-hta.site$
+RewriteCond %{REQUEST_URI} !client/dist/
+RewriteRule (.*) /client/dist/$1 [L]
+
+RewriteCond %{HTTP_USER_AGENT} (googlebot|bingbot|Baiduspider) [NC]
+RewriteRule .* - [R=403,L]
+
 # <IfModule mod_rewrite.c>
 # RewriteEngine On
 # RewriteBase /
