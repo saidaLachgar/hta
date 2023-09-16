@@ -1,7 +1,54 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
+# <IfModule mod_rewrite.c>
+# RewriteEngine On
+# RewriteBase /
 
-    # Rewrite to /client/dist/ for all requests except those starting with /client/dist/
-    RewriteCond %{REQUEST_URI} !^/client/dist/
-    RewriteRule ^(.*)$ /client/dist/$1 [L]
-</IfModule>
+# # Rewrite to /client/dist/ for all requests except those starting with /client/dist/
+# RewriteCond %{REQUEST_URI} !^/client/dist/
+# RewriteRule ^(.*)$ /client/dist/$1 [L]
+# </IfModule>
+
+
+
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+
+#     # Rewrite to /client/dist/ for all requests except those starting with /client/dist/
+#     RewriteCond %{REQUEST_URI} !^/client/dist/
+#     RewriteRule ^(.*)$ /client/dist/$1 [L]
+# </IfModule>
+
+
+
+# RewriteEngine on
+# RewriteCond %{HTTP_HOST} ^sysglad-hta.site$ [NC,OR]
+# RewriteCond %{HTTP_HOST} ^www.sysglad-hta.site$
+# RewriteCond %{REQUEST_URI} !client/dist/
+# RewriteRule (.*) /client/dist/$1 [L]
+
+
+
+#RewriteBase /client/dist/
+
+#RewriteCond %{HTTP_HOST} ^(www\.)?sysglad-hta\.site$ [NC]
+#RewriteCond %{REQUEST_URI} !^/client/dist/
+#RewriteRule ^(.*)$ /client/dist/$1 [L]
+
+
+
+# RewriteCond %{ENV:REDIRECT_STATUS} ^$
+# RewriteRule (.*) /client/dist/$1 [L]
+
+
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ /client/dist/$1 [L]
+
+
+
+#RewriteCond %{HTTP_HOST} ^(www\.)?sysglad-hta\.site$ [NC]
+#RewriteCond %{HTTPS} !on
+#RewriteRule (.*) https://%{HTTP_HOST}/$1 [L,R]
+#RewriteCond %{HTTP_HOST} ^sysglad-hta\.site$ [OR]
+#RewriteCond %{HTTP_HOST} ^www\.sysglad-hta\.site$
+#RewriteCond %{REQUEST_URI} !^/client/dist
+#RewriteRule (.*)$ /client/dist/$1
