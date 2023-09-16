@@ -8,7 +8,7 @@
 <div class="container-fluid mb-5">
 
   <!-- statistics -->
-  <div class="row">
+  <div class="row" *ngIf="authService.isAuthorized('statistiques_show')">
     <div class="col-xl">
       <div class="card card-body">
 
@@ -150,7 +150,7 @@
     </div>
     <div class="col-auto">
     <button class="btn btn-primary ms-2" (click)="ShowSearch = !ShowSearch"><i class="fas fa-filter me-1"></i>Filtres</button>
-    <a routerLink="/mission/persist" class="btn btn-primary ms-2" *ngIf="authService.isAuthorized('mission_add')"><i class="fas fa-plus-circle"></i> Ajouter</a>
+    <a routerLink="/mission/persist" class="btn btn-primary ms-2" *ngIf="authService.isAuthorized('missions_add')"><i class="fas fa-plus-circle"></i> Ajouter</a>
   </div>
   </div>
 
@@ -333,14 +333,14 @@
                 <tr>
                   <td
                     class="text-center"
-                    colspan="14"
+                    colspan="15"
                     *ngIf="!(service.mission$ | async) && service.loading$ | async"
                   >
                     Chargement...
                   </td>
                   <td
                     class="text-center"
-                    colspan="14"
+                    colspan="15"
                     *ngIf="(service.mission$ | async) && (service.mission$ | async).length === 0 && service.loaded$ | async"
                   >
                   Aucune donnée trouvée !
@@ -473,7 +473,7 @@
                         <!-- {{item.id}} -->
                         <div ngbDropdown 
                           placement="bottom-left"
-                          *ngIf="authService.isAuthorized('mission_details') || authService.isAuthorized('mission_update') || authService.isAuthorized('mission_delete')"
+                          *ngIf="authService.isAuthorized('missions_details') || authService.isAuthorized('missions_update') || authService.isAuthorized('missions_delete')"
                           >
                           <i
                             class="fas fa-ellipsis-h dropdown-toggle c-pointer"
@@ -488,7 +488,7 @@
                             <!-- <a
                               class="dropdown-item bg-success bg-soft"
                               href="javascript: void(0);"
-                              *ngIf="item.type && isToday(item.dateStart) && authService.isAuthorized('mission_update')"
+                              *ngIf="item.type && isToday(item.dateStart) && authService.isAuthorized('missions_update')"
                               [routerLink]="['persist', item.id, true]"
                               >
                               <i class="fas fa-play me-2 text-success"></i> Continuer
@@ -496,14 +496,14 @@
                             <a class="dropdown-item"
                               [routerLink]="['details', item.id]"
                               href="javascript: void(0);"
-                              *ngIf="authService.isAuthorized('mission_details')"
+                              *ngIf="authService.isAuthorized('missions_details')"
                               >
                               <i class="fas fa-eye me-2"></i> Voir
                             </a>
                             <a
                               class="dropdown-item"
                               href="javascript: void(0);"
-                              *ngIf="authService.isAuthorized('mission_update')"
+                              *ngIf="authService.isAuthorized('missions_update')"
                               [routerLink]="['persist', item.id]"
                               >
                               <!-- skipLocationChange -->
@@ -513,7 +513,7 @@
                             <a
                               class="dropdown-item text-danger"
                               href="javascript: void(0);"
-                              *ngIf="authService.isAuthorized('mission_delete')"
+                              *ngIf="authService.isAuthorized('missions_delete')"
                               (click)="service.deleteItem(item.id, $event.target)"
                             >
                               <i class="fas fa-trash me-2"></i> Supprimer

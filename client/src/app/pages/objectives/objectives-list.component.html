@@ -1,9 +1,10 @@
-<style>
+<style>    
     .editable-cell:hover{
         outline: 1px solid rgba(32,45,52,.4);
         cursor: pointer;
         transition: outline .05s;
     }
+
 </style>
 <div class="container-fluid mb-5">
 
@@ -24,67 +25,69 @@
                     <button class="btn btn-light font-size-10" (click)="updateYear(+current_year + 1)"><i class="fas fa-chevron-right"></i></button>
                 </p>
 
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col" valign="middle" rowspan="2">Intitulé de l'action</th>
-            <th scope="col" valign="middle" rowspan="2">Obj</th>
-            <th scope="col" colspan="2" *ngFor="let month of months">{{month}}</th>
-            <th scope="col" colspan="2">Cumul</th>
-            <th scope="col" valign="middle" rowspan="2"> % Obj</th>
-          </tr>
-          <tr>
-            <ng-container *ngFor="let number of months">
-                <th>P</th>
-                <th>R</th>
-            </ng-container>
-            <!-- Cumul -->
-            <th>P</th>
-            <th>R</th>
-          </tr>
-        </thead>
-        <tbody *ngIf='!data_loading && (data$ | async) as data; else loading_template'>
-            <ng-container *ngFor="let group of data | keyvalue">
-                <tr>
-                 <td class="bg-light fw-bold" colspan="29">{{group.key}}</td>
-                </tr>
-                <tr *ngFor="let goal of group.value | keyvalue">
-                    <td>{{goal.key}}</td>
-                    <td>{{goal.value.target_achievement}}</td>
-                    <ng-container *ngFor="let number of months; let month = index">
-                        <ng-container *ngIf="goal.value.achievements[+month + 1];else empty_cells">
-                            <td class="editable-cell" (click)="showForm(true, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
-                                {{goal.value.achievements[+month + 1].p? goal.value.achievements[+month + 1].p: ""}} 
-                            </td>
-                            <td class="editable-cell" (click)="showForm(false, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
-                                {{goal.value.achievements[+month + 1].r?goal.value.achievements[+month + 1].r: ""}} 
-                            </td>
-                        </ng-container>
-                        <ng-template #empty_cells>
-                            <td class="editable-cell" (click)="showForm(true, +month + 1, goal.value.id)"></td>
-                            <td class="editable-cell" (click)="showForm(false, +month + 1, goal.value.id)"></td>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                          <tr>
+                            <th scope="col" valign="middle" rowspan="2">Intitulé de l'action</th>
+                            <th scope="col" valign="middle" rowspan="2">Obj</th>
+                            <th scope="col" colspan="2" *ngFor="let month of months">{{month}}</th>
+                            <th scope="col" colspan="2">Cumul</th>
+                            <th scope="col" valign="middle" rowspan="2"> % Obj</th>
+                          </tr>
+                          <tr>
+                            <ng-container *ngFor="let number of months">
+                                <th>P</th>
+                                <th>R</th>
+                            </ng-container>
+                            <!-- Cumul -->
+                            <th>P</th>
+                            <th>R</th>
+                          </tr>
+                        </thead>
+                        <tbody *ngIf='!data_loading && (data$ | async) as data; else loading_template'>
+                            <ng-container *ngFor="let group of data | keyvalue">
+                                <tr>
+                                 <td class="bg-light fw-bold" colspan="29">{{group.key}}</td>
+                                </tr>
+                                <tr *ngFor="let goal of group.value | keyvalue">
+                                    <td>{{goal.key}}</td>
+                                    <td>{{goal.value.target_achievement}}</td>
+                                    <ng-container *ngFor="let number of months; let month = index">
+                                        <ng-container *ngIf="goal.value.achievements[+month + 1];else empty_cells">
+                                            <td [ngClass]="{'editable-cell': authorized}" (click)="showForm(true, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
+                                                {{goal.value.achievements[+month + 1].p? goal.value.achievements[+month + 1].p: ""}} 
+                                            </td>
+                                            <td [ngClass]="{'editable-cell': authorized}" (click)="showForm(false, +month + 1, goal.value.id,goal.value.achievements[+month + 1])">
+                                                {{goal.value.achievements[+month + 1].r?goal.value.achievements[+month + 1].r: ""}} 
+                                            </td>
+                                        </ng-container>
+                                        <ng-template #empty_cells>
+                                            <td [ngClass]="{'editable-cell': authorized}" (click)="showForm(true, +month + 1, goal.value.id)"></td>
+                                            <td [ngClass]="{'editable-cell': authorized}" (click)="showForm(false, +month + 1, goal.value.id)"></td>
+                                        </ng-template>
+                                        
+                                    </ng-container>
+                                    <!-- Cumul -->
+                                    <td>{{goal.value.target_achievement}}</td>
+                                    <td>{{goal.value.cumul}}</td>
+                                    <td>
+                                        <ngb-progressbar 
+                                            [value]="( goal.value.cumul / goal.value.target_achievement ) * 100" 
+                                            [striped]="true" 
+                                            type="danger"
+                                            [showValue]="true"
+                                            [animated]="true"
+                                        ></ngb-progressbar>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                        <ng-template #loading_template>
+                            <tbody><tr><td colspan="29" class="text-center">Chargement...</td></tr></tbody>
                         </ng-template>
-                        
-                    </ng-container>
-                    <!-- Cumul -->
-                    <td>{{goal.value.target_achievement}}</td>
-                    <td>{{goal.value.cumul}}</td>
-                    <td>
-                        <ngb-progressbar 
-                            [value]="( goal.value.cumul / goal.value.target_achievement ) * 100" 
-                            [striped]="true" 
-                            type="danger"
-                            [showValue]="true"
-                            [animated]="true"
-                        ></ngb-progressbar>
-                    </td>
-                </tr>
-            </ng-container>
-        </tbody>
-        <ng-template #loading_template>
-            <tbody><tr><td colspan="29" class="text-center">Chargement...</td></tr></tbody>
-        </ng-template>
-    </table>
+                    </table>
+                </div>
 
 
             </div>
@@ -164,16 +167,17 @@
 
                 </div>
             </div>
-            
-
 		</form>
 	</div>
 	<div class="modal-footer">
-		<button *ngIf="edit_mode" type="button" class="btn btn-outline-danger" [disabled]="loading" (click)="deleteAchievement(planned)">
+		<button *ngIf="edit_mode && authService.isAuthorized('objectives_delete')" type="button" class="btn btn-outline-danger" [disabled]="loading" (click)="deleteAchievement(planned)">
             Supprimer
         </button>
-		<button type="submit" class="btn btn-primary" form="obj-form" [disabled]="loading">
-            {{edit_mode ? "Enregistrer" : "Ajouter"}}
+		<button *ngIf="edit_mode && authService.isAuthorized('objectives_update')" type="submit" class="btn btn-primary" form="obj-form" [disabled]="loading">
+            Enregistrer
+        </button>
+		<button *ngIf="!edit_mode && authService.isAuthorized('objectives_add')" type="submit" class="btn btn-primary" form="obj-form" [disabled]="loading">
+            Ajouter
         </button>
 	</div>
 </ng-template>

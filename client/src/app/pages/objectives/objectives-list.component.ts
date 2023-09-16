@@ -6,9 +6,10 @@ import {
 } from "@angular/forms";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { HotToastService } from "@ngneat/hot-toast";
-import { BehaviorSubject, Observable, of } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { switchMap, tap } from "rxjs/operators";
 import { Objective } from "src/app/core/models";
+import { AuthenticationService } from "src/app/core/services/auth.service";
 import { ObjectivesService } from "./objectives.service";
 
 @Component({
@@ -25,15 +26,18 @@ export class ObjectivesComponent {
   data_loading: boolean = false;
   planned: boolean = false;
   edit_mode: boolean | number = false;
+  authorized: boolean = false;
   data$: Observable<any[]>;
   private refreshTrigger$ = new BehaviorSubject<void>(undefined);
 
   constructor(
     public service: ObjectivesService,
+    public authService: AuthenticationService,
     private fb: FormBuilder,
     private toast: HotToastService,
     private modalService: NgbModal
   ) {
+    this.authorized = authService.isAuthorized('objectives_update') || authService.isAuthorized('objectives_add');
     this.months = [
       "Janv.",
       "Févr.",
@@ -76,17 +80,19 @@ export class ObjectivesComponent {
   }
 
   showForm(p: boolean, month: number, goal_id: string, achievement = null) {
-    this.edit_mode =
-      achievement && ((p && achievement.p) || (!p && achievement.r));
-    this.planned = p;
-    this.openModal();
-    this.form.patchValue({
-      date: this.current_year + "-" + String(month).padStart(2, "0"),
-      goal: "/api/goals/" + goal_id,
-      id: achievement ? achievement.id : null,
-      plannedCount: achievement && achievement.p ? achievement.p : null,
-      count: achievement && achievement.r ? achievement.r : null,
-    });
+    if (this.authorized) {
+      this.edit_mode =
+        achievement && ((p && achievement.p) || (!p && achievement.r));
+      this.planned = p;
+      this.openModal();
+      this.form.patchValue({
+        date: this.current_year + "-" + String(month).padStart(2, "0"),
+        goal: "/api/goals/" + goal_id,
+        id: achievement ? achievement.id : null,
+        plannedCount: achievement && achievement.p ? achievement.p : null,
+        count: achievement && achievement.r ? achievement.r : null,
+      });
+    }
   }
 
   updateYear(year: number) {

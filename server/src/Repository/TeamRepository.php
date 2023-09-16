@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
+
 
 /**
  * @extends ServiceEntityRepository<Team>
@@ -19,11 +21,13 @@ use Doctrine\ORM\EntityManagerInterface;
 class TeamRepository extends ServiceEntityRepository
 {
     private $em;
+    private $security;
 
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager, Security $security)
     {
         parent::__construct($registry, Team::class);
         $this->em = $entityManager;
+        $this->security = $security;
     }
 
     public function add(Team $entity, bool $flush = false): void
@@ -44,9 +48,19 @@ class TeamRepository extends ServiceEntityRepository
         }
     }
 
+    function getTeams() {
+        $roles = $this->security->getUser()->getRoles();
+        if (in_array("ROLE_SUPER_ADMIN", $roles)) {
+            return  $this->findAll();
+        } else {
+            return [$this->security->getUser()->getTeam()];
+        }
+    }
+
+    // if not super  admin get only their team
     public function getTeamsData(): array
     {
-        $teams = $this->findAll();
+        $teams = $this->getTeams();
         $date = new \DateTime();
         $current_year = $date->format('Y');
         $current_month = $date->format('m');
@@ -138,9 +152,10 @@ class TeamRepository extends ServiceEntityRepository
         return $teamsStats;
     }
 
+    // if not super  admin get only their teams
     public function getTeamsMonthlyData(): array
     {
-        $teams = $this->findAll();
+        $teams = $this->getTeams();
         $currentDate = new \DateTime();
         $startDate = clone $currentDate;
         $startDate->sub(new \DateInterval('P12M'));
@@ -276,9 +291,10 @@ class TeamRepository extends ServiceEntityRepository
         return $result;
     }
 
+    // if not super  admin get only their teams
     public function getTeamsAnomalies(): array
     {
-        $teams = $this->findAll();
+        $teams = $this->getTeams();
 
         $anomalyStats = $this->em->createQueryBuilder()
             ->select(

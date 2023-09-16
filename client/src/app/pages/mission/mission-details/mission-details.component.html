@@ -101,7 +101,7 @@ width: 99%;
         </div>
         <button 
           class="btn btn-primary mt-4 float-end ms-2" 
-          *ngIf="authService.isAuthorized('mission_update')"
+          *ngIf="authService.isAuthorized('missions_update')"
           routerLink="/mission/persist/{{mission.id}}"
         ><i class="fas fa-edit me-1"></i>Modifier</button>
         <button class="btn btn-light mt-4 float-end" routerLink="/mission"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>

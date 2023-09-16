@@ -1,11 +1,11 @@
 <div class="container-fluid mb-5">
   <!-- statistics -->
-  <div class="row">
+  <div class="row" *ngIf="authService.isAuthorized('statistiques_show')">
     <ng-container *ngIf="visitsStats$ | async as data; else statsLoading">
-    <div class="col-6 d-flex flex-column">
+    <div class="col-xl-6 d-flex flex-column">
       <div class="card card-body py-2 flex-grow-0">
       <div class="row">
-        <div class="col-7 p-1">
+        <div class="col-lg-7 p-1">
           <div class="border p-3 rounded-3">
             <p class="fw-medium mb-1">Distance parcourue</p>
             <div class="row">
@@ -20,7 +20,7 @@
             </div>
           </div>
         </div>
-        <div class="col-5 p-1">
+        <div class="col-lg-5 p-1">
           <div class="border p-3 rounded-3">
             <p class="fw-medium mb-2">Anomalies <small class="text-muted">(mois en cours)</small></p>
             <p class="mt-2 mb-2">
@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-xl-6">
       <div class="card card-body pb-0">
         <p class="fw-medium mb-0">Vistes par communes <small class="text-muted">(année courante)</small></p>
         <apx-chart class="apex-charts" dir="ltr" [series]="Chartdata.series" [chart]="Chartdata.chart"
