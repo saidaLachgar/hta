@@ -18,7 +18,7 @@
 
 
 # Compiled output
-# /client/dist
+/client/dist
 /client/tmp
 /client/out-tsc
 /client/bazel-out

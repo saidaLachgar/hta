@@ -8,6 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "build-and-move": "ng build --configuration production && MOVE C:\\wamp64\\www\\hta\\client\\dist\\* C:\\wamp64\\www\\hta",
     "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production"
   },
   "private": true,
