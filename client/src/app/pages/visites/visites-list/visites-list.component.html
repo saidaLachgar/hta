@@ -46,12 +46,18 @@
         </div>
       </div>
     </div>
-    <div class="col-xl-6">
-      <div class="card card-body pb-0">
+    <div class="col-xl-6 pb-4">
+      <div class="card card-body pb-0 h-100 mb-0">
         <p class="fw-medium mb-0">Vistes par communes <small class="text-muted">(année courante)</small></p>
-        <apx-chart class="apex-charts" dir="ltr" [series]="Chartdata.series" [chart]="Chartdata.chart"
-            [plotOptions]="Chartdata.plotOptions" [dataLabels]="Chartdata.dataLabels" [xaxis]="Chartdata.xaxis"
-            [colors]="Chartdata.colors" [grid]="Chartdata.grid"></apx-chart>
+        <ng-container *ngIf="!Chartdata.empty; else VistesByCommuneEmpty">
+          <apx-chart class="apex-charts" dir="ltr" [series]="Chartdata.series" [chart]="Chartdata.chart"
+          [plotOptions]="Chartdata.plotOptions" [dataLabels]="Chartdata.dataLabels" [xaxis]="Chartdata.xaxis"
+          [colors]="Chartdata.colors" [grid]="Chartdata.grid"></apx-chart>
+        </ng-container>
+        <ng-template #VistesByCommuneEmpty>
+            <p class="mt-4 alert alert-info">Pas de données trouvées !</p>
+        </ng-template>
+       
       </div>
     </div>
     </ng-container>

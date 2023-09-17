@@ -7,35 +7,6 @@ import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 
-// Chart data
-export interface ChartType {
-  chart?: any;
-  plotOptions?: any;
-  colors?: any;
-  series?: any;
-  stroke?: any;
-  fill?: any;
-  labels?: any;
-  markers?: any;
-  legend?: any;
-  xaxis?: any;
-  yaxis?: any;
-  tooltip?: any;
-  grid?: any;
-  datasets?: any;
-  options?: any;
-  toolbar?: any;
-  type?: any;
-  height?: any;
-  dataLabels?: any;
-  sparkline?: any;
-  responsive?: any;
-  states?: any;
-  title?: any;
-  subtitle?: any;
-}
-
-
 @Component({
   selector: "app-visites-list",
   templateUrl: "./visites-list.component.html",
@@ -43,7 +14,7 @@ export interface ChartType {
 export class visitesListComponent {
   readonly server = environment.serverURL;
   breadCrumbItems: Array<{}>;
-  Chartdata: ChartType;
+  Chartdata: any;
   visitsStats$;
 
   constructor(
@@ -72,42 +43,13 @@ export class visitesListComponent {
     });
 
     config.notFoundText = 'Aucune donnée trouvée !';
-
-
-    this.Chartdata = {
-      chart: {
-        height: 220,
-        type: 'bar',
-        toolbar: {
-          show: false
-        }
-      },
-      plotOptions: {
-        bar: {
-          horizontal: true,
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      series: [{
-        data: [380, 430, 450, 475, 550, 584]
-      }],
-      colors: ['#269ffb'],
-      xaxis: {
-        // tslint:disable-next-line: max-line-length
-        categories: ['LAMZOUDIA', 'Chichaoua', 'SIDI BOUZID', 'Saidate', 'SIDI MED DALIL', 'Ahdil'],
-      },
-      grid: {
-        borderColor: '#f1f1f1'
-      },
-    };
   }
 
   ReportStats() {
     this.visitsStats$ = this.http.get(`${this.server}/api/analytics/visits-stats/`).pipe(
       map(data => {
         console.log(data);
+        let VistesByCommune = data["VistesByCommune"];
         let currentMonthTasks = data["anomaliesPrev"]*1;
         let lastMonthTasks = data["anomaliesCurrent"]*1;
         data["percentageChange"] = 0;
@@ -115,6 +57,41 @@ export class visitesListComponent {
         if(lastMonthTasks){
           data["percentageChange"] = ((currentMonthTasks - lastMonthTasks) / lastMonthTasks) * 100;
         }
+
+        this.Chartdata = {
+          empty: VistesByCommune.length == 0,
+          chart: {
+            height: 220,
+            type: 'bar',
+            toolbar: {
+              show: false
+            }
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          series: [{
+            data: VistesByCommune.map(item => item.VISTES)
+          }],
+          colors: ['#269ffb'],
+          xaxis: {
+            // tslint:disable-next-line: max-line-length
+            categories: VistesByCommune.map(item => item.COMMUNE),
+          },
+          yaxis: {
+            labels: {
+              formatter: value => Math.round(value)
+            },
+          },
+          grid: {
+            borderColor: '#f1f1f1'
+          },
+        };
 
         
         return data;
