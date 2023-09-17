@@ -24,9 +24,8 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'goals_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'goals_show')", "pagination_enabled"=false},
+ *      "get"= {"pagination_enabled"=false},
  *      "grouped_goals"= {
- *          "access_control"="is_granted('hasPermission', 'goals_show')",
  *          "method"="GET",
  *          "path"="/goals/by-group",
  *          "openapi_context"={

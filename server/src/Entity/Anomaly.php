@@ -28,7 +28,7 @@ use App\Action\AnomalyAction;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'anomalies_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'anomalies_show')"},
+ *      "get"= {},
  *      "bulk"= {
  *          "method"="POST",
  *          "path"="/anomalies/bulk",

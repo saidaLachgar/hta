@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Component } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { map } from "rxjs/operators";
+import { delay, map } from "rxjs/operators";
 import { CausesList } from "src/app/core/models";
 import { DecimalHourToTimePipe } from "src/app/core/pipes";
 import { AuthenticationService } from "src/app/core/services/auth.service";
@@ -58,7 +58,7 @@ export class StatistiquesComponent {
     this.CausesAndType$ = this.http.post<[]>(this.url, {
       "stats": "CausesAndType",
       ...(args)
-    }).pipe(map(data => {
+    }).pipe(delay(1000),map(data => {
       let causes = Object.values(data)
         .filter((v, i) => Object.keys(data)[i].includes("Cause_"))
         .map(value => value ? parseInt(value, 10) : 0);
@@ -138,7 +138,7 @@ export class StatistiquesComponent {
     this.InterruptionsPerformance$ = this.http.post(this.url, {
       "stats": "InterruptionsPerformance",
       ...(args)
-    }).pipe(map(data => {
+    }).pipe(delay(2000),map(data => {
       const decimalHourToTimePipe = new DecimalHourToTimePipe();
       const statTypes = ['DMS_TOTAL', 'END_TOTAL', 'IFS_TOTAL'];
       let structuredData = [];
@@ -209,7 +209,7 @@ export class StatistiquesComponent {
     this.AnomalyCorrection$ = this.http.post<any>(this.url, {
       "stats": "AnomalyCorrection",
       ...(args)
-    }).pipe(map(data => {
+    }).pipe(delay(3000),map(data => {
       return {
         series: [
           {
@@ -269,7 +269,7 @@ export class StatistiquesComponent {
     this.KMVisitedPerCommune$ = this.http.post<any>(this.url, {
       "stats": "KMVisitedPerCommune",
       ...(args)
-    }).pipe(map(data => {
+    }).pipe(delay(4000),map(data => {
       // console.log(data.map(item => item.DISTANCE));
       // console.log(data.map(item => item.COMMUNE));
       return {
@@ -322,7 +322,7 @@ export class StatistiquesComponent {
     this.ClientCutsByCommune$ = this.http.post<any>(this.url, {
       "stats": "ClientCutsByCommune",
       ...(args)
-    }).pipe(map(data => {
+    }).pipe(delay(5000),map(data => {
       // console.log(data.map(item => item.CLIENTS));
       // console.log(data.map(item => item.COMMUNE));
 

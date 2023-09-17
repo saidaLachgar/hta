@@ -17,9 +17,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'objectives_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'objectives_show')"},
+ *      "get"= { },
  *      "achievements"= {
- *          "access_control"="is_granted('hasPermission', 'objectives_show')",
  *          "method"="GET",
  *          "path"="/objectives/get-achievements",
  *          "openapi_context"={

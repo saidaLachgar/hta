@@ -27,7 +27,7 @@ use App\Dto\PosteOutput;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'postes_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'postes_show')"},
+ *      "get"= { },
  *   },
  * )
  * @ApiFilter(

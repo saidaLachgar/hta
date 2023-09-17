@@ -23,7 +23,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'dps_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'dps_show')"},
+ *      "get"= {},
  *   },
  * )
  * @ApiFilter(

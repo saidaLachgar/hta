@@ -20,7 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'goal_groups_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'goal_groups_show')"},
+ *      "get"= {},
  *   },
  * )
  * @ApiFilter(

@@ -27,7 +27,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'users_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'users_show')"},
+ *      "get"= { },
  *   },
  * )
  * @ApiFilter(

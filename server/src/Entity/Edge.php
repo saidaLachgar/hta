@@ -23,9 +23,8 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'edges_add')"},
- *      "get"= { "access_control"="is_granted('hasPermission', 'edges_show')"},
+ *      "get"= {},
  *      "by_range"= {
- *          "access_control"="is_granted('hasPermission', 'edges_show')",
  *          "method"="GET",
  *          "path"="/edges/by-range",
  *          "openapi_context"={
