@@ -63,6 +63,7 @@ class Dps
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"dps"})
      */
     private $nbClients;
 
