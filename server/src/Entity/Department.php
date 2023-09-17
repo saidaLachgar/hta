@@ -89,6 +89,7 @@ class Department
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"depar"})
      */
     private $courantMax;
 
