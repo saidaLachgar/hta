@@ -1,12 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Component } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { delay, map } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { CausesList } from "src/app/core/models";
 import { DecimalHourToTimePipe } from "src/app/core/pipes";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { environment } from 'src/environments/environment';
 import { statistiquesService } from "./statistiques.service";
+
+const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
+const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
 
 @Component({
   selector: "app-statistiques",
@@ -48,8 +51,14 @@ export class StatistiquesComponent {
     let form = this.form;
     if (form.invalid) return;
     this.submitted = true;
+    let fields = form.value;
+    let args = {
+      dateStart: fields.dateStart ? DateToString(fields.dateStart) : null,
+      dateEnd: fields.dateEnd ? DateToString(fields.dateEnd) : null,
+      team: fields.team,
+    }
     // console.log(form.value);
-    let args = form.value;
+    // console.log(args);
 
     this.TotalActivity$ = this.http.post<[]>(this.url, {
       "stats": "TotalActivity",
@@ -58,7 +67,7 @@ export class StatistiquesComponent {
     this.CausesAndType$ = this.http.post<[]>(this.url, {
       "stats": "CausesAndType",
       ...(args)
-    }).pipe(delay(1000),map(data => {
+    }).pipe(map(data => {
       let causes = Object.values(data)
         .filter((v, i) => Object.keys(data)[i].includes("Cause_"))
         .map(value => value ? parseInt(value, 10) : 0);
@@ -138,7 +147,7 @@ export class StatistiquesComponent {
     this.InterruptionsPerformance$ = this.http.post(this.url, {
       "stats": "InterruptionsPerformance",
       ...(args)
-    }).pipe(delay(2000),map(data => {
+    }).pipe(map(data => {
       const decimalHourToTimePipe = new DecimalHourToTimePipe();
       const statTypes = ['DMS_TOTAL', 'END_TOTAL', 'IFS_TOTAL'];
       let structuredData = [];
@@ -209,7 +218,7 @@ export class StatistiquesComponent {
     this.AnomalyCorrection$ = this.http.post<any>(this.url, {
       "stats": "AnomalyCorrection",
       ...(args)
-    }).pipe(delay(3000),map(data => {
+    }).pipe(map(data => {
       return {
         series: [
           {
@@ -269,7 +278,7 @@ export class StatistiquesComponent {
     this.KMVisitedPerCommune$ = this.http.post<any>(this.url, {
       "stats": "KMVisitedPerCommune",
       ...(args)
-    }).pipe(delay(4000),map(data => {
+    }).pipe(map(data => {
       // console.log(data.map(item => item.DISTANCE));
       // console.log(data.map(item => item.COMMUNE));
       return {
@@ -322,7 +331,7 @@ export class StatistiquesComponent {
     this.ClientCutsByCommune$ = this.http.post<any>(this.url, {
       "stats": "ClientCutsByCommune",
       ...(args)
-    }).pipe(delay(5000),map(data => {
+    }).pipe(map(data => {
       // console.log(data.map(item => item.CLIENTS));
       // console.log(data.map(item => item.COMMUNE));
 

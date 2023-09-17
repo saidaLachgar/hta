@@ -329,6 +329,9 @@ class TeamRepository extends ServiceEntityRepository
 
     public function filterDate($query, $dateStart, $dateEnd, $attr)
     {
+        $dates = $this->getDates($dateStart , $dateEnd);
+        $dateStart = $dates[0];
+        $dateEnd = $dates[1];
         if ($dateStart) {
             $query
                 ->andWhere($attr . ' >= :dateStart')
@@ -340,6 +343,33 @@ class TeamRepository extends ServiceEntityRepository
                 ->setParameter('dateEnd', $dateEnd);
         }
         return $query;
+    }
+    function getDates($dateStart , $dateEnd) {
+        // if only end date or start date get data of that date month only
+        // if none given get this year data
+        if ($dateStart && $dateEnd) {
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+        } elseif ($dateStart) {
+            //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
+
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = clone $dateStart;
+            // last day of the original month
+            $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
+        } elseif ($dateEnd) {
+            // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
+
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+            $dateStart = clone $dateEnd;
+            // 1st day of the same month
+            $dateStart->setDate($dateStart->format('Y'), $dateStart->format('m'), 1);
+        } else {
+            // if none was given, $dateStart is the 1st day of the current year and $dateEnd is the last day of current year
+            $dateStart = new \DateTime('first day of January this year');
+            $dateEnd = new \DateTime('last day of December this year');
+        }
+        return [$dateStart, $dateEnd];
     }
 
     //  -> Total des interruptions -  Total des Vistes -  Total des anomalies
@@ -428,30 +458,9 @@ class TeamRepository extends ServiceEntityRepository
 
         $result = [];
 
-        // if only end date or start date get data of that date month only
-        // if none given get this year data
-        if ($dateStart && $dateEnd) {
-            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
-            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
-        } elseif ($dateStart) {
-            //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
-
-            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
-            $dateEnd = clone $dateStart;
-            // last day of the original month
-            $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
-        } elseif ($dateEnd) {
-            // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
-
-            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
-            $dateStart = clone $dateEnd;
-            // 1st day of the same month
-            $dateStart->setDate($dateStart->format('Y'), $dateStart->format('m'), 1);
-        } else {
-            // if none was given, $dateStart is the 1st day of the current year and $dateEnd is the last day of current year
-            $dateStart = new \DateTime('first day of January this year');
-            $dateEnd = new \DateTime('last day of December this year');
-        }
+        $dates = $this->getDates($dateStart , $dateEnd);
+        $dateStart = $dates[0];
+        $dateEnd = $dates[1];
 
         // Calculate the difference in days between the start and end dates
         $dateInterval = $dateStart->diff($dateEnd);
