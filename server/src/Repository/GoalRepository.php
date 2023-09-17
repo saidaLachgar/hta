@@ -128,21 +128,25 @@ class GoalRepository extends ServiceEntityRepository
         if($date == false){
             $date = new \DateTime();
         }
-        
         $year = $date->format('Y');
         $query = $this->createQueryBuilder('g')
         ->where('g.calc = :calc')
         ->setParameter('calc', $calc);
+
+        // Create a clone of the original query for the fallback
+        $fallbackQuery = clone $query;
+
 
         $result =  $query
             ->andWhere('g.target_years LIKE :target_year')
             ->setParameter('target_year', '%' . $year . '%')
             ->getQuery()
             ->getOneOrNullResult();
-
+            
         if(!$result) {
-            $result =  $query->getQuery()->getOneOrNullResult();
+            $result =  $fallbackQuery->getQuery()->getOneOrNullResult();
         }
+        // dd($result);
 
         return $result;
     }
