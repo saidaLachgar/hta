@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../core/services/auth.service';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -40,6 +39,8 @@ export class LoginComponent implements OnInit {
     // get return url from route parameters or default to '/'
     // tslint:disable-next-line: no-string-literal
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+    this.authenticationService.logout(false);
   }
 
   // convenience getter for easy access to form fields

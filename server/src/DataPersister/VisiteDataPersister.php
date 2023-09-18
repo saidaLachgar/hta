@@ -35,7 +35,7 @@ class VisiteDataPersister implements DataPersisterInterface
         if (!$prevVisite) {
             // Visite au sol (Km) -> all visites of this year
             $action = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT");
-            $action && $this->em->getRepository(Objective::class)->UpdateAchievement([$action],false, $Visite->getDate(), $Visite->getNbSupport() / 1000);
+            $action && $this->em->getRepository(Objective::class)->UpdateAchievement([$action],false, $Visite->getDate(), $Visite->getNbSupport() / 100);
         }
 
         $this->em->persist($Visite);

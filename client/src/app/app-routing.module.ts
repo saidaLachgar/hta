@@ -4,6 +4,7 @@ import { Routes, RouterModule } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
 import { LayoutComponent } from "./layouts/layout.component";
 import { Page404Component } from "./extrapages/page404/page404.component";
+import { LoggedInGuard } from "./core/guards/logged-in.guard";
 
 const routes: Routes = [
   {
@@ -17,6 +18,7 @@ const routes: Routes = [
     path: "account",
     loadChildren: () =>
       import("./account/account.module").then((m) => m.AccountModule),
+    canActivate: [LoggedInGuard],
   },
   {
     path: "pages",

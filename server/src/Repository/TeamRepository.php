@@ -103,7 +103,7 @@ class TeamRepository extends ServiceEntityRepository
         $visiteStats = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(d.team) as TEAM',
-                'SUM(v.nbSupport) / 1000 as VISIT_LENGTH'
+                'SUM(v.nbSupport) / 100 as VISIT_LENGTH'
             )
             ->from('App\Entity\Visite', 'v')
             ->innerJoin('v.node_a', 'n')
