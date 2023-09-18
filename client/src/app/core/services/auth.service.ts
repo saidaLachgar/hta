@@ -98,8 +98,13 @@ export class AuthenticationService {
       )
     );
   }
+  
   getPermissions(): string[] {
-    return JSON.parse(localStorage.getItem("permissions")).permissions;
+    try {
+      return JSON.parse(localStorage.getItem("permissions")).permissions;
+    } catch (error) {
+      this.logout();
+    }
   }
 
   isAuthorized(access: string): boolean {
