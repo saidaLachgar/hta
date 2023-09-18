@@ -31,6 +31,7 @@ export class visitesListComponent {
     service.loadDepartments();
     this.ReportStats();
 
+    config.notFoundText = 'Aucune donnée trouvée !';
 
     service.visiteForm = fb.group({
       nbSupport: [null],
@@ -42,7 +43,6 @@ export class visitesListComponent {
       "node_a.department.team.id[]": [""],
     });
 
-    config.notFoundText = 'Aucune donnée trouvée !';
   }
 
   ReportStats() {

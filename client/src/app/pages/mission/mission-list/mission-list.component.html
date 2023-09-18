@@ -434,7 +434,7 @@
                       <!-- DMS -->
                       <td title="{{item.DMS}}"><ngb-highlight [result]="item.DMS | decimalHourToTime" [term]="searchDMS.value"></ngb-highlight></td>
                       <!-- DMS * 3600000 converts the DMS value from hours to milliseconds since date pipe expects milliseconds -->
-                      <td title="{{item.END}}"><ngb-highlight [result]="item.END | decimalHourToTime" [term]="searchEND.value"></ngb-highlight></td>
+                      <td title="{{item.END}}"><ngb-highlight [result]="item.END" [term]="searchEND.value"></ngb-highlight></td>
                       <!-- team -->
                       <td *ngIf="item.rowspan != -1" [attr.rowspan]="item.rowspan">
                         <a 

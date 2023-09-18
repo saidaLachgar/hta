@@ -1,14 +1,14 @@
+import { HttpClient } from "@angular/common/http";
 import { Component } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { NgSelectConfig } from "@ng-select/ng-select";
-import { AuthenticationService } from "src/app/core/services/auth.service";
-import { missionService } from "../mission.service";
-import { isSameDay, setDefaultOptions } from 'date-fns';
+import { setDefaultOptions } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { map } from "rxjs/operators";
-import { HttpClient } from "@angular/common/http";
-import { environment } from "src/environments/environment";
 import { DecimalHourToTimePipe } from "src/app/core/pipes";
+import { AuthenticationService } from "src/app/core/services/auth.service";
+import { environment } from "src/environments/environment";
+import { missionService } from "../mission.service";
 setDefaultOptions({ locale: fr })
 
 @Component({
@@ -40,7 +40,9 @@ export class missionListComponent {
     service.loadDepartments();
     this.generateMonths();
     this.ReportDMS();    
+
     config.notFoundText = 'Aucune donnée trouvée !';
+    
     service.missionForm = fb.group({
       "node_a.department.id[]": [''],
       "node_a.id[]": [''],

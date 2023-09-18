@@ -103,7 +103,7 @@ class TeamRepository extends ServiceEntityRepository
         $visiteStats = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(d.team) as TEAM',
-                'SUM(v.nbSupport) * 100 as VISIT_LENGTH'
+                'SUM(v.nbSupport) / 1000 as VISIT_LENGTH'
             )
             ->from('App\Entity\Visite', 'v')
             ->innerJoin('v.node_a', 'n')
@@ -309,13 +309,14 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
+
         $teamsAnomalyStats = [];
         foreach ($teams as $team) {
             $teamId = $team->getId();
 
             // Search for the statistics related to this team
             $teamAnomalyStats = array_filter($anomalyStats, function ($item) use ($teamId) {
-                return $item['TEAM'] === $teamId;
+                return $item['TEAM'] == $teamId;
             });
 
             $teamsAnomalyStats[] = [
@@ -324,6 +325,7 @@ class TeamRepository extends ServiceEntityRepository
                 "TOTAL_ANOMALIES" => $teamAnomalyStats[0]["TOTAL_ANOMALIES"] ?? 0,
             ];
         }
+
         return $teamsAnomalyStats;
     }
 

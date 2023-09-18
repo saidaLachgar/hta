@@ -36,7 +36,7 @@ width: 99%;
             <div class="border-end pe-5"><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
           </div>
           <div class="col-auto">
-            <div><p class="fw-medium mb-3">END</p><strong class="h2" title="{{mission.END}}">{{mission.END?(mission.END | decimalHourToTime): "-"}}</strong></div>
+            <div><p class="fw-medium mb-3">END</p><strong class="h2" title="{{mission.END}}">{{mission.END?(mission.END): "-"}}</strong></div>
           </div>
         </div>
 
