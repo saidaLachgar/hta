@@ -117,6 +117,11 @@ export class DefaultComponent implements OnInit {
         type: "category",
         categories: data.map(item => item.TEAM)
       },
+      yaxis: {
+        labels: {
+          formatter: value => Math.round(value)
+        },
+      },
       chart: {
         type: "bar",
         height: 275,
