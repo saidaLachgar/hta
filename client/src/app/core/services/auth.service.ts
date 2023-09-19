@@ -1,11 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable, throwError } from "rxjs";
+import { catchError, switchMap, tap } from "rxjs/operators";
 import { User } from "../models";
 import { environment } from "../../../environments/environment";
 import { Router } from "@angular/router";
 import { UserPermissionsService } from "src/app/pages/UserPermissions/user-permissions.service";
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
@@ -17,6 +18,7 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private jwtHelper: JwtHelperService,
     private UserPermissionsService: UserPermissionsService
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
@@ -43,19 +45,35 @@ export class AuthenticationService {
       })
       .pipe(
         tap((result) => this.storeJWT(result, this.user.username)),
-        switchMap(() => this.setPermissions(this.roles[0]))
+        switchMap(() => this.setPermissions(this.roles[0])),
+        catchError((error) => {
+          // Handle token refresh error here
+          console.error("Token refresh error:", error);
+          // You can log out the user or take other actions as needed
+          this.logout(); // Example: Log out the user
+          return throwError(error); // Pass the error downstream
+        })
       );
+
+      
   }
   // Function to check if JWT token has expired
-  isTokenExpired(): boolean {
-    if (this.getToken()) {
-      const expTime = this.decodeToken(this.getToken().token).exp * 1000; // Convert expiration time to milliseconds
-      const currentTime = new Date().getTime(); // Get the current time in milliseconds
-      if (currentTime > expTime) {
-        return true; // Token has expired
-      }
+  isTokenExpired(): boolean | Promise<boolean> {
+    // if (this.getToken()) {
+    //   const expTime = this.decodeToken(this.getToken().token).exp * 1000; // Convert expiration time to milliseconds
+    //   const currentTime = new Date().getTime(); // Get the current time in milliseconds
+    //   if (currentTime > expTime) {
+    //     return true; // Token has expired
+    //   }
+    // }
+    // return false; // Token is not expired
+    const tokens = this.getToken();
+    
+    if (!tokens) {
+      return true; // Token not present, consider it expired
     }
-    return false; // Token is not expired
+
+    return this.jwtHelper.isTokenExpired(tokens.token);
   }
 
   login(username: string, password: string) {
@@ -109,6 +127,10 @@ export class AuthenticationService {
 
   isAuthorized(access: string): boolean {
     // console.log(this.getPermissions(), access);
-    return this.getPermissions().includes(access);
+    let permissions = this.getPermissions();
+    if(permissions) {
+      return permissions.includes(access);
+    } 
+    return false;
   }
 }

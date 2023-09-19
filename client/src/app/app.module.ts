@@ -7,7 +7,6 @@ import { NgbNavModule, NgbAccordionModule, NgbTooltipModule, NgbModule } from '@
 import { HotToastModule } from '@ngneat/hot-toast';
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
-
 import { ExtrapagesModule } from './extrapages/extrapages.module';
 
 import { LayoutsModule } from './layouts/layouts.module';
@@ -15,9 +14,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { JwtInterceptor } from './core/helpers/jwt.interceptor';
+import { JwtModule } from '@auth0/angular-jwt';
+
 import { AppStoreModule } from './store/entity-store.module';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+
 registerLocaleData(localeFr);
 
 @NgModule({
@@ -37,8 +39,15 @@ registerLocaleData(localeFr);
     NgbTooltipModule,
     ScrollToModule.forRoot(),
     HotToastModule.forRoot({ theme:'snackbar',position: 'bottom-center',dismissible: true }),
-    
     AppStoreModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: () => {
+          let user = localStorage.getItem("currentUser");
+          return user && JSON.parse(user).jwt;
+        },
+      },
+    }),
   ],
   bootstrap: [AppComponent],
   providers: [

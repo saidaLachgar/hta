@@ -18,8 +18,11 @@ export class JwtInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // Exclude the refresh-token endpoint from interception
-    if (request.url.includes("token/refresh")) {
+    // Exclude the refresh-token and login endpoints from interception
+    if (
+      ["token/refresh", "account/login", "api/login"]
+      .some(substring => request.url.includes(substring))
+    ) {
       return next.handle(request);
     }
 

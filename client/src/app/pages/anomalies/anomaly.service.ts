@@ -109,9 +109,11 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     obj["properties[]"] = "id";
     obj["properties[node_a][]"] = "titre";
     obj["properties[node_b][]"] = "titre";
-    delete obj.node_a;
+    obj["pagination"] = "false";
+    delete obj.node_a;delete obj.page;
     obj.node_b && delete obj.node_b;
-
+    // console.log("dz",obj);
+    
     this.edgeService.getWithQuery(obj).subscribe(edges => {
       this.edgesInRange$.next(edges);
     });

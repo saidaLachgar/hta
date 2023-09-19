@@ -23,7 +23,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
  *   },
  *   collectionOperations={
  *      "post"= {"access_control"="is_granted('hasPermission', 'edges_add')"},
- *      "get"= {},
+ *      "get"= {"pagination_enabled"=true},
  *      "by_range"= {
  *          "method"="GET",
  *          "path"="/edges/by-range",
