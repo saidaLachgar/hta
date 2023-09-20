@@ -74,6 +74,11 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: [0, 1, 2, 3, 4]
     },
     {
+        name: 'Profile',
+        value: 'profile',
+        permissions: 0
+    },
+    {
         name: 'Statistiques',
         value: 'statistiques',
         permissions: 4
