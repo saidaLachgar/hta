@@ -6,7 +6,7 @@ import { User } from "../models";
 import { environment } from "../../../environments/environment";
 import { Router } from "@angular/router";
 import { UserPermissionsService } from "src/app/pages/UserPermissions/user-permissions.service";
-import { JwtHelperService } from '@auth0/angular-jwt';
+// import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
@@ -18,7 +18,7 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private jwtHelper: JwtHelperService,
+    // private jwtHelper: JwtHelperService,
     private UserPermissionsService: UserPermissionsService
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
@@ -58,23 +58,16 @@ export class AuthenticationService {
       
   }
   // Function to check if JWT token has expired
-  isTokenExpired(): boolean | Promise<boolean> {
-    // if (this.getToken()) {
-    //   const expTime = this.decodeToken(this.getToken().token).exp * 1000; // Convert expiration time to milliseconds
-    //   const currentTime = new Date().getTime(); // Get the current time in milliseconds
-    //   if (currentTime > expTime) {
-    //     return true; // Token has expired
-    //   }
-    // }
-    // return false; // Token is not expired
-    const tokens = this.getToken();
+  // isTokenExpired(): boolean | Promise<boolean> {
+  //   // return false; // Token is not expired
+  //   const tokens = this.getToken();
     
-    if (!tokens) {
-      return true; // Token not present, consider it expired
-    }
+  //   if (!tokens) {
+  //     return true; // Token not present, consider it expired
+  //   }
 
-    return this.jwtHelper.isTokenExpired(tokens.token);
-  }
+  //   return this.jwtHelper.isTokenExpired(tokens.token);
+  // }
 
   login(username: string, password: string) {
     this.roles = [];
@@ -107,6 +100,7 @@ export class AuthenticationService {
     localStorage.clear();
     this.currentUserSubject && this.currentUserSubject.next(null);
     redirect && this.router.navigate(["account/login"]);
+    window.location.reload();
   }
 
   setPermissions(role: string) {
@@ -118,14 +112,15 @@ export class AuthenticationService {
   }
   
   getPermissions(): string[] {
-    try {
+    // try {
       return JSON.parse(localStorage.getItem("permissions")).permissions;
-    } catch (error) {
-      this.logout();
-    }
+    // } catch (error) {
+    //   this.logout();
+    // }
   }
 
   isAuthorized(access: string): boolean {
+    // return true;
     // console.log(this.getPermissions(), access);
     let permissions = this.getPermissions();
     if(permissions) {

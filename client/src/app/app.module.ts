@@ -14,7 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { JwtInterceptor } from './core/helpers/jwt.interceptor';
-import { JwtModule } from '@auth0/angular-jwt';
+// import { JwtModule } from '@auth0/angular-jwt';
 
 import { AppStoreModule } from './store/entity-store.module';
 import { registerLocaleData } from '@angular/common';
@@ -40,14 +40,14 @@ registerLocaleData(localeFr);
     ScrollToModule.forRoot(),
     HotToastModule.forRoot({ theme:'snackbar',position: 'bottom-center',dismissible: true }),
     AppStoreModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: () => {
-          let user = localStorage.getItem("currentUser");
-          return user && JSON.parse(user).jwt;
-        },
-      },
-    }),
+    // JwtModule.forRoot({
+    //   config: {
+    //     tokenGetter: () => {
+    //       let user = localStorage.getItem("currentUser");
+    //       return user && JSON.parse(user).jwt;
+    //     },
+    //   },
+    // }),
   ],
   bootstrap: [AppComponent],
   providers: [

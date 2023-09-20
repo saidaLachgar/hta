@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     // tslint:disable-next-line: no-string-literal
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 
-    this.authenticationService.logout(false);
+    // this.authenticationService.logout(false);
   }
 
   // convenience getter for easy access to form fields
