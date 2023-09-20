@@ -1,11 +1,8 @@
 import { Component } from "@angular/core";
-import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { visiteService } from "../visite.service";
-import { AuthenticationService } from "src/app/core/services/auth.service";
-import { anomalyService } from "../../anomalies/anomaly.service";
-import { Edge, User } from "src/app/core/models";
+import { FormArray, FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import { Observable } from "rxjs";
+import { AuthenticationService } from "src/app/core/services/auth.service";
+import { visiteService } from "../visite.service";
 
 const parseDate = d => new Date(Date.parse(d))
 const timeObject = d => { return { hour: d.getHours(), minute: d.getMinutes(), second: d.getSeconds() } };
@@ -33,8 +30,6 @@ export class visitePersistComponent {
     public authService: AuthenticationService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Fiche visite', active: true }];
     service.loadDepartments(false);
-    service.loadANodes();
-    service.loadBNodes();
     // service.loadTeams();
     service.visiteForm = this.fb.group({
       anomalies: this.fb.array([]),
@@ -94,7 +89,8 @@ export class visitePersistComponent {
         date: today,
         time: currentTime,
       });
-
+      service.loadANodes();
+      service.loadBNodes();
       this.formListeners();
     }
 
@@ -144,23 +140,17 @@ export class visitePersistComponent {
       this.anomalies.controls.forEach((control) => {
         control.get('edge').reset();
       });
-      //  reload edges and anomalies
-      this.currentEdge = {
-        ANode: na.value,
-        BNode: nb.value,
-        department: dp.value,
-        type: true
-      }
     });
 
-    // on change BNode > reload edges and anomalies
-    nb.valueChanges.subscribe(() => {
-        na.value && na.value.trim() !== '' && (this.currentEdge = {
+    [nb,na].forEach(input => {
+      input.valueChanges.subscribe(() => {
+       this.currentEdge = {
           ANode: na.value,
           BNode: nb.value,
           department: dp.value,
           type: true
-        });
+        };
+      });
     });
 
     // on change depar > reset edges  
