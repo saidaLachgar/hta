@@ -61,6 +61,14 @@
   z-index: 100;
   border-top: 1px solid #ebebeb;
   box-shadow: 0 -0.125rem 1.25rem rgba(0, 0, 0, 0.025) !important;
+  @media (max-width: 800px) {
+    display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 10px;
+  column-gap: 10px;
+  }
 }
 
 .collapse-cta {

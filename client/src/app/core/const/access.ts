@@ -2,48 +2,57 @@ import { EntityAccess } from "../models";
 
 export const EntitiesAccess:EntityAccess[] = [
     {
-        name: 'Mission',
+        name: 'Travaux',
         value: 'missions',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: "Anomalies",
         value: "anomalies",
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Visites',
         value: 'visites',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Départ',
         value: 'departments',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Dps',
         value: 'dps',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Commune',
         value: 'communes',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
         name: 'Tronçon',
         value: 'edges',
+        related : true,
         permissions: -1
     },
     {
         name: 'Postes',
         value: 'postes',
+        related : true,
         permissions: -1
     },
     {
         name: 'Appareils coupeur',
         value: 'nodes',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {

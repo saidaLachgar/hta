@@ -39,8 +39,8 @@
             <div class="py-2">
                 <h5 class="fw-medium mb-2">Total des visites <small class="text-muted">(par objectif annuel)</small><span class="float-end">0%</span></h5>
                 <div class="progress animated-progess progress-sm">
-                    <div class="progress-bar" role="progressbar" style="width: 0%"
-                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar" [style.width]="((data.totalVisits / data.targetVisits) * 100) + '%'"
+                        attr.aria-valuenow="{{data.totalVisits}}" aria-valuemin="0" attr.aria-valuemax="{{data.targetVisits}}"></div>
                 </div>
             </div>
         </div>
@@ -275,7 +275,7 @@
                       [result]="item.nbSupport"
                       [term]="searchNbSupport.value"
                     ></ngb-highlight> Support</b><br>
-                    <small class="text-muted">({{item.nbSupport / 100}}/{{item.edge_set_length}}km)</small>
+                    <small class="text-muted">({{item.edge_set_length/1000}}km)</small>
                   </td>
 
                   <!-- team -->

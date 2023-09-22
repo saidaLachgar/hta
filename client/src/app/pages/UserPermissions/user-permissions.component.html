@@ -1,12 +1,12 @@
 <div class="container-fluid">
     <!-- start page title -->
     <app-page-title title="Autorisation des utilisateurs" [breadcrumbItems]="breadCrumbItems"></app-page-title>
-    <!-- <div class="alert alert-info mt-3">
-        <h6 class="alert-heading">Les changements peuvent prendre un certain temps avant de prendre effet !</h6>
+    <div class="alert alert-info mt-3">
+        <h6 class="alert-heading">La durée de la session</h6>
         Pour que les changements soient immédiatement pris en compte, l'utilisateur doit se déconnecter et s'authentifier à nouveau.<br>
         Sinon les changements seront effectués lorsque la session expire ou l'utilisateur n'est pas autorisé à une interface.<br>
-        <small>La session de l'utilisateur est mise à jour chaque 24 heures</small>
-    </div> -->
+        <small>La session de l'utilisateur est mise à jour <b>chaque 5 min</b></small>
+    </div>
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <fieldset class="col-12">
@@ -14,29 +14,6 @@
                 <div class="card-body">
                     <i class="bx bx-loader-alt fa-spin text-center fs-1 text-primary d-block m-5" *ngIf="!submitted && (service.loading$ | async)"></i>
 
-                    <!-- <ng-container *ngIf="(UserPermissions$ | async) as UserPermissions">
-                    <div *ngFor="let role of userRoles; let i = index">
-                        <h4>{{role.name}}</h4>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" [formControlName]="i + '_edit'" (change)="onEditChange(role.name, $event.target.checked)"> Edit
-                            </label>
-                            <label>
-                                <input type="checkbox" [formControlName]="i + '_modify'" (change)="onModifyChange(role.name, $event.target.checked)"> Modify
-                            </label>
-                            <label>
-                                <input type="checkbox" [formControlName]="i + '_delete'" (change)="onDeleteChange(role.name, $event.target.checked)"> Delete
-                            </label>
-                            <label>
-                                <input type="checkbox" [formControlName]="i + '_add'" (change)="onAddChange(role.name, $event.target.checked)"> Add
-                            </label>
-                            <label>
-                                <input type="checkbox" [formControlName]="i + '_import'" (change)="onImportChange(role.name, $event.target.checked)"> Import
-                            </label>
-                        </div>
-                    </div>
-                    </ng-container> -->
-                    
                     <ng-container *ngIf="(UserPermissions$ | async) as UserPermissions">
                     <div class="row">
                         <ul ngbNav #nav="ngbNav" [activeId]="0" class="nav-tabs">
@@ -44,8 +21,7 @@
                                 [ngbNavItem]="j"
                                 >
                                 <a ngbNavLink>
-                                    <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                    <span class="d-none d-sm-block">{{r.label}}</span>
+                                    <span>{{r.label}}</span>
                                 </a>
                                 <ng-template ngbNavContent>
                                     <div class="table-responsive mt-4">
@@ -76,6 +52,7 @@
                                                                     [value]="access.value+'_'+permission.value"
                                                                     [checked]="isChecked(access.value+'_'+permission.value, r.role)"
                                                                 >
+                                                                <small class="text-muted" *ngIf="r.role != 'ROLE_SUPER_ADMIN' && permission.value == 'show' && access.related"> (Seul concerné)</small>
                                                             </label>
                                                         </ng-container>
                                                         <ng-template #disabled>

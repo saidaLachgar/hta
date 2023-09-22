@@ -100,7 +100,7 @@ class VisiteRepository extends ServiceEntityRepository
         $currentDate = new \DateTime();
         $year = $currentDate->format('Y');
         return $this->createQueryBuilder('v')
-            ->select('c.titre AS COMMUNE, SUM(v.id) as VISTES')
+            ->select('c.titre AS COMMUNE, COUNT(v.id) as VISTES')
 
             ->join('v.node_a', 'n')
             ->join('n.commune', 'c')
@@ -125,9 +125,23 @@ class VisiteRepository extends ServiceEntityRepository
             $prevYear--;
         }
         
+        $goalRepo = $this->em->getRepository(Goal::class);
         // Visite au sol (Km) -> all visites of this year
-        $goal = $this->em->getRepository(Goal::class)->getTarget("ANNUAL_VISIT_COUNT", $currentDate);
-        $targetDistance = $goal ? $goal->getTargetAchievement() : null;
+        $distanceGoal = $goalRepo->getTarget("ANNUAL_VISIT_COUNT", $currentDate);
+        $targetDistance = $distanceGoal ? $distanceGoal->getTargetAchievement() : null;
+        // the target number of visits
+        $numberGoal = $goalRepo->getTarget("ANNUAL_VISIT_NUMBER", $currentDate);
+        $targetNumber = $numberGoal ? $numberGoal->getTargetAchievement() : null;
+
+        // total visits (this year) 
+        $totalVisits = $this->em->createQueryBuilder()
+            ->select(
+                'COUNT(v.id) as TOTAL_VISITS'
+            )
+            ->from('App\Entity\Visite', 'v')
+            ->andWhere('YEAR(v.date) = :year')
+            ->setParameter('year', $year)
+            ->getQuery()->getSingleScalarResult();
 
         // total anomalies (this month + last month) 
         $anomalyQuery = $this->em->createQueryBuilder()
@@ -137,14 +151,14 @@ class VisiteRepository extends ServiceEntityRepository
             ->from('App\Entity\Anomaly', 'a')
             ->andWhere('YEAR(a.createdAt) = :year')
             ->andWhere('MONTH(a.createdAt) = :month');
+        $anomaliesPrev = clone $anomalyQuery;
 
         $anomaliesCurrent = $anomalyQuery
             ->setParameter('year', $year)
             ->setParameter('month', $month)
             ->getQuery()->getSingleScalarResult();
 
-
-        $anomaliesPrev = $anomalyQuery
+        $anomaliesPrev = $anomaliesPrev
             ->setParameter('year', $prevYear)
             ->setParameter('month', $prevMonth)
             ->getQuery()->getSingleScalarResult();
@@ -156,22 +170,25 @@ class VisiteRepository extends ServiceEntityRepository
             ->select('SUM(v.nbSupport) as SUPPORTS')
             ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year);
+        $nbSupportYear = clone $nbSupportQuery;
 
         $nbSupportMonth = $nbSupportQuery
             ->andWhere('MONTH(v.date) = :month')
             ->setParameter('month', $month)
             ->getQuery()->getSingleScalarResult();
 
-        $nbSupportYear = $nbSupportQuery->getQuery()->getSingleScalarResult();
+        $nbSupportYear = $nbSupportYear->getQuery()->getSingleScalarResult();
 
 
         return [
-            "nbSupportYear" => $nbSupportYear ? $nbSupportYear * 100 : 0,
-            "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth * 100 : 0,
+            "nbSupportYear" => $nbSupportYear ? $nbSupportYear / 10 : 0,
+            "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth / 10 : 0,
             "anomaliesCurrent" => $anomaliesCurrent ?? null,
             "anomaliesPrev" => $anomaliesPrev ?? null,
             "annualVisitLgth" => $targetDistance ?? 0,
             "VistesByCommune" => $this->VistesByCommune(),
+            "targetVisits" => $targetNumber ?? 0,
+            "totalVisits" => $totalVisits ?? 0,
         ];
 
     }

@@ -408,9 +408,9 @@ class TeamRepository extends ServiceEntityRepository
         $missionTotal = $this->filterDate($missionTotal, $dateStart, $dateEnd, "m.dateStart");
         $missionTotal = $missionTotal->getQuery()->getSingleScalarResult();
         return [
-            "Total des interruptions" => $anomalyTotal,
+            "Total des interruptions" => $missionTotal,
             "Total des Vistes" => $visitsTotal,
-            "Total des anomalies" => $missionTotal
+            "Total des anomalies" => $anomalyTotal
         ];
     }
 
@@ -568,9 +568,9 @@ class TeamRepository extends ServiceEntityRepository
                 'c.id as ID, c.titre as TITLE'
             )
             ->from('App\Entity\Commune', 'c')
-            ->join('App\Entity\Edge', 'e', Join::WITH, 'c = e.commune')
-            ->join('e.node_a', 'n')
-            ->join('n.department', 'd')
+            ->join('c.edges', 'e')
+            // ->join('e.node_a', 'n')
+            ->join('e.department', 'd')
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team)
             ->groupBy('c.id')
@@ -616,9 +616,9 @@ class TeamRepository extends ServiceEntityRepository
                 'c.id as ID, c.titre as TITLE'
             )
             ->from('App\Entity\Commune', 'c')
-            ->join('App\Entity\Edge', 'e', Join::WITH, 'c = e.commune')
-            ->join('e.node_a', 'n')
-            ->join('n.department', 'd')
+            ->join('c.edges', 'e')
+            // ->join('e.node_a', 'n')
+            ->join('e.department', 'd')
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team)
             ->groupBy('c.id')

@@ -169,23 +169,23 @@
     <table class="table table-bordered table-striped mb-0" formArrayName="anomalies">  
       <tr>  
         <th colspan="2"><div>Ajouter des anomalies</div></th>  
-        <td width="100px">
+        <td width="69px">
           <div class="text-end">
-            <button type="button" (click)="addAnomaly()" class="btn btn-primary">Ajouter</button>
+            <button type="button" (click)="addAnomaly()" class="btn btn-sm btn-primary"><i class="bx bx-plus fs-4 lh-sm"></i></button>
           </div>
         </td>  
       </tr>  
       <tr *ngFor="let anomaly of anomalies.controls; let i=index" [formGroupName]="i">  
         <td width="40%">  
           <div class="row">  
-            <div class="col-6">
+            <div class="col-lg-6 mb-3 mb-lg-0">
               <label>Statut</label>
               <ng-select [searchable]="false" formControlName="status" placeholder="Statut..">
                 <ng-option [value]="true">Terminé</ng-option>
                 <ng-option [value]="false">En attente</ng-option>
               </ng-select>
             </div>  
-            <div class="col-6">
+            <div class="col-lg-6 mb-lg-0">
               <label>Priorité</label>
               <ng-select [searchable]="false" formControlName="severity" placeholder="Priorité..">
                 <ng-option *ngFor="let option of anomalyService.severityOptions" [value]="option.value">
@@ -229,9 +229,9 @@
           </div>  
         </td>  
         <td>  
-          <div>  
+          <div class="p-0">  
           <div class="text-center">
-            <button (click)="removeAnomaly(i)" class="btn btn-danger">Suppr.</button>  
+            <button (click)="removeAnomaly(i)" class="btn btn-danger"><i class="fas fa-trash"></i></button>  
           </div>
           </div>  
         </td>  

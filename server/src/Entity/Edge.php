@@ -110,7 +110,7 @@ class Edge
     private $node_b;
 
      /**
-     * @ORM\ManyToOne(targetEntity=Commune::class)
+     * @ORM\ManyToOne(targetEntity=Commune::class, inversedBy="edges")
      * 
      * @Groups({"edge"})
      */

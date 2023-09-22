@@ -6,7 +6,7 @@
         {{ title }}
         <div role="status" class="spinner-grow ms-1 spinner-grow-sm text-primary" *ngIf="Loading"><span class="sr-only">Loading...</span></div>
       </h4>
-      <div class="page-title-right">
+      <div class="page-title-right d-none d-md-block">
         <ol class="breadcrumb m-0">
           <ng-container *ngFor="let item of breadcrumbItems">
             <li class="breadcrumb-item" *ngIf="!item.active"><a href="javascript: void(0);">{{ item.label }}</a>

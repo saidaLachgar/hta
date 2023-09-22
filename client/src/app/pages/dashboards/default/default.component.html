@@ -33,7 +33,7 @@
                         <tr *ngFor="let team of teamsStats;" valign="middle">
                             <td>{{team.TEAM}}</td>
                             <td>{{team.VISIT_LENGTH}} km</td>
-                            <td>{{team.ACHIEVED_ANOMALIES ? (team.ACHIEVED_ANOMALIES / team.TOTAL_ANOMALIES)*100 : 0 }}%</td>
+                            <td>{{ (team.ACHIEVED_ANOMALIES ? (team.ACHIEVED_ANOMALIES / team.TOTAL_ANOMALIES) * 100 : 0) | number:'1.1-1' }}%</td>
                             <td>{{team.INCIDENTS_COUNT}}</td>
                             <td>{{team.COUPEUR_COUNT}}</td>
                             <td>{{team.CLIENTS_COUNT}}</td>

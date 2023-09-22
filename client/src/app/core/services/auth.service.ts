@@ -33,7 +33,7 @@ export class AuthenticationService {
     return this.user && this.user.jwt;
   }
   getUserName(): string {
-    return this.user.username;
+    return this.user.fullName;
   }
   decodeToken(token: string) {
     return JSON.parse(atob(token.split(".")[1]));
@@ -86,6 +86,7 @@ export class AuthenticationService {
     this.roles = PAYLOAD.roles;
     let user: User = {
       id: PAYLOAD.id,
+      fullName: PAYLOAD.fullName,
       username: username,
       jwt: jwt,
       roles: this.roles,

@@ -57,6 +57,11 @@ class Commune
     private $titre;
 
     /**
+     * @ORM\OneToMany(targetEntity=Edge::class, mappedBy="commune")
+     */
+    private $edges;
+
+    /**
      * @ORM\OneToMany(targetEntity=MissionCommune::class, mappedBy="Commune", orphanRemoval=true)
      */
     private $missionCommunes;
@@ -84,6 +89,36 @@ class Commune
     public function setTitre(string $titre): self
     {
         $this->titre = $titre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Edge>
+     */
+    public function getEdges(): Collection
+    {
+        return $this->edges;
+    }
+
+    public function addEdge(Edge $edge): self
+    {
+        if (!$this->edges->contains($edge)) {
+            $this->edges[] = $edge;
+            $edge->setNodeA($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEdge(Edge $edge): self
+    {
+        if ($this->a_edges->removeElement($edge)) {
+            // set the owning side to null (unless already changed)
+            if ($edge->getNodeA() === $this) {
+                $edge->setNodeA(null);
+            }
+        }
 
         return $this;
     }

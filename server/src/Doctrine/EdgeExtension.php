@@ -4,12 +4,12 @@ namespace App\Doctrine;
 
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use App\Entity\Mission;
+use App\Entity\Edge;
 use Doctrine\ORM\QueryBuilder;
 use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Security\Core\Security;
 
-class MissionExtension implements QueryCollectionExtensionInterface
+class EdgeExtension implements QueryCollectionExtensionInterface
 {
     private $security;
     public function __construct(Security $security)
@@ -25,17 +25,6 @@ class MissionExtension implements QueryCollectionExtensionInterface
         array $context = []): void 
     {
         $this->addWhere($queryBuilder, $resourceClass);
-        // if ($resourceClass === Mission::class) {
-        //     $rootAlias = $queryBuilder->getRootAliases()[0];
-           
-        //     $queryBuilder->innerJoin("$rootAlias.node_a", "n")
-        //         ->leftJoin("n.department", "d")
-        //         ->orderBy("DATE($rootAlias.dateStart)", "DESC")
-        //         ->addOrderBy("d.id", "DESC")
-        //         ->addOrderBy("$rootAlias.type", "DESC")
-        //         ->addOrderBy("TIME($rootAlias.dateStart)", "ASC")
-        //         ;
-        // }
     }
 
     private function addWhere(QueryBuilder $queryBuilder, string $resourceClass): void
@@ -43,7 +32,7 @@ class MissionExtension implements QueryCollectionExtensionInterface
         $user = $this->security->getUser();
         // Check if the user is a super admin
         if (
-            Mission::class !== $resourceClass ||
+            Edge::class !== $resourceClass ||
             in_array('ROLE_SUPER_ADMIN', $user->getRoles())
         ) {
             return;
@@ -54,9 +43,7 @@ class MissionExtension implements QueryCollectionExtensionInterface
 
         // Apply a filter to fetch data related to the user's department/team
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        $queryBuilder->join($rootAlias .'.node_a', 'n')
-            // ->join('n.edge', 'e')
-            ->join('n.department', 'd')
+        $queryBuilder->join($rootAlias .'.department', 'd')
             ->join('d.team', 't')
             ->andWhere('t = :userTeam')
             ->setParameter('userTeam', $userTeam);

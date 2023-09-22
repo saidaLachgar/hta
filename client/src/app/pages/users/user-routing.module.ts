@@ -11,7 +11,7 @@ import { UsersListComponent } from './users-list/users-list.component';
 const routes: Routes = [
   {path: '', component: UsersListComponent, canActivate: [RoleGuard], data: {access: 'users_show'}},
   {path: 'add', component: UserCreateComponent, canActivate: [RoleGuard], data: {access: 'users_add'}},
-  {path: 'profile', component: UserProfileComponent, canActivate: [RoleGuard], data: {access: 'users_profile'}},
+  {path: 'profile', component: UserProfileComponent, canActivate: [RoleGuard], data: {access: 'profile_update'}},
   {path: 'update/:id', component: UserUpdateComponent, canActivate: [RoleGuard], data: {access: 'users_update'}},
   {path: 'details/:id', component: UserDetailsComponent, canActivate: [RoleGuard], data: {access: 'users_details'}},
 ];
