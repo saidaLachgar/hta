@@ -14,6 +14,7 @@ import { map } from "rxjs/operators";
 export class visitesListComponent {
   readonly server = environment.serverURL;
   breadCrumbItems: Array<{}>;
+  Math: any = Math;
   Chartdata: any;
   visitsStats$;
 
@@ -50,13 +51,10 @@ export class visitesListComponent {
       map(data => {
         console.log(data);
         let VistesByCommune = data["VistesByCommune"];
-        let currentMonthTasks = data["anomaliesPrev"]*1;
-        let lastMonthTasks = data["anomaliesCurrent"]*1;
-        data["percentageChange"] = 0;
-        // Calculate the percentage change
-        if(lastMonthTasks){
-          data["percentageChange"] = ((currentMonthTasks - lastMonthTasks) / lastMonthTasks) * 100;
-        }
+        let currentMonthTasks = data["anomaliesCurrent"]*1;
+        let lastMonthTasks = data["anomaliesPrev"]*1;
+        // Calculate the difference 
+        data["difference"] = currentMonthTasks - lastMonthTasks;
 
         this.Chartdata = {
           empty: VistesByCommune.length == 0,
