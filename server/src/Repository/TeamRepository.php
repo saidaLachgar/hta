@@ -181,9 +181,10 @@ class TeamRepository extends ServiceEntityRepository
                 ->andWhere('MONTH(m.dateStart) = :month')
                 ->setParameter('year', $year)
                 ->setParameter('month', $month)
+                ->groupBy('d.team')
                 ->getQuery()
                 ->getResult();
-
+            // dump($missionStats);
             foreach ($teams as $team) {
                 $teamId = $team->getId();
 
@@ -201,6 +202,7 @@ class TeamRepository extends ServiceEntityRepository
 
             $startDate->add(new \DateInterval('P1M'));
         }
+        // exit;
         return $monthlyStats;
     }
 
