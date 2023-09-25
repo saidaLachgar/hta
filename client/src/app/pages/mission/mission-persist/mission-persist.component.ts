@@ -31,6 +31,7 @@ export class missionPersistComponent {
     public service: missionService,
     public authService: AuthenticationService) {
     this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupeur', active: true }];
+    this.service.EditeMode = false;
     service.loadDepartments(false);
     service.loadActions();
 
