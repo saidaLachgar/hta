@@ -39,8 +39,8 @@
                             <td>{{team.CLIENTS_COUNT}}</td>
                             <td>{{team.POSTES_TOTAL}}</td>
                             <td>{{team.DMS_TOTAL | decimalHourToTime }}</td>
-                            <td>{{team.IFS_TOTAL}}</td>
-                            <td>{{team.END_TOTAL}}</td>
+                            <td>{{team.IFS_TOTAL | number:'1.4-4'}}</td>
+                            <td>{{team.END_TOTAL | number:'1.4-4'}}</td>
                         </tr>
                     </tbody>
                     <ng-template #loading>
