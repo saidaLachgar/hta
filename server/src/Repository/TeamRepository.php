@@ -114,37 +114,40 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
+           
 
         $teamsStats = [];
         foreach ($teams as $team) {
             $teamId = $team->getId();
 
-            $teamAnomalyStats = array_filter($anomalyStats, function ($item) use ($teamId) {
+            $teamAnomalyStats = current(array_filter($anomalyStats, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
-            });
+            }));
 
-            $teamMissionStats = array_filter($missionStats, function ($item) use ($teamId) {
+            $teamMissionStats = current(array_filter($missionStats, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
-            });
+            }));
 
-            $teamVisiteStats = array_filter($visiteStats, function ($item) use ($teamId) {
+            $teamVisiteStats = current(array_filter($visiteStats, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
-            });
-
+            }));
+            // dump($teamAnomalyStats);
+            // dump($teamMissionStats);
+            // dump($teamVisiteStats);
             // Calculate other statistics based on $teamAnomalyStats and $teamMissionStats
 
             $teamsStats[] = [
                 "TEAM" => $team->getTitre(),
-                "VISIT_LENGTH" => $teamVisiteStats[0]["VISIT_LENGTH"] ?? 0,
-                "ACHIEVED_ANOMALIES" => $teamAnomalyStats[0]["ACHIEVED_ANOMALIES"] ?? 0,
-                "TOTAL_ANOMALIES" => $teamAnomalyStats[0]["TOTAL_ANOMALIES"] ?? 0,
-                "INCIDENTS_COUNT" => $teamMissionStats[0]["INCIDENTS_COUNT"] ?? 0,
-                "COUPEUR_COUNT" => $teamMissionStats[0]["COUPEUR_COUNT"] ?? 0,
-                "CLIENTS_COUNT" => $teamMissionStats[0]["CLIENTS_COUNT"] ?? 0,
-                "IFS_TOTAL" => $teamMissionStats[0]["IFS_TOTAL"] ?? 0,
-                "DMS_TOTAL" => $teamMissionStats[0]["DMS_TOTAL"] ?? 0,
-                "END_TOTAL" => $teamMissionStats[0]["END_TOTAL"] ?? 0,
-                "POSTES_TOTAL" => $teamMissionStats[0]["POSTES_TOTAL"] ?? 0
+                "VISIT_LENGTH" => $teamVisiteStats["VISIT_LENGTH"] ?? 0,
+                "ACHIEVED_ANOMALIES" => $teamAnomalyStats["ACHIEVED_ANOMALIES"] ?? 0,
+                "TOTAL_ANOMALIES" => $teamAnomalyStats["TOTAL_ANOMALIES"] ?? 0,
+                "INCIDENTS_COUNT" => $teamMissionStats["INCIDENTS_COUNT"] ?? 0,
+                "COUPEUR_COUNT" => $teamMissionStats["COUPEUR_COUNT"] ?? 0,
+                "CLIENTS_COUNT" => $teamMissionStats["CLIENTS_COUNT"] ?? 0,
+                "IFS_TOTAL" => $teamMissionStats["IFS_TOTAL"] ?? 0,
+                "DMS_TOTAL" => $teamMissionStats["DMS_TOTAL"] ?? 0,
+                "END_TOTAL" => $teamMissionStats["END_TOTAL"] ?? 0,
+                "POSTES_TOTAL" => $teamMissionStats["POSTES_TOTAL"] ?? 0
             ];
         }
         // dd($teamsStats);
@@ -184,15 +187,15 @@ class TeamRepository extends ServiceEntityRepository
             foreach ($teams as $team) {
                 $teamId = $team->getId();
 
-                $teamMissionStats = array_filter($missionStats, function ($item) use ($teamId) {
+                $teamMissionStats = current(array_filter($missionStats, function ($item) use ($teamId) {
                     return $item['TEAM'] === (string) $teamId;
-                });
+                }));
 
                 $monthlyStats[$team->getTitre()][] = [
                     "MONTH" => $month,
-                    "IFS_TOTAL" => $teamMissionStats[0]['IFS_TOTAL'] ?? 0,
-                    "DMS_TOTAL" => $teamMissionStats[0]['DMS_TOTAL'] ?? 0,
-                    "END_TOTAL" => $teamMissionStats[0]['END_TOTAL'] ?? 0,
+                    "IFS_TOTAL" => $teamMissionStats['IFS_TOTAL'] ?? 0,
+                    "DMS_TOTAL" => $teamMissionStats['DMS_TOTAL'] ?? 0,
+                    "END_TOTAL" => $teamMissionStats['END_TOTAL'] ?? 0,
                 ];
             }
 
@@ -233,13 +236,13 @@ class TeamRepository extends ServiceEntityRepository
                 foreach ($teams as $team) {
                     $teamId = $team->getId();
 
-                    $teamMissionStats = array_filter($missionStats, function ($item) use ($teamId) {
+                    $teamMissionStats = current(array_filter($missionStats, function ($item) use ($teamId) {
                         return $item['TEAM'] === (string) $teamId;
-                    });
+                    }));
 
                     $result[$team->getTitre()][] = [
                         "MONTH" => $month,
-                        "DMS_TOTAL" => $teamMissionStats[0]['DMS_TOTAL'] ?? 0,
+                        "DMS_TOTAL" => $teamMissionStats['DMS_TOTAL'] ?? 0,
                     ];
                 }
 
@@ -274,13 +277,13 @@ class TeamRepository extends ServiceEntityRepository
                 foreach ($teams as $team) {
                     $teamId = $team->getId();
 
-                    $teamMissionStats = array_filter($missionStats, function ($item) use ($teamId) {
+                    $teamMissionStats = current(array_filter($missionStats, function ($item) use ($teamId) {
                         return $item['TEAM'] === (string) $teamId;
-                    });
+                    }));
 
                     $result[$team->getTitre()][] = [
                         "DAY" => $day,
-                        "DMS_TOTAL" => $teamMissionStats[0]['DMS_TOTAL'] ?? 0,
+                        "DMS_TOTAL" => $teamMissionStats['DMS_TOTAL'] ?? 0,
                     ];
                 }
 
@@ -315,14 +318,14 @@ class TeamRepository extends ServiceEntityRepository
             $teamId = $team->getId();
 
             // Search for the statistics related to this team
-            $teamAnomalyStats = array_filter($anomalyStats, function ($item) use ($teamId) {
+            $teamAnomalyStats = current(array_filter($anomalyStats, function ($item) use ($teamId) {
                 return $item['TEAM'] == $teamId;
-            });
+            }));
 
             $teamsAnomalyStats[] = [
                 "TEAM" => $team->getTitre(),
-                "ACHIEVED_ANOMALIES" => $teamAnomalyStats[0]["ACHIEVED_ANOMALIES"] ?? 0,
-                "TOTAL_ANOMALIES" => $teamAnomalyStats[0]["TOTAL_ANOMALIES"] ?? 0,
+                "ACHIEVED_ANOMALIES" => $teamAnomalyStats["ACHIEVED_ANOMALIES"] ?? 0,
+                "TOTAL_ANOMALIES" => $teamAnomalyStats["TOTAL_ANOMALIES"] ?? 0,
             ];
         }
 
@@ -440,7 +443,7 @@ class TeamRepository extends ServiceEntityRepository
                 ->setParameter("val_parm_" . $key, $key + 1);
         }
 
-        $results = $queryBuilder->getQuery()->getResult()[0];
+        $results = current($queryBuilder->getQuery()->getResult());
         // dd($results);
         return $results;
 
@@ -505,13 +508,13 @@ class TeamRepository extends ServiceEntityRepository
                         ->setParameter('day', $day);
                 }
 
-                $qb = $qb->getQuery()->getResult();
+                $qb = current($qb->getQuery()->getResult());
 
                 $result[$department['titre']][] = [
                     "TIMEFRAME" => $groupKey,
-                    "DMS_TOTAL" => $qb[0]['DMS_TOTAL'] ?? 0,
-                    "END_TOTAL" => $qb[0]['END_TOTAL'] ?? 0,
-                    "IFS_TOTAL" => $qb[0]['IFS_TOTAL'] ?? 0,
+                    "DMS_TOTAL" => $qb['DMS_TOTAL'] ?? 0,
+                    "END_TOTAL" => $qb['END_TOTAL'] ?? 0,
+                    "IFS_TOTAL" => $qb['IFS_TOTAL'] ?? 0,
                 ];
             }
 
@@ -546,14 +549,14 @@ class TeamRepository extends ServiceEntityRepository
         $result = [];
 
         foreach ($departments as $department) {
-            $data = array_filter($qb, function ($item) use ($department) {
+            $data = current(array_filter($qb, function ($item) use ($department) {
                 return $item['DEPARTMENT'] === $department['id'];
-            });
+            }));
 
             $result[] = [
                 "DEPARTMENT" => $department['titre'],
-                "ACHIEVED_ANOMALIES" => $data[0]["ACHIEVED_ANOMALIES"] ?? 0,
-                "TOTAL_ANOMALIES" => $data[0]["TOTAL_ANOMALIES"] ?? 0,
+                "ACHIEVED_ANOMALIES" => $data["ACHIEVED_ANOMALIES"] ?? 0,
+                "TOTAL_ANOMALIES" => $data["TOTAL_ANOMALIES"] ?? 0,
             ];
         }
 
@@ -597,13 +600,13 @@ class TeamRepository extends ServiceEntityRepository
         foreach ($Communes as $Commune) {
             $CommuneId = $Commune["ID"];
 
-            $data = array_filter($nbSupport, function ($item) use ($CommuneId) {
+            $data = current(array_filter($nbSupport, function ($item) use ($CommuneId) {
                 return $item['COMMUNE'] === $CommuneId;
-            });
+            }));
 
             $result[] = [
                 "COMMUNE" => $Commune["TITLE"],
-                "DISTANCE" => !empty($data) ? floatval($data[0]["SUPPORTS"]) * 100 : 0,
+                "DISTANCE" => !empty($data) ? floatval($data["SUPPORTS"]) * 100 : 0,
             ];
         }
         return $result;
@@ -646,13 +649,13 @@ class TeamRepository extends ServiceEntityRepository
         foreach ($Communes as $Commune) {
             $CommuneId = $Commune["ID"];
 
-            $data = array_filter($MissionCommune, function ($item) use ($CommuneId) {
+            $data = current(array_filter($MissionCommune, function ($item) use ($CommuneId) {
                 return $item['COMMUNE'] === $CommuneId;
-            });
+            }));
 
             $result[] = [
                 "COMMUNE" => $Commune["TITLE"],
-                "CLIENTS" => $data[0]["CLIENTS"] ?? 0,
+                "CLIENTS" => $data["CLIENTS"] ?? 0,
             ];
         }
         return $result;
