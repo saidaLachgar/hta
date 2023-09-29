@@ -163,15 +163,17 @@ class Visite
         return $this;
     }
 
-    public function getEdgeSetLength()
+    public function getEdgeSetLength(): ?float
     {
         return $this->edge_set_length;
     }
 
-    public function setEdgeSetLength($edge_set_length)
+    public function setEdgeSetLength(?float $edge_set_length): self
     {
         $this->edge_set_length = $edge_set_length;
 
         return $this;
     }
+
+   
 }

@@ -50,6 +50,11 @@ class VisiteOutput
      */
     private $undone_anomalies;
 
+    /**
+     * @Groups({"visite"})
+     */
+    private $edge_set_length;
+
 
     public function __construct()
     {
@@ -165,5 +170,15 @@ class VisiteOutput
         return $this;
     }
 
-    
+    public function getEdgeSetLength(): ?float
+    {
+        return $this->edge_set_length;
+    }
+
+    public function setEdgeSetLength(?float $edge_set_length): self
+    {
+        $this->edge_set_length = $edge_set_length;
+
+        return $this;
+    }
 }
