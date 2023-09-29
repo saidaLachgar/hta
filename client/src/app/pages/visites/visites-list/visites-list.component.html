@@ -11,11 +11,11 @@
             <div class="row">
               <div class="col-6">
                 <small class="text-muted">Année courante</small>
-                <strong class="h2 d-block">{{data.nbSupportYear}} <small class="text-muted">/{{data.annualVisitLgth}} km</small></strong>
+                <strong class="h2 d-block">{{data.visitedLgthYear/1000}} <small class="text-muted">/{{data.annualVisitLgth}} km</small></strong>
               </div>
               <div class="col-6">
                 <small class="text-muted">Mois en cours</small>
-                <strong class="h2 d-block">{{data.nbSupportMonth}} km</strong>
+                <strong class="h2 d-block">{{data.visitedLgthMonth/1000}} km</strong>
               </div>
             </div>
           </div>
@@ -274,7 +274,9 @@
                       [result]="item.nbSupport"
                       [term]="searchNbSupport.value"
                     ></ngb-highlight> Support</b><br>
-                    <small class="text-muted">({{item.edge_set_length/1000}}km)</small>
+                    <small 
+                    *ngIf="item.edge_set_length"
+                      class="text-muted">({{item.edge_set_length/1000}}km)</small>
                   </td>
 
                   <!-- team -->

@@ -82,6 +82,12 @@ class Visite
      */
     private $node_b;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"visite"})
+     */
+    private $edge_set_length;
+
     public function __construct()
     {
         $this->node_b = new ArrayCollection();
@@ -153,6 +159,18 @@ class Visite
     public function removeNodeB(Node $nodeB): self
     {
         $this->node_b->removeElement($nodeB);
+
+        return $this;
+    }
+
+    public function getEdgeSetLength()
+    {
+        return $this->edge_set_length;
+    }
+
+    public function setEdgeSetLength($edge_set_length)
+    {
+        $this->edge_set_length = $edge_set_length;
 
         return $this;
     }

@@ -165,24 +165,24 @@ class VisiteRepository extends ServiceEntityRepository
 
 
         // Longueur visitée (year + month)
-        $nbSupportQuery = $this->em->createQueryBuilder()
+        $visitedLgthQuery = $this->em->createQueryBuilder()
             ->from('App\Entity\Visite', 'v')
-            ->select('SUM(v.nbSupport) as SUPPORTS')
+            ->select('SUM(v.edge_set_length) as visitedLgth')
             ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year);
-        $nbSupportYear = clone $nbSupportQuery;
+        $visitedLgthYear = clone $visitedLgthQuery;
 
-        $nbSupportMonth = $nbSupportQuery
+        $visitedLgthMonth = $visitedLgthQuery
             ->andWhere('MONTH(v.date) = :month')
             ->setParameter('month', $month)
             ->getQuery()->getSingleScalarResult();
 
-        $nbSupportYear = $nbSupportYear->getQuery()->getSingleScalarResult();
+        $visitedLgthYear = $visitedLgthYear->getQuery()->getSingleScalarResult();
 
 
         return [
-            "nbSupportYear" => $nbSupportYear ? $nbSupportYear / 10 : 0,
-            "nbSupportMonth" => $nbSupportMonth ? $nbSupportMonth / 10 : 0,
+            "visitedLgthYear" => $visitedLgthYear ? $visitedLgthYear : 0,
+            "visitedLgthMonth" => $visitedLgthMonth ? $visitedLgthMonth : 0,
             "anomaliesCurrent" => $anomaliesCurrent ?? null,
             "anomaliesPrev" => $anomaliesPrev ?? null,
             "annualVisitLgth" => $targetDistance ?? 0,
