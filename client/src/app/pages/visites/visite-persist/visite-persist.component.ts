@@ -29,6 +29,7 @@ export class visitePersistComponent {
     public service: visiteService,
     public authService: AuthenticationService) {
     this.breadCrumbItems = [{ label: 'Visites' }, { label: 'Fiche visite', active: true }];
+    this.service.EditeMode = false;
     service.loadDepartments(false);
     // service.loadTeams();
     service.visiteForm = this.fb.group({
