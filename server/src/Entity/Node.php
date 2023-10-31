@@ -49,14 +49,14 @@ class Node
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"nodes","postes", "edge", "missions", "visite"})
+     * @Groups({"nodes","postes", "edge", "missions", "missions_colec", "visite"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"nodes","postes", "edge", "missions", "visite","anomalies"})
+     * @Groups({"nodes","postes", "edge", "missions", "missions_colec", "visite","anomalies"})
      */
     private $titre = "Sans titre";
 
@@ -109,7 +109,7 @@ class Node
      * @ORM\ManyToOne(targetEntity=Department::class)
      * @ORM\JoinColumn(nullable=true)
      * 
-     * @Groups({"nodes","postes", "missions", "visite"})
+     * @Groups({"nodes","postes", "missions", "missions_colec", "visite"})
      */
     private $department;
 

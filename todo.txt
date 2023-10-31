@@ -1,0 +1,57 @@
+- all missions has parent null on chose thier parent they strat to be ignored whcih means every time i need to ge total missions, i should use where parent is null
+@Done add parent field
+- when they get thier parent? 
+@Done on insert each mission i get liste of suspected related missions as a checkbox not the one that has children, when user checks one of them we update it parent to the current mission
+    suspected related missions ==  missions that has parent null same date same dapartement same type
+    button show only when mission is inserted and type is coupure
+@Done on get list of missions get only the one with null parent and find a way to send children missions to display them
+@Done on update mission show all related missions data
+@Done show one update button for all missions that update parent only
+
+@todo on delete a parent mission detach children
+@todo on search, search children missions too
+
+--------------------------------------------------------------------------------
+- i needed to get total interrupted client per commune
+> so i added a new entity where i store the total intrupted clients per each cummune (at that moment)
+@todo on major changes remove all related MissionCommune and add new ones
+
+i need to get how many times a poste intrupted
+> so i added a new entity where i store poste that related to a mission so i can get sum of poste in all missions between two given dates
+@todo instead of add a new entity add the poste directlly to the entity
+
+
+> tasks
+x remove missionPoste entity
+x add many to many ralationship between mission and poste
+- inside team repo getPostInterruptionInfo change query to get all missions that related to a given poste as number of time a poste intrpted, then get total hours of this missions as the total intrupption
+! where it should count related missions as one (parent=null)
+- check on major change, it updates related postes
+- in dashboard table each team has nbPostes that has been intrupted, u have to remove that properity from the entity and get it from the many to many relationship of mission/poste
+
+
+--------------------------------------------------------
+auto fill date visit
+fix filter troncon 
+goals!!
+
+
+merge incidents on click ajouter et ajouter un autre if has same date and depar
+data 
+
+
+--------------------------------------------------------
+cuz i couldn't prevent having the error of circular.. when getting the a item tat has children, i made two groups, one for the item operation that get all fields but not children, 
+and an other groupe for the collection operation that get all fields but not the parent field, and now in th listing i can get all children, and in update i can get the parent 
+cuz it's a get operation, and for the details page i should use the collection operation so i get the children
+
+
+
+
+
+
+x tester mission parent update
+    - same type
+fix listing
+
+fix details

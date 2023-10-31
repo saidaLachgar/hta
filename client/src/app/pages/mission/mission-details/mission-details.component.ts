@@ -19,22 +19,13 @@ export class missionDetailsComponent {
   breadCrumbItems: Array<{}>;
   causesList = Object.keys(CausesList);
 
-
   constructor(
     private route: ActivatedRoute,
     public authService: AuthenticationService,
     public service: missionService
   ) { 
     let id = this.route.snapshot.paramMap.get('id');
-    service.getByKey(id).subscribe(obj => {
-      this.mission = obj;
-      this.currentEdge = {
-        ANode: obj.node_a["@id"],
-        BNode: obj.node_b["@id"],
-        department: obj.node_a.department["@id"],
-        type: 'false'
-      }
-    });
+    service.getById(parseInt(id)).subscribe(obj => this.mission = obj);
   }
 
   getDiff(date1, date2) : string|void{

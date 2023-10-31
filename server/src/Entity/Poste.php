@@ -138,15 +138,15 @@ class Poste
     private $origine;
 
     /**
-     * @ORM\OneToMany(targetEntity=MissionPoste::class, mappedBy="poste", orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity=Mission::class, mappedBy="postes")
      */
-    private $missionPostes;
+    private $missions;
+
 
     public function __construct()
     {
-        $this->missionPostes = new ArrayCollection();
+        $this->missions = new ArrayCollection();
     }
-
 
     public function __toString()
     {
@@ -287,33 +287,31 @@ class Poste
     }
 
     /**
-     * @return Collection<int, MissionPoste>
+     * @return Collection<int, Mission>
      */
-    public function getMissionPostes(): Collection
+    public function getMissions(): Collection
     {
-        return $this->missionPostes;
+        return $this->missions;
     }
 
-    public function addMissionPoste(MissionPoste $missionPoste): self
+    public function addMission(Mission $mission): self
     {
-        if (!$this->missionPostes->contains($missionPoste)) {
-            $this->missionPostes[] = $missionPoste;
-            $missionPoste->setPoste($this);
+        if (!$this->missions->contains($mission)) {
+            $this->missions[] = $mission;
+            $mission->addPoste($this);
         }
 
         return $this;
     }
 
-    public function removeMissionPoste(MissionPoste $missionPoste): self
+    public function removeMission(Mission $mission): self
     {
-        if ($this->missionPostes->removeElement($missionPoste)) {
-            // set the owning side to null (unless already changed)
-            if ($missionPoste->getPoste() === $this) {
-                $missionPoste->setPoste(null);
-            }
+        if ($this->missions->removeElement($mission)) {
+            $mission->removePoste($this);
         }
 
         return $this;
     }
+
     
 }

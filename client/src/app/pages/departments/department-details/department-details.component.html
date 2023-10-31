@@ -9,10 +9,9 @@
     <div class="card mt-4">
       <div class="card-body pt-5">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6" *ngIf="department.visuel">
             <div style="width:100%;" class="me-4 bg-light rounded">
               <img
-              *ngIf="department.visuel"
               class="rounded c-pointer w-100"
               style="height: auto;"
               [src]="department.visuel.contentUrl"
@@ -26,7 +25,7 @@
               />
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-{{department.visuel ? '6' : '12'}}">
             <div class="table-responsive">
               <table class="table table-nowrap mb-0">
                 <tbody *ngIf="department">

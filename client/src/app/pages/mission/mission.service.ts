@@ -21,8 +21,10 @@ setDefaultOptions({ locale: fr });
 
 const parseDate = (date: string) => new Date(Date.parse(date))
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
+const DateObjToDate = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second);
 const DateTimeToString = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second).toISOString();
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
+const DateObjToString = (date) => date.toISOString().split('T')[0];
 
 @Injectable({
   providedIn: "root",
@@ -56,6 +58,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
   submitted: boolean = false;
   page: number = 1;
   anomalyLoading: boolean = false;
+  hasSearch: boolean = false;
   lastSearchedParams;
   public missionForm: FormGroup;
 
@@ -76,6 +79,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
    * Get records
    */
   findAll(): void {
+    this.hasSearch = false;
     this.findByCriteria({ page: 1 });
   }
   loadTeams(defaultVal = []) : void{
@@ -162,6 +166,23 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       );
   }
 
+  getRelatedMissions(): void {
+    let form = this.missionForm.value;
+    if( form.department && form.date ) {
+      let dateEnd = DateObjToDate(form.date, form.dateStart);
+      dateEnd.setDate(dateEnd.getDate() + 1)
+
+      let criteria = {
+        "type": true,
+        "dateStart[after]": DateToString(form.date),
+        "dateStart[before]": DateObjToString(dateEnd),
+        "node_a.department.id[]": form.department.match(/\d+/)[0],
+        "properties[]":["id","dateStart","dateEnd","node_a","node_b"],
+      }
+      this.findByCriteria(criteria, false);
+    }
+  }
+
   clone(key: string): Observable<Mission> {
     return this.http.get<Mission>(`${this.server}/api/mission/${key}/clone`);
   }
@@ -205,8 +226,10 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
    */
   onSearch(): void {
     this.page = 1;
+    this.hasSearch = true;
+
     this.lastSearchedParams = this.missionForm.value;
-    this.findByCriteria({ page: 1, ...this.lastSearchedParams });
+    this.findByCriteria({ page: 1, ...this.lastSearchedParams }, true, false);
   }
 
   /**
@@ -235,6 +258,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       // team: form.team ? form.team : null,
       // department: form.department ? form.department : null,
       nodeA: form.node_a ? form.node_a : null,
+      parent: form.parent ? form.parent : null,
       nodeB: form.node_b && form.node_b.length ? form.node_b : [],
       actions: form.actions.length ? form.actions : null,
     };
@@ -249,7 +273,11 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
       this.anomalyLoading = false;
     }
 
-    // compare last query with the new one to avoid unnecessary requests
+    // @todo compare last query with the new one to avoid unnecessary requests
+    
+    // console.log(mission);
+    // return;
+    
     if (id) {
       mission["id"] = id;
       this.update(mission).subscribe({
@@ -277,15 +305,20 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
     this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department);
   }
+  
+  getById(id:Number){
+    let criteria = {"id":id}
+    return this.findByCriteria(criteria, false, true);
+  }
 
 
   /**
    * find By Criteria
    * @param obj query parameters
    */
-  findByCriteria(obj): void {
+  findByCriteria(obj, pagination = true, singleResult = false ) {
     this.mission$ = of([]); // clear table
-
+    
     // format date
     if (Object.keys(obj).length > 1) {
       // console.log(obj);
@@ -297,44 +330,21 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
-    this.mission$ = this.getWithQuery(queryParams).pipe(
-        map((missions) => {
-          let tempObj = {}; // temporary object to group missions
-          // Sort the array using the custom comparison function
-          missions.sort(this.sortMissions);
-          missions.forEach((mission: Mission, index) => {
-            // create an id by same date and department
-            // only if type is true (Incident)
-            let key = mission.type && mission.node_a.department && mission.dateStart ?
-              mission.node_a.department.id + "-" + new Date(mission.dateStart).toLocaleDateString() :
-              mission.id;
+    
+    // prevent getting children
+    !this.hasSearch && (queryParams["exists[parent]"]="false");
 
-            // set when to concatenate same rows based on the same id
-            if (tempObj[key]) { // if already exists (same date/depar)
-              tempObj[key].push(mission); // group same rows
-
-              // Find index of 1st row has same id    
-              let objIndex = missions.findIndex(obj => obj.id === tempObj[key][0].id);
-              // add new property to tell whether to merge next rows or not
-              // property value is the amount of rows should be merged
-
-              let firstRow = Object.assign({}, missions[objIndex]); //assign = merge (old, new) )
-              firstRow.rowspan = tempObj[key].length;
-              missions[objIndex] = firstRow;
-
-              // set rowspan to -1 to tell that this row should be merged with the above
-              let currentRow = Object.assign({}, mission);
-              currentRow.rowspan = -1;
-              missions[index] = currentRow;
-
-            } else {
-              tempObj[key] = [mission]; // push new array
-            }
-          });
-          return missions;
-        })
-    );
-    this.getPagination();
+    // return single item (used to get missions by id)
+    // cuz children property can get only in collection operation
+    if(singleResult) {
+      return this.getWithQuery(queryParams).pipe(map(response => response[0]));
+    } else{
+      this.mission$ = this.getWithQuery(queryParams);
+    }
+      
+    if(pagination) {
+      this.getPagination();
+    }
   }
 
   sortMissions(a: Mission, b: Mission): number {

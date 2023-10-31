@@ -96,7 +96,7 @@
                   type="radio"
                   formControlName="type"
                   id="type-1"
-                  value="true"
+                  [value]="true"
                 />
                 <label class="form-check-label" for="type-1">
                   Incident
@@ -108,7 +108,7 @@
                   type="radio"
                   formControlName="type"
                   id="type-2"
-                  value="false"
+                  [value]="false"
                 />
                 <label class="form-check-label" for="type-2">
                   Coupeur / Ouverture
@@ -245,7 +245,112 @@
       type="button" class="btn text-danger float-end me-2 fw-medium btn-light">
       <i class="mdi mdi-trash-can align-middle me-2"></i>Supprimer
     </button>
+
+    <button 
+      [disabled]="(service.loading$ | async) || service.anomalyLoading"
+      *ngIf="service.EditeMode && service.type.value" 
+      (click)="getParentMissions()"
+      type="button" class="btn float-end me-2 fw-medium bg-success text-white">
+      <i class="bx bx-link-alt me-2 fs-5" style="vertical-align: -2px;"></i>Travaux connecté
+    </button>
+
     <i class="bx bx-loader-alt fa-spin float-end me-3" *ngIf="service.submitted && ((service.loading$ | async) || service.anomalyLoading)"></i>
   </div>
+
+  <ng-template #associations_content let-associationsModal>
+    <div class="modal-header border-0">
+      <h4 class="modal-title">Travaux associés à considérer</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="associationsModal.dismiss()"></button>
+    </div>
+    <div class="modal-body pt-0">
+      <p class="mb-0">Définir travaux auquel il est lié</p>
+      <small class="text-muted">Ces travaux sont ceux qui sont suspectés (ceux qui ont la même date et le même département)</small>
+
+      <table class="table table-bordered border-deem mt-3">
+        <thead>
+          <tr>
+            <th width="20px"></th>
+            <th>Date</th>
+            <th style="min-width: 130px;">Point coupure</th>
+            <th style="min-width: 130px;">PS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- loading -->
+          <tr>
+            <td 
+              colspan="4" 
+              *ngIf="!(service.mission$ | async) && service.loading$ | async"
+              class="text-center">Chargement...</td>
+          </tr>
+          
+          <ng-container *ngIf="service.mission$ | async as data;">
+            
+            <!-- has data : first option -->
+            <tr class="bg-soft bg-light">
+              <td>
+                <div class="form-check">
+                  <input type="radio" [value]="null" formControlName="parent" class="form-check-input">
+                </div>
+              </td>
+              <td colspan="3">Aucun</td>
+            </tr>
+             <!-- no data : when it's not loading && data is empty or has one row but it's the current mission  -->
+            <tr>
+              <td 
+                colspan="4" 
+                *ngIf="(service.loaded$ | async) && (data.length == 0 || (data.length==1 && data[0].id == id)) "
+                class="text-center">Aucun travaux suspects n'a été trouvé</td>
+            </tr>
+            <!-- has data : other options -->
+            <ng-container *ngFor="let item of data; let i = index">
+              <tr *ngIf="item.id != id" valign="middle">
+                <td>
+                  <div class="form-check">
+                    <input type="radio" value="{{item['@id']}}" formControlName="parent" class="form-check-input">
+                  </div>
+                </td>
+                <!-- date -->
+                <td>
+                  {{item.dateStart  | date:'dd/MM/yy':'Africa/Casablanca'}}<br>
+                  {{item.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{item.dateEnd ? (item.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}
+                </td>
+                <!-- nodeA -->
+                <td>
+                  <a 
+                    *ngIf="item.node_a"
+                    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.node_a.id] : null"
+                    target="_blank">{{item.node_a.titre}}</a>
+                </td>
+                <!-- nodeB -->
+                <td>
+                  <div *ngFor="let node_b of item.node_b">
+                    <a 
+                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+                      target="_blank">{{item.node_b.length==1 ? "": "- "}} {{node_b.titre}}</a>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+          </ng-container>
+          
+        </tbody>
+      </table>
+
+      
+    </div>
+    <div class="modal-footer mt-3 border-0">
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="service.submitted && ((service.loading$ | async) || service.anomalyLoading)" 
+        (click)="service.Persist('EDIT')"
+      >Sauvegarder</button>
+    </div>
+  </ng-template>
+
+
 </form>
+
 

@@ -120,27 +120,39 @@ class MissionRepository extends ServiceEntityRepository
             $prevYear--;
         }
 
-        // List of causes to consider
-        $causesList = ["Défauts matériels", "Telescopare", "Intenpaire", "Cause inconnue"];
-
-        $queryBuilder = $this->createQueryBuilder('m')
+        // data of parent missions only
+        $queryBuilderParents = $this->createQueryBuilder('m')
             ->select(
                 // Total missions count for the given month
                 'COUNT(m.id) as Total',
                 // Total missions count for each type 
                 'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) as Incident',
                 'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) as Coupeur',
+            )
+            ->where('YEAR(m.dateStart) = :year')
+            ->andWhere('MONTH(m.dateStart) = :month')
+            ->andWhere('m.parent is null')
+            ->setParameter('year', $currentYear)
+            ->setParameter('month', $month);
+
+
+        // data of all missions
+        $queryBuilderAll = $this->createQueryBuilder("m")
+            ->select(
                 // Average duration of the given month
-                'AVG(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as Duration',
+                'AVG(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as Duration'
             )
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :month')
             ->setParameter('year', $currentYear)
             ->setParameter('month', $month);
+            
 
         // Total count of missions for each cause
+        // List of causes to consider
+        $causesList = ["Défauts matériels", "Telescopare", "Intenpaire", "Cause inconnue"];
         foreach ($causesList as $key => $cause) {
-            $queryBuilder->addSelect(
+            $queryBuilderAll->addSelect(
                 "SUM(CASE WHEN m.causes = :val_parm_{$key} THEN 1 ELSE 0 END) as Cause_{$key}"
             )
             ->setParameter("val_parm_".$key, $key + 1);
@@ -149,19 +161,24 @@ class MissionRepository extends ServiceEntityRepository
         // Average duration of prev month 
         $prevDuration = $this->createQueryBuilder("m")
             ->select(
-                'AVG(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd))'
+                'AVG(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as prevDuration'
             )
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :prevMonth')
             ->setParameter('year', $prevYear)
-            ->setParameter('prevMonth', $prevMonth)
-            ->getQuery()->getSingleScalarResult();
+            ->setParameter('prevMonth', $prevMonth);
 
         // merge results
-        $results = $queryBuilder->getQuery()->getResult()[0];
-        $results['prevDuration'] = $prevDuration;
+        $dd1 = $queryBuilderParents->getQuery()->getResult()[0];
+        $dd2 = $queryBuilderAll->getQuery()->getResult()[0];
+        $dd3 = $prevDuration->getQuery()->getResult()[0];
+
+        dump($dd1);
+        dump($dd2);
+        dump($dd3);
+        exit;
         // dd($results);
-        return $results;
+        // return $results;
     }
 
 

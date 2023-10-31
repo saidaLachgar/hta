@@ -13,7 +13,7 @@ final class CustomBooleanFilter extends AbstractFilter
 
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = [])
     {
-        dd("klk");
+        // dd("klk");
         $rootAlias = $queryBuilder->getRootAliases()[0];
         foreach (array_keys($this->getProperties()) as $prop) { //NOTE: we use array_keys because getProperties() returns a map of property => strategy
             if (!$this->isPropertyEnabled($prop, $resourceClass) || !$this->isPropertyMapped($prop, $resourceClass)) {

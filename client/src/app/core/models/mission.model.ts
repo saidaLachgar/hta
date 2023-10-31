@@ -15,6 +15,8 @@ export interface Mission {
     total_anomalies?: number;
     undone_anomalies?: number;
     team?:Team;
+    parent?:Mission;
+    children?:Mission[];
     node_a?: Node;
     node_b?: Node[];
     actions?: string[];

@@ -48,14 +48,14 @@ class Department
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * 
-     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite"})
+     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite", "missions_colec"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * 
-     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite"})
+     * @Groups({"depar", "teams", "postes", "nodes", "edge", "missions","anomalies","visite", "missions_colec"})
      */
     private $titre;
 
@@ -71,7 +71,7 @@ class Department
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="departments")
      * 
-     * @Groups({"depar", "missions","visite"})
+     * @Groups({"depar", "missions","visite", "missions_colec"})
      */
     private $team;
 

@@ -1,0 +1,65 @@
+<div class="d-flex align-items-center">
+  <div class="pe-4 ps-2">
+    <div class="rounded bg-success text-white mini-stat-icon px-2 py-1 d-xl-block d-none">
+      <i class="fas fa-hard-hat fs-3 my-2 mx-1"></i>
+    </div>
+  </div>
+  <div class="flex-fill fs-6">
+    <p class="mb-0 fw-medium">{{mission.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{mission.dateEnd ? (mission.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}</p>
+    <!-- Point coupure -->
+    <p class="mb-0">
+      <span class="text-muted">Point coupure :</span>&nbsp;
+      <a 
+        *ngIf="mission.node_a"
+        [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', mission.node_a.id] : null"
+        target="_blank">{{mission.node_a.titre}}</a>
+    </p>
+    <!-- PS -->
+    <p class="mb-0">
+      <span class="text-muted">PS :</span>&nbsp;
+      <ng-container *ngFor="let node_b of mission.node_b;let last = last;">
+        <a 
+          [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+          target="_blank">{{node_b.titre}}</a>{{mission.node_b.length>1 && !last ? " - " : ""}}
+      </ng-container>{{mission.node_b.length == 0 ? " - " : ""}}
+    </p>
+  </div>
+  <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 d-xl-block d-none">
+    <i class="fas fa-check-circle me-2"></i>
+    <span class="text-body">Toutes résolues</span>
+  </div>
+  <div ngbDropdown 
+    placement="bottom-left"
+    *ngIf="authService.isAuthorized('missions_update') || authService.isAuthorized('missions_delete')"
+    >
+    <i
+        class="dropdown-toggle fas fa-ellipsis-h c-pointer mx-3"
+        ngbDropdownToggle
+        data-toggle="dropdown"
+        aria-expanded="true"
+    ></i>
+    <div
+        class="dropdown-menu dropdown-menu-end"
+        ngbDropdownMenu
+    >
+      <a
+        class="dropdown-item"
+        href="javascript: void(0);"
+        *ngIf="authService.isAuthorized('missions_update')"
+        [routerLink]="'/mission/persist/' + mission.id"
+        >
+        <!-- skipLocationChange -->
+        <i class="fas fa-edit me-2"></i> Modifier
+      </a>
+        
+      <a
+        class="dropdown-item text-danger"
+        href="javascript: void(0);"
+        *ngIf="authService.isAuthorized('missions_delete')"
+        (click)="service.deleteItem(mission.id, $event.target)"
+        >
+        <i class="fas fa-trash me-2"></i> Supprimer
+      </a>
+    </div>
+    </div>
+</div>

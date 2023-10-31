@@ -1,0 +1,181 @@
+                    
+<!-- Partielle ou Totalité -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    
+    <!-- is Totalité -> if has no ps && source contains letter y -->
+    <ng-container *ngIf="item.node_b.length == 0 && item.node_a.titre.toLowerCase().includes('y'); else partielle">
+    <span class="text-danger" ngbTooltip="Totalité" placement="top">
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 26 26"><path fill="currentColor" d="M24.875 0a1 1 0 0 0-.594.281l-1.656 1.656c-2.204-1.59-5.261-1.305-7.313.657c0 .076-.855.91-1.624 1.656l-.97-.969a1 1 0 0 0-.812-.312a1 1 0 0 0-.125.031a1 1 0 0 0-.5 1.719L13.562 7l-3.28 3.281a1.016 1.016 0 1 0 1.437 1.438L15 8.438L17.563 11l-3.282 3.281a1.016 1.016 0 1 0 1.438 1.438L19 12.438l2.281 2.28a1.016 1.016 0 1 0 1.438-1.437l-.969-.969l1.656-1.624c1.96-1.96 2.159-5.008.625-7.282L25.72 1.72A1 1 0 0 0 24.875 0zM3.906 10.969a1 1 0 0 0-.125.031a1 1 0 0 0-.5 1.719l.969.969l-1.656 1.624c-1.96 1.96-2.159 5.008-.625 7.282L.28 24.28a1.016 1.016 0 1 0 1.44 1.44l1.656-1.657c2.204 1.592 5.261 1.306 7.313-.656c0-.076.855-.91 1.624-1.656l.97.969a1.016 1.016 0 1 0 1.437-1.438l-10-10a1 1 0 0 0-.813-.312z"/></svg> -->
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32"><path fill="currentColor" d="M9.22 9.5a6.219 6.219 0 0 0-5.885 4.218H1.438v4h1.897a6.216 6.216 0 0 0 12.102-2A6.217 6.217 0 0 0 9.218 9.5zm18.465 4.22c-.944-5.173-5.46-9.095-10.903-9.095v4a7.104 7.104 0 0 1 7.094 7.094a7.106 7.106 0 0 1-7.094 7.092v4.002c5.442-.004 9.96-3.926 10.903-9.096h2.065v-4h-2.065z"/></svg> -->
+        <!-- https://icones.js.org/collection/all?s=network -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M14.59 6L12 8.59L9.41 6L8 7.41L10.59 10L8 12.59L9.41 14L12 11.41L14.59 14L16 12.59L13.41 10L16 7.41L14.59 6M17 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4v2h1a1 1 0 0 1 1 1h7v2h-7a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1H2v-2h7a1 1 0 0 1 1-1h1v-2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10Z"/></svg>
+    </span>
+    </ng-container>
+    <ng-template #partielle>
+    <span class="text-warning" ngbTooltip="Partielle" placement="top">
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 26 26"><path fill="currentColor" d="M24.875 0a1 1 0 0 0-.594.281l-4.656 4.657c-2.204-1.592-5.261-1.306-7.313.656c0 .076-.855.91-1.624 1.656l-.97-.969A1 1 0 0 0 8.782 6a1 1 0 0 0-.5 1.719l10 10a1.016 1.016 0 1 0 1.438-1.438l-.969-.968l1.656-1.626c1.96-1.96 2.159-5.007.625-7.28l4.688-4.688A1 1 0 0 0 24.875 0zM6.906 7.969A1 1 0 0 0 6.781 8a1 1 0 0 0-.5 1.719l.969.969l-1.656 1.624c-1.96 1.96-2.159 5.008-.625 7.282L.28 24.28a1.016 1.016 0 1 0 1.44 1.44l4.656-4.657c2.204 1.592 5.261 1.306 7.313-.656c0-.076.855-.91 1.624-1.656l.97.969a1.016 1.016 0 1 0 1.437-1.438l-10-10a1 1 0 0 0-.813-.312z"/></svg> -->
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32"><path fill="currentColor" d="M25.06 13.72c-.944-5.173-5.46-9.095-10.903-9.095v4a7.104 7.104 0 0 1 7.094 7.094a7.104 7.104 0 0 1-7.093 7.092v4.002c5.442-.004 9.96-3.926 10.903-9.096h4.69v-4h-4.69zm-4.685 2a6.216 6.216 0 0 0-12.103-2.002H1.438v4h6.834a6.216 6.216 0 0 0 12.104-2z"/></svg> -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11V9H8v2h8m1-8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4v2h1a1 1 0 0 1 1 1h7v2h-7a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1H2v-2h7a1 1 0 0 1 1-1h1v-2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10Z"/></svg>
+    </span>
+    </ng-template>
+
+</td>
+
+<!-- type -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    <div 
+    *ngIf="item.type != null"
+    [ngClass]="item.type ? 'badge-soft-danger' : 'badge-soft-info'"
+    class="badge rounded-pill">
+    {{item.type ? "Incident" : "Coupeur" }}
+    </div>
+</td>
+
+<!-- date -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    <ngb-highlight
+    [result]="item.dateStart  | date:'dd/MM/yy':'Africa/Casablanca'"
+    [term]="searchDateStart.value+searchDateEnd.value"
+    ></ngb-highlight>
+</td>
+
+<!-- duration -->
+<td>
+    {{item.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{item.dateEnd ? (item.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}<br>
+    <small class="text-muted" *ngIf="item.dateStart && item.dateEnd">Durée : {{service.getDiff(item.dateStart, item.dateEnd)}}</small>
+</td>
+
+<!-- department -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    <a 
+    *ngIf="item.node_a.department"
+    [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', item.node_a.department.id] : null"
+    target="_blank">{{item.node_a.department.titre}}</a>
+</td>
+
+<!-- nodeA -->
+<td>
+    <a 
+    *ngIf="item.node_a"
+    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', item.node_a.id] : null"
+    target="_blank">{{item.node_a.titre}}</a>
+</td>
+
+<!-- nodeB -->
+<td>
+    <div *ngFor="let node_b of item.node_b">
+    <a 
+        [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
+        target="_blank">{{item.node_b.length==1 ? "": "- "}} {{node_b.titre}}</a>
+    </div>
+</td>
+<!-- causes -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    <ng-container *ngIf="item.type != null && item.type && item.causes;">
+    <ngb-highlight
+        [result]="service.causesList[item.causes + 3]"
+        [term]="searchCauses.options[searchCauses.options.selectedIndex].text"
+    ></ngb-highlight>
+    </ng-container>
+    <!-- <ng-template #NoCauses>-</ng-template> -->
+</td>
+
+<!-- NB Clients -->
+<td>{{item.nbClients}}</td>
+
+<!-- IFS -->
+<td><ngb-highlight [result]="item.IFS" [term]="searchIFS.value"></ngb-highlight></td>
+
+<!-- DMS -->
+<td title="{{item.DMS}}"><ngb-highlight [result]="item.DMS | decimalHourToTime" [term]="searchDMS.value"></ngb-highlight></td>
+
+<!-- DMS * 3600000 converts the DMS value from hours to milliseconds since date pipe expects milliseconds -->
+<td title="{{item.END}}"><ngb-highlight [result]="item.END" [term]="searchEND.value"></ngb-highlight></td>
+
+<!-- team -->
+<td *ngIf="!child" [attr.rowspan]="rowspan">
+    <a 
+    *ngIf="item.node_a.department && item.node_a.department.team"
+    [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', item.node_a.department.team.id] : null"
+    target="_blank">{{item.node_a.department.team.titre}}</a>
+</td>
+
+<!-- Anomalies -->
+<td>
+    <a
+    href="javascript: void(0);"
+    fragment="anomalies-list"
+    [routerLink]="authService.isAuthorized('visites_details') ? ['details', item.id] : []"
+    >
+    <ng-container *ngIf="item.total_anomalies != 0 && item.undone_anomalies != 0">
+        <div  class="badge badge-soft-danger c-pointer rounded-pill border-danger border px-3 py-2 font-size-13 w-100">
+        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.undone_anomalies}}/{{item.total_anomalies}} Anomalies</span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="item.total_anomalies == 0;">
+        <div class="badge badge-soft-info c-pointer rounded-pill border-info border px-3 py-2 font-size-13 w-100">
+        <i class="fas fa-info-circle me-2"></i> <span class="text-body">Pas d'anomalies</span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="item.total_anomalies!= 0 && item.undone_anomalies == 0">
+        <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
+        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Toutes résolues</span>
+        </div>
+    </ng-container>
+    </a>
+</td>
+
+<!-- actions -->
+<td align="center">
+    <!-- {{item.id}} -->
+    <div ngbDropdown 
+    placement="bottom-left"
+    *ngIf="authService.isAuthorized('missions_details') || authService.isAuthorized('missions_update') || authService.isAuthorized('missions_delete')"
+    >
+    <i
+        class="fas fa-ellipsis-h dropdown-toggle c-pointer"
+        ngbDropdownToggle
+        data-toggle="dropdown"
+        aria-expanded="true"
+    ></i>
+    <div
+        class="dropdown-menu dropdown-menu-end"
+        ngbDropdownMenu
+    >
+        <!-- <a
+        class="dropdown-item bg-success bg-soft"
+        href="javascript: void(0);"
+        *ngIf="item.type && isToday(item.dateStart) && authService.isAuthorized('missions_update')"
+        [routerLink]="['persist', item.id, true]"
+        >
+        <i class="fas fa-play me-2 text-success"></i> Continuer
+        </a> -->
+        <a class="dropdown-item"
+        [routerLink]="['details', item.id]"
+        href="javascript: void(0);"
+        *ngIf="authService.isAuthorized('missions_details')"
+        >
+        <i class="fas fa-eye me-2"></i> Voir
+        </a>
+        <a
+        class="dropdown-item"
+        href="javascript: void(0);"
+        *ngIf="authService.isAuthorized('missions_update')"
+        [routerLink]="['persist', item.id]"
+        >
+        <!-- skipLocationChange -->
+        <i class="fas fa-edit me-2"></i> Modifier
+        </a>
+        
+        <a
+        class="dropdown-item text-danger"
+        href="javascript: void(0);"
+        *ngIf="authService.isAuthorized('missions_delete')"
+        (click)="service.deleteItem(item.id, $event.target)"
+        >
+        <i class="fas fa-trash me-2"></i> Supprimer
+        </a>
+    </div>
+    </div>
+</td>
+

@@ -12,83 +12,94 @@ class MissionOutput
 {
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $id;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $dateStart;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $dateEnd;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $type;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $causes;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $DMS;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $IFS;
     
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $END;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $nbClients;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $node_a;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     public $node_b;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $actions = [];
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $team;
+    
+    /**
+     * @Groups({"missions_colec"})
+     */
+    private $children;
 
     /**
      * @Groups({"missions"})
+     */
+    private $parent;
+
+    /**
+     * @Groups({"missions", "missions_colec"})
      */
     private $total_anomalies;
 
     /**
-     * @Groups({"missions"})
+     * @Groups({"missions", "missions_colec"})
      */
     private $undone_anomalies;
 
     public function __construct()
     {
         $this->node_b = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -210,9 +221,6 @@ class MissionOutput
         return $this;
     }
 
-    /**
-     * @return Collection<int, Node>
-     */
     public function getNodeB(): ?Collection
     {
         return $this->node_b;
@@ -254,6 +262,45 @@ class MissionOutput
     public function setTeam(?Team $team): self
     {
         $this->team = $team;
+
+        return $this;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): self
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getChildren(): ?Collection
+    {
+        return $this->children;
+    }
+
+    public function addChild(self $child): self
+    {
+        if (!$this->children->contains($child)) {
+            $this->children[] = $child;
+            $child->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(self $child): self
+    {
+        if ($this->children->removeElement($child)) {
+            // set the owning side to null (unless already changed)
+            if ($child->getParent() === $this) {
+                $child->setParent(null);
+            }
+        }
 
         return $this;
     }

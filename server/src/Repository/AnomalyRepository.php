@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Anomaly;
+use App\Entity\Edge;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 
@@ -17,8 +19,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AnomalyRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $em;
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
+        $this->em = $em;
         parent::__construct($registry, Anomaly::class);
     }
 
@@ -40,26 +44,38 @@ class AnomalyRepository extends ServiceEntityRepository
         }
     }
 
-    public function getTotalAnomalies($edgesIds, $date)
+    public function getTotalAnomalies($journey)
     {
-        $total = $this->createQueryBuilder('t')
-            ->select('t.status')
-            ->join('t.edge', 'e')
-            ->andWhere('e.id IN (:edges)')
-            ->setParameter('edges', $edgesIds)
-            ->andWhere('DATE(t.createdAt) = :date')
-            ->setParameter('date', $date->format('Y-m-d'))
-            ->getQuery()->getArrayResult();
-
-        $undone = array_filter($total, function ($item) {
-            return $item["status"] !== true;
-        });
+        $edgeRepository = $this->em->getRepository(Edge::class);
+        $edgesIds = $edgeRepository->getEdgesByRange(
+            $journey->getNodeA()->getDepartment()->getId(),
+            $journey->getNodeA()->getId(),
+            $journey->getNodeB() ? implode(',', $journey->getNodeB()->map(fn($node) => $node->getId())->toArray()) : null
+        );
+        if ($edgesIds) {
+            $date = $journey instanceof Visite ? $journey->getDate() : $journey->getDateStart();
 
 
-        return [
-            "total" => count($total),
-            "undone" => count($undone)
-        ];
+            $total = $this->createQueryBuilder('t')
+                ->select('t.status')
+                ->join('t.edge', 'e')
+                ->andWhere('e.id IN (:edges)')
+                ->setParameter('edges', $edgesIds)
+                ->andWhere('DATE(t.createdAt) = :date')
+                ->setParameter('date', $date->format('Y-m-d'))
+                ->getQuery()->getArrayResult();
+
+            $undone = array_filter($total, function ($item) {
+                return $item["status"] !== true;
+            });
+
+
+            return [
+                "total" => count($total),
+                "undone" => count($undone)
+            ];
+        }
+        return false;
     }
 
     //    /**

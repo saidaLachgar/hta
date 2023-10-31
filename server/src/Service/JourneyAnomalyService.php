@@ -17,21 +17,13 @@ class JourneyAnomalyService
 
     public function setTotalAnomalies($journey, $output)
     {
-        $edgeRepository = $this->em->getRepository(Edge::class);
         $anomalyRepository = $this->em->getRepository(Anomaly::class);
-        $edgesIds = $edgeRepository->getEdgesByRange(
-            $journey->getNodeA()->getDepartment()->getId(),
-            $journey->getNodeA()->getId(),
-            $journey->getNodeB() ? implode(',', $journey->getNodeB()->map(fn($node) => $node->getId())->toArray()) : null
-        );
-        if ($edgesIds) {
-            $date = $journey instanceof Visite ? $journey->getDate() : $journey->getDateStart();
-            $anomalies = $anomalyRepository->getTotalAnomalies($edgesIds, $date);
-        }
+        $anomalies = $anomalyRepository->getTotalAnomalies($journey);
 
         $this->entityCopyService->copyAttributes($journey, $output);
-        $output->setTotalAnomalies(isset($anomalies) ? $anomalies["total"] : null);
-        $output->setUndoneAnomalies(isset($anomalies) ? $anomalies["undone"] : null);
+
+        $output->setTotalAnomalies($anomalies ? $anomalies["total"] : null);
+        $output->setUndoneAnomalies($anomalies ? $anomalies["undone"] : null);
     }
    
 }

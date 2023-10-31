@@ -1,8 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, TemplateRef, ViewChild } from "@angular/core";
 import { FormArray, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { missionService } from "../mission.service";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
 const parseDate = d => new Date(Date.parse(d))
 const timeObject = d => { return { hour: d.getHours(), minute: d.getMinutes(), second: d.getSeconds() } };
@@ -29,6 +30,7 @@ export class missionPersistComponent {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public service: missionService,
+    private modalService: NgbModal,
     public authService: AuthenticationService) {
     this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupeur', active: true }];
     this.service.EditeMode = false;
@@ -46,6 +48,7 @@ export class missionPersistComponent {
       department: [""],
       actions: this.fb.array([]),
       anomalies: this.fb.array([]),
+      parent: [null],
     });
 
     let paramId = this.route.snapshot.paramMap.get("id");
@@ -62,6 +65,7 @@ export class missionPersistComponent {
         // fill ng-select
         service.loadANodes(obj.node_a ? [obj.node_a] : []);
         service.loadBNodes(obj.node_b ? obj.node_b : []);
+        service.getRelatedMissions();
 
 
         // date / time start
@@ -79,10 +83,11 @@ export class missionPersistComponent {
           dateStart: TimeStart,
           dateEnd: TimeEnds,
           causes: String(obj.causes), // @todo not working !! 
-          type: String(obj.type),
+          type: obj.type,
           department: obj.node_a.department ? obj.node_a.department["@id"] : null,
           node_a: obj.node_a ? obj.node_a["@id"] : null,
           node_b: obj.node_b.length ? obj.node_b.map((e) => e["@id"]) : [],
+          parent: obj.parent ? "/api/missions/"+obj.parent.id : null,
           // actions: obj.actions.length ? this.fb.array(obj.actions.map(val => new FormControl(parseInt(val)))) : [],
         });
         obj.actions.forEach(val => (service.actions as FormArray).push(new FormControl(parseInt(val))))
@@ -110,6 +115,18 @@ export class missionPersistComponent {
     }
 
   }
+
+  // get suspected related missions
+  // aka. missions that has parent null same date same department same type
+  @ViewChild("associations_content")
+  private associations_content: TemplateRef<any>;
+  getParentMissions() {
+    // open modal
+    this.modalService.open(this.associations_content, { size: 'xl',centered: true });
+    // get data
+    this.service.getRelatedMissions();
+  }
+
 
   // add actions
   onActionsChange(e) {

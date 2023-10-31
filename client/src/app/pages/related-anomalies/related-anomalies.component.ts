@@ -60,8 +60,10 @@ export class relatedAnomaliesComponent implements OnChanges {
         let anomalyFormArray = this.anomalies as FormArray;
         // let anomalyFormArray =  this.parentFormGroup.get("anomalies") as FormArray;
         // Disable each control within the FormArray
-        for (const control of anomalyFormArray.controls) {
-          type != 'false' ? control.enable() : control.disable();
+        if(anomalyFormArray) {
+          for (const control of anomalyFormArray.controls) {
+            type != 'false' ? control.enable() : control.disable();
+          }
         }
       }
     }

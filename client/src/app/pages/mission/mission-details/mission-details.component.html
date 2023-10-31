@@ -5,6 +5,32 @@
 .summary tr td:last-child {
 width: 99%;
 }
+.mini-stat-icon {
+  overflow:hidden;
+  position:relative
+}
+.mini-stat-icon:before,
+.mini-stat-icon:after {
+  content:"";
+  position:absolute;
+  width:8px;
+  height:54px;
+  background-color:#ffffff1a;
+  left:16px;
+  transform:rotate(32deg);
+  top:-5px;
+  transition:all .4s
+}
+.mini-stat-icon:after {
+  left:-12px;
+  width:12px;
+  transition:all .2s
+}
+/* @media (max-width: 1200px) {
+  .order-lg-first{
+    order: -1 
+  }
+} */
 </style>
 <div class="container-fluid">
   <!-- start page title -->
@@ -14,102 +40,69 @@ width: 99%;
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
   <!-- end page title -->
-  <div class="row">
-    <div class="card mt-4">
-      <div class="card-body" *ngIf="mission">
-        <div 
+
+
+  <div class="row" *ngIf="mission">
+    <div class="col-12 order-xl-last col-xl-3 top-0 mt-4 mt-xl-n5 me-xl-n4 shadow-sm border-start p-3 p-xl-5" style="background-color: #f8f8ff;">
+      <div class="position-sticky" style="top: 90px;">
+        <p class="text-primary fw-medium mb-4">OVERVIEW</p>
+        <!-- <div 
           *ngIf="mission.type != null"
           [ngClass]="mission.type ? 'badge-soft-danger' : 'badge-soft-info'"
-          class="badge rounded-pill float-end fs-5">
+          class="badge rounded-pill fs-5">
           {{mission.type ? "Incident" : "Coupeur" }}
-        </div>
-        <h2>{{mission.dateStart | date:'d MMMM yyyy':'Africa/Casablanca'}}</h2>
-
-        <div class="row my-5">
-          <div class="col-auto">
-            <div class="border-end pe-5"><p class="fw-medium mb-3">Durée</p><strong class="h2">{{service.getDiff(mission.dateStart, mission.dateEnd)}}&nbsp;</strong></div>
-          </div>
-          <div class="col-auto">
-            <div class="border-end pe-5"><p class="fw-medium mb-3">DMS</p><strong class="h2" title="{{mission.DMS}}">{{mission.DMS?(mission.DMS | decimalHourToTime): "-"}}</strong></div>
-          </div>
-          <div class="col-auto">
-            <div class="border-end pe-5"><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
-          </div>
-          <div class="col-auto">
-            <div><p class="fw-medium mb-3">END</p><strong class="h2" title="{{mission.END}}">{{mission.END?(mission.END): "-"}}</strong></div>
-          </div>
-        </div>
-
-
-        <div class="table-responsive">
-          <table class="table summary table-nowrap mb-0">
-            <tbody>
-              <tr>
-                <th scope="row">Heure :</th>
-                <td>{{mission.dateStart | date:'HH:mm:ss':'Africa/Casablanca'}} → {{mission.dateEnd ? (mission.dateEnd  | date:'HH:mm:ss':'Africa/Casablanca') : "— : —"}}</td>
-              </tr>
-              <tr>
-                <th scope="row">Départ :</th>
-                <td>
-                  <a 
-                    *ngIf="mission.node_a.department"
-                    [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', mission.node_a.department.id] : null"
-                    target="_blank">{{mission.node_a.department.titre}}</a>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Point coupure :</th>
-                <td>
-                  <a 
-                    *ngIf="mission.node_a"
-                    [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', mission.node_a.id] : null"
-                    target="_blank">{{mission.node_a.titre}}</a>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">PS :</th>
-                <td>
-                  <div *ngFor="let node_b of mission.node_b">
-                    <a 
-                      [routerLink]="authService.isAuthorized('nodes_details') ? ['/nodes/details', node_b.id] : null"
-                      target="_blank">{{mission.node_b.length==1 ? "": "- "}}{{node_b.titre}}</a>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Causes :</th>
-                <td>
-                  <ng-container *ngIf="mission.type != null && mission.type && mission.causes;">
-                    {{service.causesList[mission.causes + 3]}}
-                  </ng-container>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Nb Clients interrompus :</th>
-                <td>{{mission.nbClients}}</td>
-              </tr>
-              <tr>
-                <th scope="row">Équipe :</th>
-                <td><a 
-                  *ngIf="mission.team"
-                  [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', mission.team.id] : null"
-                  target="_blank">{{mission.team.titre}}</a></td>
-              </tr>
-              
-            </tbody>
-          </table>
-        </div>
-        <button 
-          class="btn btn-primary mt-4 float-end ms-2" 
-          *ngIf="authService.isAuthorized('missions_update')"
-          routerLink="/mission/persist/{{mission.id}}"
-        ><i class="fas fa-edit me-1"></i>Modifier</button>
-        <button class="btn btn-light mt-4 float-end" routerLink="/mission"><i class="fas fa-arrow-circle-left me-1"></i>Retour à la liste</button>
-        
+        </div> -->
+        <p class="text-muted mb-1 mt-5">Date</p>
+        <p class="font-size-20 fw-medium mb-5">{{mission.dateStart | date:'d MMMM yyyy':'Africa/Casablanca'}}</p>
+        <p class="text-muted mb-1">Départ</p>
+        <a 
+          class="font-size-20 fw-medium mb-5 d-block text-body"
+          *ngIf="mission.node_a.department"
+          [routerLink]="authService.isAuthorized('departments_details') ? ['/departments/details', mission.node_a.department.id] : null"
+          target="_blank">{{mission.node_a.department.titre}}</a>
+        <p class="text-muted mb-1">Équipe</p>
+        <a class="font-size-20 fw-medium d-block text-body"
+          [routerLink]="authService.isAuthorized('teams_details') ? ['/teams/details', mission.node_a.department.team.id] : null"
+          target="_blank">{{mission.node_a.department.team.titre}}</a>
       </div>
     </div>
+    <div class="col-12 col-xl-9 pt-4">
+
+      <div class="card card-body mx-n3 mx-xl-0 mb-0 h-100">
+        <ngb-accordion #acc="ngbAccordion" activeIds="static-1" [closeOthers]="true" [destroyOnHide]="false">
+          <ngb-panel id="static-1">
+            <ng-template ngbPanelHeader let-opened="opened">
+              <div class="d-flex">
+                <button class="btn" ngbPanelToggle><i class="mdi accor-plus-icon mdi-chevron-{{opened ? 'up' : 'down'}} fs-3 c-pointer"></i></button>
+                <app-accordion-header class="flex-fill" [mission]="mission"></app-accordion-header>
+              </div>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <app-accordion-panel [mission]="mission"></app-accordion-panel>
+            </ng-template>
+          </ngb-panel>
+
+          <ng-container *ngFor="let child of mission.children">
+            <ngb-panel id="child-{{child.id}}">
+              <ng-template ngbPanelHeader let-opened="opened">
+                <div class="d-flex">
+                  <button class="btn" ngbPanelToggle><i class="mdi accor-plus-icon mdi-chevron-{{opened ? 'up' : 'down'}} fs-3 c-pointer"></i></button>
+                  <app-accordion-header class="flex-fill" [mission]="child"></app-accordion-header>
+                </div>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                <app-accordion-panel [mission]="child"></app-accordion-panel>
+              </ng-template>
+            </ngb-panel>
+          </ng-container>
+        </ngb-accordion>
+
+      </div>
+
+
+    </div>
   </div>
-  <app-related-anomalies  [currentEdge]="currentEdge"></app-related-anomalies>
+
 </div>
 
   
