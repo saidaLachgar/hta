@@ -11,26 +11,38 @@ import { environment } from 'src/environments/environment';
 })
 export class DefaultComponent implements OnInit {
   readonly server = environment.serverURL;
+  months: { value: number, label: string }[] = [];
   isVisible: string;
   isActive: string;
+  DMSType: boolean;
+  IFSType: boolean;
+  ENDType: boolean;
   today: Date = new Date();
   AnomaliesPerTeamChart;
   teamsStats$;
-  teamsCharts$;
-  teamsAnomalies$;
+  teamsDMSCharts$;
+  teamsIFSCharts$;
+  teamsENDCharts$;
+  teamsAnomalies$
 
   constructor(
     private http: HttpClient,
     public authService: AuthenticationService,
   ) {
-    this.teamsStats$ = http.get(`${this.server}/api/analytics/teams-data`).pipe();
     this.teamsAnomalies$ = http.get(`${this.server}/api/analytics/teams-anomalies`).pipe(
       map(data => this.anomaliesPerTeamChart(data))
     );
-    this.teamsCharts$ = http.get(`${this.server}/api/analytics/teams-monthly-data`).pipe(
-      map(data => this.teamsMonthlyStatsChart(data))
-    );
+
+    this.ReportIFS();
+    this.ReportDMS();
+    this.ReportEND();
   }
+
+  ReportIFS(type: boolean = true) { this.teamsIFSCharts$ = this.teamsMonthlyStatsChart("IFS", type); this.IFSType = type; }
+  ReportDMS(type: boolean = true) { this.teamsDMSCharts$ = this.teamsMonthlyStatsChart("DMS", type); this.DMSType = type; }
+  ReportEND(type: boolean = true) { this.teamsENDCharts$ = this.teamsMonthlyStatsChart("END", type); this.ENDType = type; }
+  ReportStats(selectedMonth: string) { this.teamsStats$ = this.http.get(`${this.server}/api/analytics/teams-data/`+ selectedMonth).pipe() }
+
 
   ngOnInit() {
     //  horizontal-vertical layput set
@@ -40,69 +52,65 @@ export class DefaultComponent implements OnInit {
     vertical && vertical.setAttribute('checked', 'true');
   }
 
-  teamsMonthlyStatsChart(data: any): any {
-    const decimalHourToTimePipe = new DecimalHourToTimePipe();
-    const statTypes = ['DMS_TOTAL', 'END_TOTAL', 'IFS_TOTAL'];
-    const monthMap: { [key: string]: string } = {
-      "01": "JAN", "02": "FÉV", "03": "MAR", "04": "AVR",
-      "05": "MAI", "06": "JUN", "07": "JUL", "08": "AOÛ",
-      "09": "SEP", "10": "OCT", "11": "NOV", "12": "DÉC"
-    };
-    let structuredData = [];
+  teamsMonthlyStatsChart(property: string, type: boolean): any {
+    return this.http.get(`${this.server}/api/analytics/teams-monthly-data?property=${property}&type=${type}`).pipe(
+      map(data => {
+        const decimalHourToTimePipe = new DecimalHourToTimePipe();
+        const monthMap: { [key: string]: string } = {
+          "01": "JAN", "02": "FÉV", "03": "MAR", "04": "AVR",
+          "05": "MAI", "06": "JUN", "07": "JUL", "08": "AOÛ",
+          "09": "SEP", "10": "OCT", "11": "NOV", "12": "DÉC"
+        };
 
-    for (const statType of statTypes) {
-      const statData = {
-        type: statType,
-        series: [],
-        chart: {
-          height: 275,
-          type: "line"
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        yaxis: {
-          labels: {
-            formatter: function (val) {
-              if(statType == "IFS_TOTAL") {
+        let statData = {
+          series: [],
+          chart: {
+            height: 275,
+            type: "line"
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          yaxis: {
+            labels: {
+              formatter: function (val) {
+                if (property == "DMS") {
+                  return decimalHourToTimePipe.transform(val);
+                }
                 return val.toFixed(3);
               }
-              return decimalHourToTimePipe.transform(val);
-            }
+            },
           },
-        },
-        stroke: {
-          curve: "smooth"
-        },
-        xaxis: {
-          labels: {
-            rotate: -45
+          stroke: {
+            curve: "smooth"
           },
-          categories: [],
-        },
-      };
-      // console.log(data);
+          xaxis: {
+            labels: {
+              rotate: -45
+            },
+            categories: [],
+          },
+        };
+        // console.log(data);
 
-      for (const teamName in data) {
-        statData.series.push({
-          name: teamName,
-          data: data[teamName].map(monthData => {
-            statData.xaxis.categories.push(monthMap[monthData["MONTH"]]);
-            return monthData[statType];
-          })
-        });
-      }
-
-      structuredData.push(statData);
-    }
-
-    // console.log(structuredData);
-
-    return structuredData;
+        for (const teamName in data) {
+          statData.series.push({
+            name: teamName,
+            data: data[teamName].map(monthData => {
+              statData.xaxis.categories.push(monthMap[monthData["MONTH"]]);
+              return monthData[property];
+            })
+          });
+        }
+        // console.log(statData);
+        
+        return statData;
+      })
+    );
   }
 
   anomaliesPerTeamChart(data: any): any {
-    return{
+    return {
       series: [
         {
           name: "Réaliser",

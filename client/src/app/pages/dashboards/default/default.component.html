@@ -12,21 +12,27 @@
 
     <div class="row mt-4 mb-2">
         <div class="col-12">
-            <div class="card card-body p-2">
+            <div class="card card-body">
+            <div class="clearfix">
+                <div class="float-end">
+                    <months-selector (selectionChange)="ReportStats($event)"></months-selector>
+                </div>
+                <h4 class="card-title mb-4">Analyses mensuelles</h4>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                           <th>Équipe</th>
-                          <th>Visite au sol</th>
-                          <th>Anomalies réalisées</th>
-                          <th>Nombre d'incidents <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>Nombre de coupures <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>Nombre de clients coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>Nombre de postes coupés <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>DMS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>IFS <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
-                          <th>END <small class="text-muted">({{today | date:'MMM':'Africa/Casablanca'}})</small></th>
+                          <th>Visite au sol <span class="text-muted ms-1 align-middle" ngbTooltip="Les données sont depuis toujours (pas d'intervalle de temps)"><i class="bx bx-info-circle"></i></span></th>
+                          <th>Anomalies réalisées <span class="text-muted ms-1 align-middle" ngbTooltip="Les données sont depuis toujours (pas d'intervalle de temps)"><i class="bx bx-info-circle"></i></span></th>
+                          <th>Nombre d'incidents</th>
+                          <th>Nombre de coupures</th>
+                          <th>Nombre de clients coupés</th>
+                          <th>Nombre de postes coupés</th>
+                          <th>DMS</th>
+                          <th>IFS</th>
+                          <th>END</th>
                         </tr>
                       </thead>
                     <tbody *ngIf="teamsStats$ | async as teamsStats; else loading">
@@ -59,48 +65,152 @@
 
     <!-- charts -->
     <div class="row">
-    
-    <div class="col-lg-6" *ngFor="let chart of teamsCharts$ | async;">
-        <div class="card card-body">
-            <div class="fw-bold mb-4">
-                <div *ngIf="chart.type == 'DMS_TOTAL'">
-                  DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
+        <div class="col-lg-6">
+            <div class="card card-body">
+                <div class="fw-bold mb-4">
+                    DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
+                    <div class="float-end">
+                        <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportDMS(false)"
+                            [ngClass]="{'active': DMSType==false}">Coupeur</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportDMS()"
+                                [ngClass]="{'active': DMSType}">Incident</a>
+                        </li>
+                        </ul>
+                    </div>
                 </div>
-                <div *ngIf="chart.type == 'IFS_TOTAL'">
-                  IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
-                </div>
-                <div *ngIf="chart.type == 'END_TOTAL'">
-                  END <small class="text-muted font-size-12">(année en cours)</small>
-                </div>
+                <ng-container *ngIf="teamsDMSCharts$ | async as chart;else teamsDMSChartsLoading">
+                    <apx-chart
+                        [series]="chart.series"
+                        [chart]="chart.chart"
+                        [xaxis]="chart.xaxis"
+                        [yaxis]="chart.yaxis"
+                        [stroke]="chart.stroke"
+                        [tooltip]="chart.tooltip"
+                        [dataLabels]="chart.dataLabels"
+                        [colors]="chart.colors"
+                    ></apx-chart>
+                </ng-container>
+                <ng-template #teamsDMSChartsLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+                        </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+                        </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+                        </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+                        </rect></g>
+                    </svg>
+                </ng-template>
             </div>
-            <apx-chart
-            [series]="chart.series"
-            [chart]="chart.chart"
-            [xaxis]="chart.xaxis"
-            [yaxis]="chart.yaxis"
-            [stroke]="chart.stroke"
-            [tooltip]="chart.tooltip"
-            [dataLabels]="chart.dataLabels"
-            [colors]="chart.colors"
-            ></apx-chart>
-      </div>
-    </div>
-    
-    <div class="col-lg-6" *ngIf="teamsAnomalies$ | async as teamsAnomalies">
-      <div class="card card-body">
-        <div class="fw-bold mb-4">Taux de correction des anomalies</div>
-        <apx-chart
-            [series]="teamsAnomalies.series"
-            [chart]="teamsAnomalies.chart"
-            [dataLabels]="teamsAnomalies.dataLabels"
-            [plotOptions]="teamsAnomalies.plotOptions"
-            [responsive]="teamsAnomalies.responsive"
-            [xaxis]="teamsAnomalies.xaxis"
-            [legend]="teamsAnomalies.legend"
-            [fill]="teamsAnomalies.fill"
-        ></apx-chart>
-         
-      </div>
-    </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card card-body">
+                <div class="fw-bold mb-4">
+                    IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
+                    <div class="float-end">
+                        <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportIFS(false)"
+                            [ngClass]="{'active': IFSType==false}">Coupeur</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportIFS()"
+                                [ngClass]="{'active': IFSType}">Incident</a>
+                        </li>
+                        </ul>
+                    </div>
+                </div>
+                <ng-container *ngIf="teamsIFSCharts$ | async as chart;else teamsIFSChartsLoading">
+                    <apx-chart
+                        [series]="chart.series"
+                        [chart]="chart.chart"
+                        [xaxis]="chart.xaxis"
+                        [yaxis]="chart.yaxis"
+                        [stroke]="chart.stroke"
+                        [tooltip]="chart.tooltip"
+                        [dataLabels]="chart.dataLabels"
+                        [colors]="chart.colors"
+                        ></apx-chart>
+                </ng-container>
+                <ng-template #teamsIFSChartsLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+                        </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+                        </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+                        </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+                        </rect></g>
+                    </svg>
+                </ng-template>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card card-body">
+                <div class="fw-bold mb-4">
+                    END <small class="text-muted font-size-12">(année en cours)</small>
+                    <div class="float-end">
+                        <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="ReportEND(false)"
+                            [ngClass]="{'active': ENDType==false}">Coupeur</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="ReportEND()"
+                                [ngClass]="{'active': ENDType}">Incident</a>
+                        </li>
+                        </ul>
+                    </div>
+                </div>
+                <ng-container *ngIf="teamsENDCharts$ | async as chart;else teamsENDChartsLoading">
+                    <apx-chart
+                        [series]="chart.series"
+                        [chart]="chart.chart"
+                        [xaxis]="chart.xaxis"
+                        [yaxis]="chart.yaxis"
+                        [stroke]="chart.stroke"
+                        [tooltip]="chart.tooltip"
+                        [dataLabels]="chart.dataLabels"
+                        [colors]="chart.colors"
+                    ></apx-chart>
+                </ng-container>
+                <ng-template #teamsENDChartsLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+                        </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+                        </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+                        </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+                        </rect></g>
+                    </svg>
+                </ng-template>
+            </div>
+        </div>
+        <div class="col-lg-6" *ngIf="teamsAnomalies$ | async as teamsAnomalies">
+            <div class="card card-body">
+                <div class="fw-bold mb-4">Taux de correction des anomalies</div>
+                <apx-chart
+                    [series]="teamsAnomalies.series"
+                    [chart]="teamsAnomalies.chart"
+                    [dataLabels]="teamsAnomalies.dataLabels"
+                    [plotOptions]="teamsAnomalies.plotOptions"
+                    [responsive]="teamsAnomalies.responsive"
+                    [xaxis]="teamsAnomalies.xaxis"
+                    [legend]="teamsAnomalies.legend"
+                    [fill]="teamsAnomalies.fill"
+                ></apx-chart>
+            </div>
+        </div>
     </div>
 </div> <!-- container-fluid -->

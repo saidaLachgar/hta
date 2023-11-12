@@ -1,21 +1,24 @@
-<div class="row my-3 gy-5 mt-n5 pt-1">
+<div class="row my-3 gy-5 gx-5 mt-n5 pt-1">
   <div class="col-6 col-lg-auto">
-    <div class="border-end pe-lg-5"><p class="fw-medium mb-3">Durée</p><strong class="h2">{{service.getDiff(mission.dateStart, mission.dateEnd)}}&nbsp;</strong></div>
+    <div><p class="fw-medium mb-2">Durée</p><strong class="h3">{{service.getDiff(mission.dateStart, mission.dateEnd)}}&nbsp;</strong></div>
   </div>
   <div class="col-6 col-lg-auto">
-    <div class="border-end pe-lg-5"><p class="fw-medium mb-3">DMS</p><strong class="h2" title="{{mission.DMS}}">{{mission.DMS?(mission.DMS | decimalHourToTime): "-"}}</strong></div>
+    <div><p class="fw-medium mb-2">DMS</p><strong class="h3" title="{{mission.DMS}}">{{mission.DMS?(mission.DMS | decimalHourToTime): "-"}}</strong></div>
   </div>
   <div class="col-6 col-lg-auto">
-    <div class="border-end pe-lg-5"><p class="fw-medium mb-3">IFS</p><strong class="h2">{{mission.IFS?mission.IFS: "-"}}</strong></div>
+    <div><p class="fw-medium mb-2">IFS</p><strong class="h3">{{mission.IFS?mission.IFS: "-"}}</strong></div>
   </div>
   <div class="col-6 col-lg-auto">
-    <div class="border-end pe-lg-5"><p class="fw-medium mb-3">END</p><strong class="h2">{{mission.END?mission.END: "-"}}</strong></div>
+    <div><p class="fw-medium mb-2">END</p><strong class="h3">{{mission.END?mission.END: "-"}}</strong></div>
   </div>
   <div class="col-6 col-lg-auto">
-    <div class="border-end pe-lg-5"><p class="fw-medium mb-3">Nb Clients interrompus</p><strong class="h2">{{mission.nbClients}}</strong></div>
+    <div><p class="fw-medium mb-2">Nb Clients interrompus</p><strong class="h3">{{mission.nbClients}}</strong></div>
   </div>
   <div class="col-6 col-lg-auto" *ngIf="mission.type != null && mission.type && mission.causes;">
-    <div><p class="fw-medium mb-3">Causes</p><strong class="h2">{{service.causesList[mission.causes + 3]}}</strong></div>
+    <div><p class="fw-medium mb-2">Causes</p><strong class="h3">{{service.causesList[mission.causes + 3]}}</strong></div>
+  </div>
+  <div class="col-6 col-lg-auto">
+    <div><p class="fw-medium mb-2">Type</p><strong class="h3">{{mission.type ? "Incident" : "Coupeur" }}</strong></div>
   </div>
 </div>
 <div class="mx-n4">

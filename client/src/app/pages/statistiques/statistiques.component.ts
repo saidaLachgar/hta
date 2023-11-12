@@ -19,6 +19,7 @@ export class StatistiquesComponent {
   readonly server = environment.serverURL;
   readonly url = `${this.server}/api/analytics/by-team`;
   causesList = Object.keys(CausesList);
+  dateToString = DateToString;
   form: FormGroup;
   today: Date = new Date();
   submitted: boolean = false;

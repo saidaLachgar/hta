@@ -110,11 +110,23 @@ class MissionRepository extends ServiceEntityRepository
         ;
 
     }
+
     public function getMissionsStats(int $month): array
     {
         $currentYear = date('Y');
+        $date = new \DateTime();
+
+        // Check if the given month has occurred in the current year
+        $current_month = (int)$date->format('m');
+        if ($month > $current_month) {
+            // If the month hasn't occurred yet, adjust the year to the previous one
+            $currentYear--;
+        }
+
+        // get previous month
         $prevYear = $currentYear;
         $prevMonth = $month - 1;
+        // if previous month is from the previous year 
         if ($prevMonth === 0) {
             $prevMonth = 12;
             $prevYear--;
@@ -126,8 +138,8 @@ class MissionRepository extends ServiceEntityRepository
                 // Total missions count for the given month
                 'COUNT(m.id) as Total',
                 // Total missions count for each type 
-                'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) as Incident',
-                'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) as Coupeur',
+                'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) as Coupeur',
+                'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) as Incident',
             )
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :month')
@@ -169,16 +181,11 @@ class MissionRepository extends ServiceEntityRepository
             ->setParameter('prevMonth', $prevMonth);
 
         // merge results
-        $dd1 = $queryBuilderParents->getQuery()->getResult()[0];
-        $dd2 = $queryBuilderAll->getQuery()->getResult()[0];
-        $dd3 = $prevDuration->getQuery()->getResult()[0];
+        $r1 = $queryBuilderParents->getQuery()->getResult()[0];
+        $r2 = $queryBuilderAll->getQuery()->getResult()[0];
+        $r3 = $prevDuration->getQuery()->getResult()[0];
 
-        dump($dd1);
-        dump($dd2);
-        dump($dd3);
-        exit;
-        // dd($results);
-        // return $results;
+        return array_merge( $r1, $r2, $r3 );
     }
 
 

@@ -48,14 +48,14 @@ class AnalyticsController extends AbstractController
   }
 
   /**
-   * @Route("/api/analytics/teams-data", name="getTeamsData", options={"expose"=true})
+   * @Route("/api/analytics/teams-data/{month}", name="getTeamsData", options={"expose"=true})
    */
-  public function getTeamsData(Request $request)
+  public function getTeamsData($month)
   {
     /** @var \App\Repository\TeamRepository $TeamRepo */
     $TeamRepo = $this->em->getRepository(Team::class);
 
-    $data = $TeamRepo->getTeamsData();
+    $data = $TeamRepo->getTeamsData($month);
 
     return new JsonResponse($data);
   }
@@ -110,10 +110,11 @@ class AnalyticsController extends AbstractController
    */
   public function getTeamsMonthlyData(Request $request)
   {
+    $q = $request->query;
     /** @var \App\Repository\TeamRepository $TeamRepo */
     $TeamRepo = $this->em->getRepository(Team::class);
 
-    $data = $TeamRepo->getTeamsMonthlyData();
+    $data = $TeamRepo->getTeamsMonthlyData($q->get('property'),$q->get('type'));
 
     return new JsonResponse($data);
   }

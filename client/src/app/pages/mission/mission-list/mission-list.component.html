@@ -15,12 +15,7 @@
         <!-- title -->
         <div class="clearfix">
               <div class="float-end">
-                  <div class="input-group input-group-sm">
-                      <select [(ngModel)]="selectedMonth" (change)="ReportStats()" class="form-select form-select-sm">
-                        <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
-                      </select>
-                      <label class="input-group-text">Mois</label>
-                  </div>
+                <months-selector (selectionChange)="ReportStats($event)"></months-selector>
               </div>
               <h4 class="card-title mb-4">Analyses mensuelles</h4>
         </div>

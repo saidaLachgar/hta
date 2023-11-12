@@ -7,9 +7,9 @@
 @Done on get list of missions get only the one with null parent and find a way to send children missions to display them
 @Done on update mission show all related missions data
 @Done show one update button for all missions that update parent only
+@Done on search, search children missions too
 
 @todo on delete a parent mission detach children
-@todo on search, search children missions too
 
 --------------------------------------------------------------------------------
 - i needed to get total interrupted client per commune
@@ -55,3 +55,14 @@ x tester mission parent update
 fix listing
 
 fix details
+
+
+
+-> liste visits choix de mois
+- teams distance
+- statistiques chart re style
+- fix bug postes copé
+- new chart
+- supp parent/children mission
+- are all values stored ? postes?
+- 

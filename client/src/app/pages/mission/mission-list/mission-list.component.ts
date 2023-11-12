@@ -21,8 +21,6 @@ export class missionListComponent {
   breadCrumbItems: Array<{}>;
   ShowSearch: boolean = false;
   DMSMonthly: boolean;
-  months: { value: number, label: string }[] = [];
-  selectedMonth: number;
   missionsStats$;
   DMSChart$;
 
@@ -31,14 +29,13 @@ export class missionListComponent {
     private fb: FormBuilder,
     public authService: AuthenticationService,
     private http: HttpClient,
-    private config: NgSelectConfig
+    private config: NgSelectConfig,
   ) {
     service.findAll();
     service.loadTeams();
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
-    this.generateMonths();
     this.ReportDMS();    
 
     config.notFoundText = 'Aucune donnée trouvée !';
@@ -59,26 +56,12 @@ export class missionListComponent {
 
   }
 
-  private generateMonths() {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth()+1;
-    const monthMap = ["JAN", "FÉV", "MAR", "AVR","MAI", "JUN", "JUL", "AOÛ","SEP", "OCT", "NOV", "DÉC"];
-    for (let month = currentMonth; month >= 1; month--) {
-      this.months.push({
-        value: month,
-        label: monthMap[month-1]
-      });
-    }
-    this.selectedMonth = currentMonth;
-    this.ReportStats();
-  }
-
   // isToday(date: string): boolean {
   //   return isSameDay(new Date(date), new Date());
   // }
 
-  ReportStats() {
-    this.missionsStats$ = this.http.get(`${this.server}/api/analytics/mission-stats/` + this.selectedMonth).pipe(
+  ReportStats(selectedMonth: string) {
+    this.missionsStats$ = this.http.get(`${this.server}/api/analytics/mission-stats/` + selectedMonth).pipe(
       map(data => {
         let causes = Object.values(data)
           .filter((v, i) => Object.keys(data)[i].includes("Cause_"))

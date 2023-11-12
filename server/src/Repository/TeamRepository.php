@@ -58,12 +58,18 @@ class TeamRepository extends ServiceEntityRepository
     }
 
     // if not super  admin get only their team
-    public function getTeamsData(): array
+    public function getTeamsData(int $month): array
     {
         $teams = $this->getTeams();
         $date = new \DateTime();
         $current_year = $date->format('Y');
-        $current_month = $date->format('m');
+
+        // Check if the given month has occurred in the current year
+        $current_month = (int)$date->format('m');
+        if ($month > $current_month) {
+            // If the month hasn't occurred yet, adjust the year to the previous one
+            $current_year--;
+        }
 
         $anomalyStats = $this->em->createQueryBuilder()
             ->select(
@@ -78,25 +84,43 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $missionStats = $this->em->createQueryBuilder()
+        $missionStatsAll = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(d.team) as TEAM',
-                'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) AS INCIDENTS_COUNT',
-                'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) AS COUPEUR_COUNT',
                 "SUM(CAST(SUBSTRING_INDEX(m.nbClients, '/', 1) AS UNSIGNED)) AS CLIENTS_COUNT",
-                'SUM(m.nbPostes) as POSTES_TOTAL',
+                'COUNT(p.id) as POSTES_TOTAL',
                 'SUM(m.DMS) as DMS_TOTAL',
                 'SUM(m.END) as END_TOTAL',
                 'SUM(m.IFS) as IFS_TOTAL'
             )
             ->from('App\Entity\Mission', 'm')
+            ->leftJoin('m.postes', 'p')
             ->innerJoin('m.node_a', 'n')
             ->innerJoin('n.department', 'd')
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :month')
             ->groupBy('d.team')
             ->setParameter('year', $current_year)
-            ->setParameter('month', $current_month)
+            ->setParameter('month', $month)
+            ->getQuery()
+            ->getResult();
+
+        // data of parent missions only
+        $missionStatsParents = $this->em->createQueryBuilder()
+            ->select(
+                'IDENTITY(d.team) as TEAM',
+                'SUM(CASE WHEN m.type = true THEN 1 ELSE 0 END) AS INCIDENTS_COUNT',
+                'SUM(CASE WHEN m.type = false THEN 1 ELSE 0 END) AS COUPEUR_COUNT',
+            )
+            ->from('App\Entity\Mission', 'm')
+            ->innerJoin('m.node_a', 'n')
+            ->innerJoin('n.department', 'd')
+            ->where('YEAR(m.dateStart) = :year')
+            ->andWhere('MONTH(m.dateStart) = :month')
+            ->andWhere('m.parent is null')
+            ->groupBy('d.team')
+            ->setParameter('year', $current_year)
+            ->setParameter('month', $month)
             ->getQuery()
             ->getResult();
 
@@ -124,7 +148,11 @@ class TeamRepository extends ServiceEntityRepository
                 return $item['TEAM'] === (string) $teamId;
             }));
 
-            $teamMissionStats = current(array_filter($missionStats, function ($item) use ($teamId) {
+            $teamMissionStatsAll = current(array_filter($missionStatsAll, function ($item) use ($teamId) {
+                return $item['TEAM'] === (string) $teamId;
+            }));
+
+            $teamMissionStatsParents = current(array_filter($missionStatsParents, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
             }));
 
@@ -141,13 +169,13 @@ class TeamRepository extends ServiceEntityRepository
                 "VISIT_LENGTH" => $teamVisiteStats["VISIT_LENGTH"] ?? 0,
                 "ACHIEVED_ANOMALIES" => $teamAnomalyStats["ACHIEVED_ANOMALIES"] ?? 0,
                 "TOTAL_ANOMALIES" => $teamAnomalyStats["TOTAL_ANOMALIES"] ?? 0,
-                "INCIDENTS_COUNT" => $teamMissionStats["INCIDENTS_COUNT"] ?? 0,
-                "COUPEUR_COUNT" => $teamMissionStats["COUPEUR_COUNT"] ?? 0,
-                "CLIENTS_COUNT" => $teamMissionStats["CLIENTS_COUNT"] ?? 0,
-                "IFS_TOTAL" => $teamMissionStats["IFS_TOTAL"] ?? 0,
-                "DMS_TOTAL" => $teamMissionStats["DMS_TOTAL"] ?? 0,
-                "END_TOTAL" => $teamMissionStats["END_TOTAL"] ?? 0,
-                "POSTES_TOTAL" => $teamMissionStats["POSTES_TOTAL"] ?? 0
+                "INCIDENTS_COUNT" => $teamMissionStatsParents["INCIDENTS_COUNT"] ?? 0,
+                "COUPEUR_COUNT" => $teamMissionStatsParents["COUPEUR_COUNT"] ?? 0,
+                "CLIENTS_COUNT" => $teamMissionStatsAll["CLIENTS_COUNT"] ?? 0,
+                "IFS_TOTAL" => $teamMissionStatsAll["IFS_TOTAL"] ?? 0,
+                "DMS_TOTAL" => $teamMissionStatsAll["DMS_TOTAL"] ?? 0,
+                "END_TOTAL" => $teamMissionStatsAll["END_TOTAL"] ?? 0,
+                "POSTES_TOTAL" => $teamMissionStatsAll["POSTES_TOTAL"] ?? 0
             ];
         }
         // dd($teamsStats);
@@ -156,7 +184,7 @@ class TeamRepository extends ServiceEntityRepository
     }
 
     // if not super  admin get only their teams
-    public function getTeamsMonthlyData(): array
+    public function getTeamsMonthlyData($property,$type): array
     {
         $teams = $this->getTeams();
         $currentDate = new \DateTime();
@@ -170,17 +198,17 @@ class TeamRepository extends ServiceEntityRepository
             $missionStats = $this->em->createQueryBuilder()
                 ->select(
                     'IDENTITY(d.team) as TEAM',
-                    'SUM(m.DMS) as DMS_TOTAL',
-                    'SUM(m.END) as END_TOTAL',
-                    'SUM(m.IFS) as IFS_TOTAL'
+                    'SUM(m.'.$property.') as '.$property,
                 )
                 ->from('App\Entity\Mission', 'm')
                 ->innerJoin('m.node_a', 'n')
                 ->innerJoin('n.department', 'd')
                 ->andWhere('YEAR(m.dateStart) = :year')
                 ->andWhere('MONTH(m.dateStart) = :month')
+                ->andWhere('m.type = :type')
                 ->setParameter('year', $year)
                 ->setParameter('month', $month)
+                ->setParameter('type', $type === 'true'? true : false)
                 ->groupBy('d.team')
                 ->getQuery()
                 ->getResult();
@@ -194,9 +222,7 @@ class TeamRepository extends ServiceEntityRepository
 
                 $monthlyStats[$team->getTitre()][] = [
                     "MONTH" => $month,
-                    "IFS_TOTAL" => $teamMissionStats['IFS_TOTAL'] ?? 0,
-                    "DMS_TOTAL" => $teamMissionStats['DMS_TOTAL'] ?? 0,
-                    "END_TOTAL" => $teamMissionStats['END_TOTAL'] ?? 0,
+                    $property => $teamMissionStats[$property] ?? 0,
                 ];
             }
 

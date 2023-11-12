@@ -6,13 +6,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from './components/confirm-dialog/confirm-dialog.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DecimalHourToTimePipe } from '../core/pipes';
+import { monthsSelectorComponent } from './components/months-selector/months-selector.component';
 @NgModule({
   declarations: [
     // pipes and directives
-    DecimalHourToTimePipe
+    DecimalHourToTimePipe,
+    monthsSelectorComponent, 
   ],
   imports: [
     // components
+    FormsModule,
     CommonModule
   ],
   exports: [
@@ -28,6 +31,7 @@ import { DecimalHourToTimePipe } from '../core/pipes';
     NgbTypeaheadModule,
     NgbDropdownModule,
     NgbNavModule,
+    monthsSelectorComponent, 
     DecimalHourToTimePipe
   ]
 })

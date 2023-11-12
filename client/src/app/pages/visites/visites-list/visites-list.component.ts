@@ -30,7 +30,6 @@ export class visitesListComponent {
     service.loadANodes();
     service.loadBNodes();
     service.loadDepartments();
-    this.ReportStats();
 
     config.notFoundText = 'Aucune donnée trouvée !';
 
@@ -46,7 +45,7 @@ export class visitesListComponent {
 
   }
 
-  ReportStats() {
+  ReportStats(selectedMonth: string) {
     this.visitsStats$ = this.http.get(`${this.server}/api/analytics/visits-stats/`).pipe(
       map(data => {
         console.log(data);

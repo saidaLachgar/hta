@@ -207,15 +207,15 @@
                 <div class="card card-body">
                     <div class="fw-bold mb-4">
                         <div *ngIf="chart.type == 'DMS_TOTAL'">
-                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
+                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions</small>
                           <br>Total : {{ chart.total | decimalHourToTime }}
                         </div>
                         <div *ngIf="chart.type == 'IFS_TOTAL'">
-                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
+                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions</small>
                           <br>Total : {{ chart.total }}
                         </div>
                         <div *ngIf="chart.type == 'END_TOTAL'">
-                          END <small class="text-muted font-size-12">(année en cours)</small>
+                          END
                           <br>Total : {{ chart.total }}
                         </div>
                     </div>
