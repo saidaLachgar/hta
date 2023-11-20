@@ -1,33 +1,37 @@
 <div class="container-fluid mb-5">
   <!-- statistics -->
   <div class="row" *ngIf="authService.isAuthorized('statistiques_show')">
-    <ng-container *ngIf="visitsStats$ | async as data; else statsLoading">
+    
     <div class="col-xl-6 d-flex flex-column">
       <div class="card card-body py-2 flex-grow-0">
-        <div class="clearfix">
+        <div class="clearfix mb-2">
           <div class="float-end">
-            <months-selector (selectionChange)="ReportStats($event)"></months-selector>
+            <months-selector (selectionChange)="statsPerMonth($event)"></months-selector>
           </div>
-      </div>
+        </div>
       <div class="row">
-        <div class="col-lg-7 p-1">
+        <!-- Distance parcourue -->
+        <div class="col-lg-7 p-1" >
           <div class="border p-3 rounded-3 h-100">
             <p class="fw-medium mb-1">Distance parcourue</p>
             <div class="row">
-              <div class="col-7">
+              <!-- Année courante -->
+              <div class="col-7" *ngIf="totalCoveredDistance$ | async as data;">
                 <small class="text-muted">Année courante</small>
                 <strong class="h2 d-block">{{data.visitedLgthYear/1000}} <small class="text-muted">/{{data.annualVisitLgth}} km</small></strong>
               </div>
-              <div class="col-5">
-                <small class="text-muted">Mois en cours</small>
+              <!-- Selected month -->
+              <div class="col-5" *ngIf="statsPerMonth$ | async as data;">
+                <small class="text-muted">Pendant le mois {{ selectedMonth | lowercase }}.</small>
                 <strong class="h2 d-block">{{data.visitedLgthMonth/1000}} km</strong>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-5 p-1">
+        <!-- Nombre d'anomalies  -->
+        <div class="col-lg-5 p-1"  *ngIf="statsPerMonth$ | async as data">
           <div class="border p-3 rounded-3 h-100">
-            <p class="fw-medium mb-2">Nombre d'anomalies <small class="text-muted">(mois en cours)</small></p>
+            <p class="fw-medium mb-2">Nombre d'anomalies <small class="text-muted">({{ selectedMonth | lowercase }}.)</small></p>
             <p class="mt-2 mb-2">
               <span class="font-size-11 me-2 badge" [ngClass]="{'badge-soft-danger': data.difference >= 0, 'badge-soft-success': data.difference  < 0}">
                 {{ Math.abs(data.difference) }} <small> de {{data.difference >= 0 ? "plus" : "moins"}} que la période précédente</small>
@@ -38,37 +42,48 @@
         </div>
       </div>
       </div>
+      <!-- Total des visites  -->
       <div class="card card-body flex-1">
-        <div>
-            <div class="py-2">
-                <h5 class="fw-medium mb-2">Total des visites <small class="text-muted">(par objectif annuel)</small><span class="float-end">0%</span></h5>
-                <div class="progress animated-progess progress-sm">
-                    <div class="progress-bar" role="progressbar" [style.width]="((data.totalVisits / data.targetVisits) * 100) + '%'"
-                        attr.aria-valuenow="{{data.totalVisits}}" aria-valuemin="0" attr.aria-valuemax="{{data.targetVisits}}"></div>
-                </div>
-            </div>
+        <div class="py-2" *ngIf="teamCoveredDistance$ | async as data">
+            <h5 class="fw-medium mb-2" title="la longueur visitée de chaque équipe pendant l'année en cours, où elle est comparée à la longueur totale des départements de l'équipe * 2 ( autrement dit, chaque équipe devrait passer dans chaque département deux fois par an).">Parcours annuel de l'équipe <small class="text-muted">(double visites)</small></h5>
+
+            <ng-container *ngFor="let team of data">
+              <p class="mt-4 pb-2 mb-0" title="{{team.covered}}/{{team.target}} km">{{team.name}}<span class="float-end">{{team.progress}}%</span></p>
+              <div class="progress animated-progess progress-sm">
+                  <div 
+                    class="progress-bar" role="progressbar" [style.width]="team.progress + '%'"
+                    attr.aria-valuenow="{{team.progress}}" aria-valuemin="0" attr.aria-valuemax="100">
+                  </div>
+              </div>
+            </ng-container>
         </div>
       </div>
     </div>
+
+    <!-- Vistes par communes  -->
     <div class="col-xl-6 pb-4">
       <div class="card card-body pb-0 h-100 mb-0">
-        <p class="fw-medium mb-0">Vistes par communes <small class="text-muted">(année courante)</small></p>
-        <ng-container *ngIf="!Chartdata.empty; else VistesByCommuneEmpty">
-          <apx-chart class="apex-charts" dir="ltr" [series]="Chartdata.series" [chart]="Chartdata.chart"
-          [plotOptions]="Chartdata.plotOptions" [dataLabels]="Chartdata.dataLabels" [xaxis]="Chartdata.xaxis"
-          [colors]="Chartdata.colors" [grid]="Chartdata.grid"></apx-chart>
+        
+        <ng-container *ngIf="visitsParCommunes$ | async as data; else visitsParCommunesLoading">
+          <p class="fw-medium mb-0">Visites par communes <small class="text-muted">(année courante)</small></p>
+          <ng-container *ngIf="!data.empty; else VistesByCommuneEmpty">
+              <apx-chart
+                [series]="data.series"
+                [chart]="data.chart"
+                [dataLabels]="data.dataLabels"
+                [plotOptions]="data.plotOptions"
+                [yaxis]="data.yaxis"
+                [xaxis]="data.xaxis"
+                [legend]="data.legend"
+                [grid]="data.grid"
+              ></apx-chart>
+          </ng-container>
+          <ng-template #VistesByCommuneEmpty>
+              <p class="mt-4 alert alert-info">Pas de données trouvées !</p>
+          </ng-template>
         </ng-container>
-        <ng-template #VistesByCommuneEmpty>
-            <p class="mt-4 alert alert-info">Pas de données trouvées !</p>
-        </ng-template>
-       
-      </div>
-    </div>
-    </ng-container>
-    <ng-template #statsLoading>
-      <div class="col-12">
-      <div class="card card-body">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <ng-template #visitsParCommunesLoading>
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
             <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
             <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
             </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
@@ -78,10 +93,13 @@
             </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
             <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
             </rect></g>
-        </svg>
+          </svg>
+        </ng-template>
+
       </div>
-      </div>
-  </ng-template>
+    </div>
+
+    
   </div>
 
 

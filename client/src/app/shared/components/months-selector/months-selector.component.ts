@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { monthMap } from 'src/app/core/const/months-map';
 
 @Component({
     selector: 'months-selector',
@@ -19,7 +20,6 @@ export class monthsSelectorComponent implements OnInit {
     ngOnInit(): void {
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth()+1;
-        const monthMap = ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUN", "JUL", "AOÛ", "SEP", "OCT", "NOV", "DÉC"];
         for (let i = 0; i < 12; i++) {
             // Calculate the month for the current iteration
             let month = currentMonth - i;

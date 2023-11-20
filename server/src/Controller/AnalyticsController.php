@@ -162,10 +162,17 @@ class AnalyticsController extends AbstractController
   }
 
   /**
-   * @Route("/api/analytics/visits-stats", name="getVisitsStats", options={"expose"=true})
+   * @Route("/api/analytics/visits-stats/{type}", name="getVisitsStats", options={"expose"=true})
    */
-  public function getVisitsStats()
+  public function getVisitsStats(Request $request, $type)
   {
+    $q = $request->query;
+    // stats-per-month
+    // total-covered-distance
+    // team-covered-distance
+    // visits-per-communes
+
+    // AKA.
     // Vistes par communes 
     // Distance parcourue (Année courante + Mois en cours) + objectif annuel (km) 
     // Total des visites (par objectif annuel) (78%)
@@ -173,7 +180,7 @@ class AnalyticsController extends AbstractController
     /** @var \App\Repository\VisiteRepository $VisiteRepo */
     $VisiteRepo = $this->em->getRepository(Visite::class);
 
-    $data = $VisiteRepo->getVisitsStats();
+    $data = $VisiteRepo->getVisitsStats($type, $q->get('m'));
 
     return new JsonResponse($data);
   }
