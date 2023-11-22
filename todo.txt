@@ -49,18 +49,10 @@ cuz it's a get operation, and for the details page i should use the collection o
 
 
 
-
-x tester mission parent update
-    - same type
-fix listing
-
-fix details
-
-
-
--> liste visits choix de mois
-- teams distance
-- statistiques chart re style
+x liste visits choix de mois
+x teams distance
+-> statistiques chart re style
+    FINISHED - NEED VALUE VERFICATION
 - fix bug postes copé
 - new chart
 - supp parent/children mission

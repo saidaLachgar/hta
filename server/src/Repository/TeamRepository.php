@@ -48,10 +48,11 @@ class TeamRepository extends ServiceEntityRepository
         }
     }
 
-    function getTeams() {
+    function getTeams()
+    {
         $roles = $this->security->getUser()->getRoles();
         if (in_array("ROLE_SUPER_ADMIN", $roles)) {
-            return  $this->findAll();
+            return $this->findAll();
         } else {
             return [$this->security->getUser()->getTeam()];
         }
@@ -65,7 +66,7 @@ class TeamRepository extends ServiceEntityRepository
         $current_year = $date->format('Y');
 
         // Check if the given month has occurred in the current year
-        $current_month = (int)$date->format('m');
+        $current_month = (int) $date->format('m');
         if ($month > $current_month) {
             // If the month hasn't occurred yet, adjust the year to the previous one
             $current_year--;
@@ -138,7 +139,7 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-           
+
 
         $teamsStats = [];
         foreach ($teams as $team) {
@@ -184,7 +185,7 @@ class TeamRepository extends ServiceEntityRepository
     }
 
     // if not super  admin get only their teams
-    public function getTeamsMonthlyData($property,$type): array
+    public function getTeamsMonthlyData($property, $type): array
     {
         $teams = $this->getTeams();
         $currentDate = new \DateTime();
@@ -198,7 +199,7 @@ class TeamRepository extends ServiceEntityRepository
             $missionStats = $this->em->createQueryBuilder()
                 ->select(
                     'IDENTITY(d.team) as TEAM',
-                    'SUM(m.'.$property.') as '.$property,
+                    'SUM(m.' . $property . ') as ' . $property,
                 )
                 ->from('App\Entity\Mission', 'm')
                 ->innerJoin('m.node_a', 'n')
@@ -208,7 +209,7 @@ class TeamRepository extends ServiceEntityRepository
                 ->andWhere('m.type = :type')
                 ->setParameter('year', $year)
                 ->setParameter('month', $month)
-                ->setParameter('type', $type === 'true'? true : false)
+                ->setParameter('type', $type === 'true' ? true : false)
                 ->groupBy('d.team')
                 ->getQuery()
                 ->getResult();
@@ -362,7 +363,7 @@ class TeamRepository extends ServiceEntityRepository
 
     public function filterDate($query, $dateStart, $dateEnd, $attr)
     {
-        $dates = $this->getDates($dateStart , $dateEnd);
+        $dates = $this->getDates($dateStart, $dateEnd);
         $dateStart = $dates[0];
         $dateEnd = $dates[1];
         if ($dateStart) {
@@ -377,7 +378,8 @@ class TeamRepository extends ServiceEntityRepository
         }
         return $query;
     }
-    function getDates($dateStart , $dateEnd) {
+    function getDates($dateStart, $dateEnd)
+    {
         // if only end date or start date get data of that date month only
         // if none given get this year data
         if ($dateStart && $dateEnd) {
@@ -479,7 +481,6 @@ class TeamRepository extends ServiceEntityRepository
     //  -> DMS, IFS, END
     public function getInterruptionsPerformance($dateStart, $dateEnd, $team)
     {
-
         $departments = $this->em->createQueryBuilder()
             ->select('d.id, d.titre')
             ->from('App\Entity\Department', 'd')
@@ -487,70 +488,60 @@ class TeamRepository extends ServiceEntityRepository
             ->setParameter('teamId', $team)
             ->getQuery()
             ->getResult();
-        // dd($departments);
-
-        $result = [];
-
-        $dates = $this->getDates($dateStart , $dateEnd);
+        // dump($departments);
+        $dates = $this->getDates($dateStart, $dateEnd);
         $dateStart = $dates[0];
         $dateEnd = $dates[1];
 
-        // Calculate the difference in days between the start and end dates
-        $dateInterval = $dateStart->diff($dateEnd);
-        $daysDifference = $dateInterval->days;
+        $qb = $this->em->createQueryBuilder();
+        $qb = $qb->select(
+            'IDENTITY(n.department) as DEPARTMENT',
+            'SUM(CASE WHEN m.type = true THEN m.DMS ELSE 0 END) as DMS_TOTAL_INCIDENT',
+            'SUM(CASE WHEN m.type = true THEN m.END ELSE 0 END) as END_TOTAL_INCIDENT',
+            'SUM(CASE WHEN m.type = true THEN m.IFS ELSE 0 END) as IFS_TOTAL_INCIDENT',
 
-        // Determine whether to group by month or by day
-        $groupByMonth = $daysDifference > 30;
+            'SUM(CASE WHEN m.type = false THEN m.DMS ELSE 0 END) as DMS_TOTAL_COUPEUR',
+            'SUM(CASE WHEN m.type = false THEN m.END ELSE 0 END) as END_TOTAL_COUPEUR',
+            'SUM(CASE WHEN m.type = false THEN m.IFS ELSE 0 END) as IFS_TOTAL_COUPEUR'
+        )
+            ->from('App\Entity\Mission', 'm')
+            ->innerJoin('m.node_a', 'n')
+            ->innerJoin('n.department', 'd')
+            ->where($qb->expr()->orX(
+                $qb->expr()->between('m.dateStart', ':start_date', ':end_date'),
+                $qb->expr()->between('m.dateEnd', ':start_date', ':end_date')
+            )
+            )
+            ->andWhere('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->setParameter('start_date', $dateStart)
+            ->setParameter('end_date', $dateEnd)
+            ->groupBy('n.department')
+            ->getQuery()->getResult();
+        // dump($qb);
 
-        // dump($daysDifference);
-        // dump($groupByMonth);
-        // exit;
+        $result = [];
 
-        $currentDate = clone $dateStart;
+        foreach ($departments as $department) {
+            $data = current(array_filter($qb, function ($item) use ($department) {
+                return $item['DEPARTMENT'] === (string) $department['id'];
+            }));
 
-        while ($currentDate <= $dateEnd) {
-            $groupKey = $groupByMonth ? $currentDate->format('Y-m') : $currentDate->format('Y-m-d');
-            $day = $currentDate->format('d');
-            $month = $currentDate->format('m');
-            $year = $currentDate->format('Y');
-            foreach ($departments as $department) {
+            // dd($data);
 
-                $qb = $this->em->createQueryBuilder()
-                    ->select(
-                        'SUM(m.DMS) as DMS_TOTAL',
-                        'SUM(m.END) as END_TOTAL',
-                        'SUM(m.IFS) as IFS_TOTAL'
-                    )
-                    ->from('App\Entity\Mission', 'm')
-                    ->innerJoin('m.node_a', 'n')
-                    ->innerJoin('n.department', 'd')
-                    ->where('d.id = :department')
-                    ->andWhere('YEAR(m.dateStart) = :year')
-                    ->andWhere('MONTH(m.dateStart) = :month')
-                    ->setParameter('department', $department['id'])
-                    ->setParameter('year', $year)
-                    ->setParameter('month', $month);
-
-                if (!$groupByMonth) {
-                    $qb = $qb->andWhere('DAY(m.dateStart) = :day')
-                        ->setParameter('day', $day);
-                }
-
-                $qb = current($qb->getQuery()->getResult());
-
-                $result[$department['titre']][] = [
-                    "TIMEFRAME" => $groupKey,
-                    "DMS_TOTAL" => $qb['DMS_TOTAL'] ?? 0,
-                    "END_TOTAL" => $qb['END_TOTAL'] ?? 0,
-                    "IFS_TOTAL" => $qb['IFS_TOTAL'] ?? 0,
-                ];
-            }
-
-            $currentDate->add(new \DateInterval('P1' . ($groupByMonth ? 'M' : 'D')));
+            $result[] = [
+                "DEPARTMENT" => $department['titre'],
+                "DMS_TOTAL_INCIDENT" => $data["DMS_TOTAL_INCIDENT"] ?? 0,
+                "DMS_TOTAL_COUPEUR" => $data["DMS_TOTAL_COUPEUR"] ?? 0,
+                "END_TOTAL_INCIDENT" => $data["END_TOTAL_INCIDENT"] ?? 0,
+                "END_TOTAL_COUPEUR" => $data["END_TOTAL_COUPEUR"] ?? 0,
+                "IFS_TOTAL_INCIDENT" => $data["IFS_TOTAL_INCIDENT"] ?? 0,
+                "IFS_TOTAL_COUPEUR" => $data["IFS_TOTAL_COUPEUR"] ?? 0,
+            ];
         }
+
         // dd($result);
         return $result;
-
     }
     //  -> Taux de correction des anomalies
     public function getAnomalyCorrection($dateStart, $dateEnd, $team)

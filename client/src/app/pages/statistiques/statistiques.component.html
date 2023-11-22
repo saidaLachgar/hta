@@ -207,27 +207,41 @@
                 <div class="card card-body">
                     <div class="fw-bold mb-4">
                         <div *ngIf="chart.type == 'DMS_TOTAL'">
-                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions</small>
-                          <br>Total : {{ chart.total | decimalHourToTime }}
+                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions)</small>
+                          <br>Total : {{ (DMSType ? chart.incident_total : chart.coupeur_total) | decimalHourToTime }}
                         </div>
                         <div *ngIf="chart.type == 'IFS_TOTAL'">
-                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions</small>
-                          <br>Total : {{ chart.total }}
+                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions)</small>
+                          <br>Total : {{ (IFSType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
                         </div>
                         <div *ngIf="chart.type == 'END_TOTAL'">
                           END
-                          <br>Total : {{ chart.total }}
+                          <br>Total : {{ (ENDType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
                         </div>
+
+                        <div class="float-end">
+                            <ul class="nav nav-pills">
+                            <li class="nav-item">
+                                <a class="nav-link py-1 px-2" href="javascript: void(0);" (click)="toggleType(chart.type,false)"
+                                [ngClass]="{'active': getType(chart.type)==false}">Coupeur</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link font-size-12 py-1 px-2" href="javascript: void(0);" (click)="toggleType(chart.type,true)"
+                                    [ngClass]="{'active': getType(chart.type)}">Incident</a>
+                            </li>
+                            </ul>
+                        </div>
+
                     </div>
                     <apx-chart
-                    [series]="chart.series"
-                    [chart]="chart.chart"
-                    [xaxis]="chart.xaxis"
-                    [yaxis]="chart.yaxis"
-                    [stroke]="chart.stroke"
-                    [tooltip]="chart.tooltip"
-                    [dataLabels]="chart.dataLabels"
-                    [colors]="chart.colors"
+                        [series]="getType(chart.type) ? chart.incident_series : chart.coupeur_series"
+                        [chart]="chart.chart"
+                        [dataLabels]="chart.dataLabels"
+                        [plotOptions]="chart.plotOptions"
+                        [yaxis]="chart.yaxis"
+                        [xaxis]="chart.xaxis"
+                        [legend]="chart.legend"
+                        [grid]="chart.grid"
                     ></apx-chart>
               </div>
             </div>

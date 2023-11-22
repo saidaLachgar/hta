@@ -23,6 +23,9 @@ export class StatistiquesComponent {
   form: FormGroup;
   today: Date = new Date();
   submitted: boolean = false;
+  DMSType: boolean = true;
+  IFSType: boolean = true;
+  ENDType: boolean = true;
   postesStatsSubmitted: boolean = false;
   selectedPoste;
   RelatedPostes$;
@@ -61,10 +64,13 @@ export class StatistiquesComponent {
     // console.log(form.value);
     // console.log(args);
 
+    // Total des interruptions -  Total des Vistes -  Total des anomalies
     this.TotalActivity$ = this.http.post<[]>(this.url, {
       "stats": "TotalActivity",
       ...(args)
     }).pipe();
+
+    // Causes And Types
     this.CausesAndType$ = this.http.post<[]>(this.url, {
       "stats": "CausesAndType",
       ...(args)
@@ -145,7 +151,9 @@ export class StatistiquesComponent {
 
       return data;
     }));
-    this.InterruptionsPerformance$ = this.http.post(this.url, {
+
+    // DMS - IFS - END
+    this.InterruptionsPerformance$ = this.http.post<any>(this.url, {
       "stats": "InterruptionsPerformance",
       ...(args)
     }).pipe(map(data => {
@@ -154,10 +162,21 @@ export class StatistiquesComponent {
       let structuredData = [];
 
       for (const statType of statTypes) {
+
         const statData = {
           type: statType,
-          total: 0,
-          series: [],
+          incident_total: data.reduce((accumulator, item) =>
+            accumulator + parseFloat(item[`${statType}_INCIDENT`]), 0),
+          coupeur_total: data.reduce((accumulator, item) =>
+            accumulator + parseFloat(item[`${statType}_COUPEUR`]), 0),
+          incident_series: [{
+            name: "distibuted",
+            data: data.map(item => item[`${statType}_INCIDENT`])
+          }],
+          coupeur_series: [{
+            name: "distibuted",
+            data: data.map(item => item[`${statType}_COUPEUR`])
+          }],
 
           responsive: [
             {
@@ -171,10 +190,25 @@ export class StatistiquesComponent {
           ],
           chart: {
             height: 300,
-            type: "line"
+            type: "bar",
+          },
+          plotOptions: {
+            bar: {
+              columnWidth: "45%",
+              distributed: true
+            }
           },
           dataLabels: {
-            enabled: false,
+            enabled: false
+          },
+          legend: {
+            show: false
+          },
+          grid: {
+            show: false
+          },
+          xaxis: {
+            categories: data.map(item => item.DEPARTMENT),
           },
           yaxis: {
             labels: {
@@ -186,36 +220,16 @@ export class StatistiquesComponent {
               }
             },
           },
-          stroke: {
-            curve: "smooth"
-          },
-          xaxis: {
-            labels: {
-              rotate: -45
-            },
-            categories: [],
-          },
-        };
-        // console.log(data);
-
-        for (const teamName in data) {
-          statData.series.push({
-            name: teamName,
-            data: data[teamName].map(monthData => {
-              let value = parseFloat(monthData[statType]);
-              statData.xaxis.categories.push(monthData["TIMEFRAME"]);
-              value && (statData.total += value)
-              return value;
-            })
-          });
         }
 
         structuredData.push(statData);
       }
 
-      // console.log(structuredData);
+      console.log(structuredData);
       return structuredData;
     }));
+
+    // Taux de correction des anomalies
     this.AnomalyCorrection$ = this.http.post<any>(this.url, {
       "stats": "AnomalyCorrection",
       ...(args)
@@ -276,6 +290,8 @@ export class StatistiquesComponent {
         }
       };
     }));
+
+    // Nombre de kilomètres visités par commune
     this.KMVisitedPerCommune$ = this.http.post<any>(this.url, {
       "stats": "KMVisitedPerCommune",
       ...(args)
@@ -329,6 +345,8 @@ export class StatistiquesComponent {
         },
       };
     }));
+
+    // Le nombre de clients coupés par commune
     this.ClientCutsByCommune$ = this.http.post<any>(this.url, {
       "stats": "ClientCutsByCommune",
       ...(args)
@@ -383,14 +401,13 @@ export class StatistiquesComponent {
         },
       };
     }));
+
+    // list of team's related poste
     this.RelatedPostes$ = this.http.post<any>(this.url, {
       "stats": "RelatedPostes",
       ...(args)
     }).pipe();
-    // let getPostInterruptionInfo = this.http.post<[]>(this.url, {
-    //   "stats": "getPostInterruptionInfo",
-    //   ...(args)
-    // }).pipe();
+
   }
 
   postesStats(): void {
@@ -403,6 +420,15 @@ export class StatistiquesComponent {
       "stats": "PostInterruptionInfo",
       ...(this.form.value)
     }).pipe();
+  }
+
+  getType(chartType): boolean {
+    return chartType == 'DMS_TOTAL' ? this.DMSType : (chartType == 'IFS_TOTAL' ? this.IFSType : this.ENDType);
+  }
+  toggleType(chartType, value): void {
+    if(chartType == 'DMS_TOTAL')  this.DMSType = value 
+    else if (chartType == 'IFS_TOTAL') this.IFSType = value
+    else this.ENDType = value;
   }
 
   get dateStart() {
