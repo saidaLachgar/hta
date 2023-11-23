@@ -77,9 +77,11 @@ class AnomalyAction extends AbstractController
                 $anomalyEntity = new Anomaly();
     
                 $anomaly->isStatus() && $anomalyEntity->setStatus($anomaly->isStatus());
+                $anomaly->getCreatedAt() && $anomalyEntity->setCreatedAt($anomaly->getCreatedAt());
+                $anomaly->getEdge() && $anomalyEntity->setEdge($anomaly->getEdge());
+                
                 $anomalyEntity->setSeverity($anomaly->getSeverity());
                 $anomalyEntity->setTitle($anomaly->getTitle());
-                $anomaly->getEdge() && $anomalyEntity->setEdge($anomaly->getEdge());
                 $anomalyEntity->setCreatedBy($this->security->getUser());
                 
                 // Save the invitation.

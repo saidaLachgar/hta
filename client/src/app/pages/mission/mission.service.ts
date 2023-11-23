@@ -264,12 +264,11 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
     };
 
     let anomalies = form.anomalies;
-    if(anomalies) {
+    if(anomalies && anomalies.length) {
       this.anomalyLoading = true;
-      // console.log(form);
-      // console.log(mission);
-      // console.log(form.anomalies);
-      anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
+      await this.anomalyService.bulkCreate(
+        anomalies.map(obj => ({ ...obj, ...{createdAt: mission.dateStart} }))
+      ).toPromise();
       this.anomalyLoading = false;
     }
 

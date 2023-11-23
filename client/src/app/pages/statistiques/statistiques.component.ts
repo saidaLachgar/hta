@@ -109,8 +109,8 @@ export class StatistiquesComponent {
           type: "bar",
         },
         colors: [
-          "#008FFB",
           "#FF4560",
+          "#008FFB",
         ],
         plotOptions: {
           bar: {

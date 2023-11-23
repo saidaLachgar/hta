@@ -1,6 +1,6 @@
 import { Node, Team } from ".";
 
-export enum CausesList {"Défauts matériels","Telescopare","Intenpaire","Cause inconnue"};
+export enum CausesList {"Défauts matériels","Tiers/corps étranger","Intempéries","Cause inconnue"};
 export interface Mission {
     id?: number;
     dateStart?: string;

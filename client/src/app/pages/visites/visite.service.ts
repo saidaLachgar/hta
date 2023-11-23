@@ -220,11 +220,15 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
       nodeA: form.nodeA ? form.nodeA : null,
       nodeB: form.nodeB && form.nodeB.length ? form.nodeB : [],
     };
+    
     let anomalies = form.anomalies;
-    this.anomalyLoading = true;
-
-    anomalies.length && await this.anomalyService.bulkCreate(anomalies).toPromise();
-    this.anomalyLoading = false;
+    if(anomalies && anomalies.length) {
+      this.anomalyLoading = true;
+      await this.anomalyService.bulkCreate(
+        anomalies.map(obj => ({ ...obj, ...{createdAt: visite.date} }))
+      ).toPromise();
+      this.anomalyLoading = false;
+    }
 
     // compare last query with the new one to avoid unnecessary requests
     if (id) {

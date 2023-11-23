@@ -128,7 +128,7 @@ class TeamRepository extends ServiceEntityRepository
         $visiteStats = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(d.team) as TEAM',
-                'SUM(v.nbSupport) / 100 as VISIT_LENGTH'
+                'SUM(v.edge_set_length) / 1000 as VISIT_LENGTH'
             )
             ->from('App\Entity\Visite', 'v')
             ->innerJoin('v.node_a', 'n')
@@ -363,7 +363,7 @@ class TeamRepository extends ServiceEntityRepository
 
     public function filterDate($query, $dateStart, $dateEnd, $attr)
     {
-        $dates = $this->getDates($dateStart, $dateEnd);
+        $dates = $this->getDates($dateStart, $dateEnd, true);
         $dateStart = $dates[0];
         $dateEnd = $dates[1];
         if ($dateStart) {
@@ -378,7 +378,7 @@ class TeamRepository extends ServiceEntityRepository
         }
         return $query;
     }
-    function getDates($dateStart, $dateEnd)
+    function getDates($dateStart, $dateEnd, $includeStart = false)
     {
         // if only end date or start date get data of that date month only
         // if none given get this year data
@@ -387,14 +387,12 @@ class TeamRepository extends ServiceEntityRepository
             $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
         } elseif ($dateStart) {
             //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
-
             $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
             $dateEnd = clone $dateStart;
             // last day of the original month
             $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
         } elseif ($dateEnd) {
             // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
-
             $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
             $dateStart = clone $dateEnd;
             // 1st day of the same month
@@ -404,6 +402,7 @@ class TeamRepository extends ServiceEntityRepository
             $dateStart = new \DateTime('first day of January this year');
             $dateEnd = new \DateTime('last day of December this year');
         }
+        if($includeStart) $dateStart->modify("-1 day");
         return [$dateStart, $dateEnd];
     }
 
@@ -489,9 +488,6 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
         // dump($departments);
-        $dates = $this->getDates($dateStart, $dateEnd);
-        $dateStart = $dates[0];
-        $dateEnd = $dates[1];
 
         $qb = $this->em->createQueryBuilder();
         $qb = $qb->select(
@@ -507,18 +503,17 @@ class TeamRepository extends ServiceEntityRepository
             ->from('App\Entity\Mission', 'm')
             ->innerJoin('m.node_a', 'n')
             ->innerJoin('n.department', 'd')
-            ->where($qb->expr()->orX(
-                $qb->expr()->between('m.dateStart', ':start_date', ':end_date'),
-                $qb->expr()->between('m.dateEnd', ':start_date', ':end_date')
-            )
-            )
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team)
-            ->setParameter('start_date', $dateStart)
-            ->setParameter('end_date', $dateEnd)
-            ->groupBy('n.department')
-            ->getQuery()->getResult();
+            ->groupBy('n.department');
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateStart");
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateEnd");
+        $qb = $qb->getQuery()->getResult();
+
+        // dump( $qb->getSQL()); 
+        // dump( $qb->getParameters());
         // dump($qb);
+        // exit;
 
         $result = [];
 

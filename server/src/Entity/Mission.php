@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *  order= {"id" = "DESC"},
+ *  order= {"dateStart" = "DESC"},
  *  output=MissionOutput::class,
  *  normalizationContext={"groups"={"missions"}, "enable_max_depth"=true},
  *  itemOperations={

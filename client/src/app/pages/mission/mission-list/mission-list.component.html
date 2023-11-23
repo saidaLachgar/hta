@@ -32,11 +32,11 @@
                 <!-- prevDuration -->
                 <p class="mt-2 mb-2" *ngIf="missionsStats['prevDuration'] as prevDuration">
                   <ng-container *ngIf="prevDuration > 0;">
-                    <span class="badge badge-soft-success font-size-11 me-2"> {{ prevDuration.toFixed(1) }}% 
+                    <span class="badge badge-soft-danger font-size-11 me-2"> {{ prevDuration.toFixed(1) }}% 
                     <i class="mdi mdi-arrow-up"></i></span><small>De la période précédente</small>
                   </ng-container>
                   <ng-container *ngIf="prevDuration < 0">
-                    <span class="badge badge-soft-danger font-size-11 me-2"> {{ Math.abs(prevDuration).toFixed(1) }}% 
+                    <span class="badge badge-soft-success font-size-11 me-2"> {{ Math.abs(prevDuration).toFixed(1) }}% 
                       <i class="mdi mdi-arrow-down"></i></span><small>De la période précédente</small>
                   </ng-container>
                 </p>
