@@ -173,9 +173,14 @@ class Mission
     private $children;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Poste::class, inversedBy="missions")
+     * @ORM\ManyToMany(targetEntity=Poste::class, inversedBy="missions", cascade={"persist"})
      */
     private $postes;
+
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $prevNodes = [];
 
 
     public function __construct()
@@ -430,6 +435,18 @@ class Mission
     public function removePoste(Poste $poste): self
     {
         $this->postes->removeElement($poste);
+
+        return $this;
+    }
+
+    public function getPrevNodes(): ?array
+    {
+        return $this->prevNodes;
+    }
+
+    public function setPrevNodes(?array $prevNodes): self
+    {
+        $this->prevNodes = $prevNodes;
 
         return $this;
     }

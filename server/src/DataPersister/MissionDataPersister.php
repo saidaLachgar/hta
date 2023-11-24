@@ -9,13 +9,13 @@ namespace App\DataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\Entity\Commune;
 use App\Entity\Department;
+use App\Entity\Dps;
 use App\Entity\Edge;
 use App\Entity\MissionCommune;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Mission;
 use App\Repository\PosteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Proxies\__CG__\App\Entity\Dps;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\Poste;
 use App\Entity\Objective;
@@ -47,10 +47,10 @@ class MissionDataPersister implements DataPersisterInterface
      */
     public function persist($Mission, array $context = [])
     {
-
         $DateStart = $Mission->getDateStart();
         $DateEnd = $Mission->getDateEnd();
-
+        $NodeB = $Mission->getNodeB();
+        $NodeA = $Mission->getNodeA();
 
         // add one day if date start smaller than date end
         if (!empty($DateEnd) && !empty($DateStart) && $this->dateToTime($DateEnd) < $this->dateToTime($DateStart)) {
@@ -67,14 +67,12 @@ class MissionDataPersister implements DataPersisterInterface
             $changes = $this->HasChanges($previousData, $Mission);
         }
         if (is_null($Mission->getDMS()) or ($changes && ($changes["major"] or $changes["time"]))) {
-            $NodeB = $Mission->getNodeB();
-            $NodeA = $Mission->getNodeA();
             $Depar = $NodeA->getDepartment();
             $nodesInRange = $this->nodesInRange($NodeB, $NodeA, $Depar);
             // dd($nodesInRange);
         }
 
-        if (is_null($Mission->getDMS()) or ($changes && $changes["major"])) { // dms is null or major change ->  Nodes
+        if (is_null($Mission->getDMS()) or ($changes && $changes["major"])) { // DMS is null or major change ->  Nodes changed
 
             /** @var PosteRepository $PostRepo */
             $PostRepo = $this->em->getRepository(Poste::class);
@@ -84,8 +82,6 @@ class MissionDataPersister implements DataPersisterInterface
             $CC = $DpRepo->ClientTotalInDp($Depar->getTeam()->getDps()->getId());
             // Get Clients interrompus : source IS NULL & ps IS NULL CI is CC else CI is ClientTotalByNodes
             $CI = $nodesInRange ? ($PostRepo->ClientTotalByNodes($nodesInRange) ?: 0) : $CC;
-            // get total interrupted postes between two nodes else in all department 
-            $nbPostes = $PostRepo->PostesTotalByNodes($nodesInRange ? $nodesInRange : $Depar->getId()) ?: 0;
 
             // set DMS/END value depending if date end exists or not
             if (!is_null($DateEnd)) {
@@ -99,11 +95,12 @@ class MissionDataPersister implements DataPersisterInterface
                 $Mission->setEND(null);
             }
             // store client count per community for this mission
-            $this->setMissionCommune($NodeB, $NodeA, $Depar, $Mission);
+            $nodesInRange && $this->setMissionCommune($nodesInRange, $Mission);
+            // store related posts to this mission
+            $nodesInRange && $this->setMissionPostes($nodesInRange, $Mission);
             // store client total in this mission
             $Mission->setNbClients($CI . "/" . $CC);
-            // store posts total in this mission
-            $Mission->setNbPostes($nbPostes);
+            // store IFS calculated value
             $Mission->setIFS(round(($CI / $CC), 3));
 
         } elseif ($changes && $changes["time"]) { // minor change -> duration changed
@@ -146,31 +143,44 @@ class MissionDataPersister implements DataPersisterInterface
         count($removedActions) && $objectivesRepo->UpdateAchievement($removedActions, true, $Mission->getDateStart());
         count($newActions) && $objectivesRepo->UpdateAchievement($newActions, false, $Mission->getDateStart());
 
+        // set prev value of b nodes (used becouse previous_data doesn't work on collection)
+        $Mission->setPrevNodes(
+            $NodeB->isEmpty() ? [] : $NodeB->map(fn($obj) => $obj->getId())->getValues()
+        );
 
         $this->em->persist($Mission);
         $this->em->flush();
     }
 
-    public function setMissionCommune($NodeB, $NodeA, $Depar, $Mission)
+    public function setMissionCommune($nodesInRange, $Mission)
     {
-        if (is_null($NodeA) and $NodeB->isEmpty()) {
-            return;
-        }
-        // get IDs of selected destinations
-        $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(function ($obj) {
-            return $obj->getId();
-        })->getValues();
-
         $CommuneRepo = $this->em->getRepository(Commune::class);
         $PosteRepo = $this->em->getRepository(Poste::class);
-        $Communes = $CommuneRepo->getCommunesByRange($Depar->getId(), $NodeA->getId(), $Destinations);
+        $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
+
+        // Remove all existing MissionCommune entities associated with the mission
+        $Mission->getMissionCommunes()->clear();
+
         foreach ($Communes as $Commune) {
             $clientCount = $PosteRepo->ClientTotalByCommune($Commune->getId());
-
             $obj = new MissionCommune();
             $obj->setCommune($Commune);
             $obj->setClientCount($clientCount);
-            $Mission->addMissionCommune($obj); 
+            $Mission->addMissionCommune($obj);
+        }
+    }
+
+    public function setMissionPostes($nodesInRange, $Mission)
+    {
+        $PosteRepo = $this->em->getRepository(Poste::class);
+        $Postes = $PosteRepo->getPostesByRange($nodesInRange);
+
+        // Remove all existing Postes entities associated with the mission
+        $Mission->getPostes()->clear();
+
+        // add all related postes
+        foreach ($Postes as $Poste) {
+            $Mission->addPoste($Poste);
         }
     }
 
@@ -209,7 +219,6 @@ class MissionDataPersister implements DataPersisterInterface
             return $obj->getId();
         })->getValues();
 
-
         return $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
 
     }
@@ -232,15 +241,19 @@ class MissionDataPersister implements DataPersisterInterface
 
     public function HasChanges(Mission $old, Mission $new): array
     {
+        $BNodes = $new->getNodeB()->isEmpty() ? [] : $new->getNodeB()->map(fn($obj) => (string)$obj->getId())->getValues();
+        // dump($BNodes);
+        // dd($new->getPrevNodes());
         if (
             $old->getNodeA() !== $new->getNodeA() ||
-            $this->compareCollections($old->getNodeB(), $new->getNodeB())
+            count($BNodes) !== count($new->getPrevNodes()) ||
+            array_diff($BNodes, $new->getPrevNodes())
         ) {
             $Major = true;
         }
         if (
-            $old->getDateStart() !== $new->getDateStart() ||
-            $old->getDateEnd() !== $new->getDateEnd()
+            $old->getDateStart()->format("YmdHis") !== $new->getDateStart()->format("YmdHis") ||
+            $old->getDateEnd()->format("YmdHis") !== $new->getDateEnd()->format("YmdHis")
         ) {
             $Time = true;
         }
@@ -248,22 +261,6 @@ class MissionDataPersister implements DataPersisterInterface
             "major" => $Major ?? false,
             "time" => $Time ?? false,
         ];
-    }
-
-    private function compareCollections($collection1, $collection2): bool
-    {
-        if ($collection1->count() !== $collection2->count()) {
-            return true;
-        }
-
-        $ids1 = $collection1->map(fn($entity) => $entity->getId())->getValues();
-        $ids2 = $collection2->map(fn($entity) => $entity->getId())->getValues();
-        if (count(array_diff($ids1, $ids2)) === 0 && count(array_diff($ids2, $ids1)) === 0) {
-            // The two ArrayCollection objects have the same set of IDs.
-            return false;
-        }
-
-        return true;
     }
 
 }

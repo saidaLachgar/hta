@@ -63,15 +63,15 @@ class PosteRepository extends ServiceEntityRepository
         ->getSingleScalarResult();
     }
 
-    public function PostesTotalByNodes($nodes): ?int
+    public function getPostesByRange($nodesInRange)
     {
         return $this->createQueryBuilder('p')
-            ->select("count(p.id)")
+            ->select("p")
             ->andWhere('n.id IN (:nodes)')
-            ->setParameter('nodes', $nodes)
+            ->setParameter('nodes', $nodesInRange)
             ->innerJoin('p.node', 'n')
             ->getQuery()
-            ->getSingleScalarResult()
+            ->getResult()
         ;
     }
 

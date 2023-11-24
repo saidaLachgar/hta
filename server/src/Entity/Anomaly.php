@@ -19,7 +19,7 @@ use App\Action\AnomalyAction;
 // https://github.com/api-platform/api-platform/issues/294
 /**
  * @ApiResource(
- *   order= {"id" = "DESC"},
+ *   order= {"createdAt" = "DESC"},
  *   normalizationContext={"groups"={"anomalies"}},
  *  itemOperations={
  *      "put"= {"access_control"="is_granted('hasPermission', 'anomalies_update')"},
@@ -210,6 +210,9 @@ class Anomaly
      */
     public function onPrePersist()
     {
-        $this->createdAt = new DateTime();
+        // Check if createdAt is not already set
+        if (!$this->createdAt) {
+            $this->createdAt = new DateTime();
+        }
     }
 }

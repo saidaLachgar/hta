@@ -402,7 +402,8 @@ class TeamRepository extends ServiceEntityRepository
             $dateStart = new \DateTime('first day of January this year');
             $dateEnd = new \DateTime('last day of December this year');
         }
-        if($includeStart) $dateStart->modify("-1 day");
+        if ($includeStart)
+            $dateStart->modify("-1 day");
         return [$dateStart, $dateEnd];
     }
 
@@ -678,24 +679,34 @@ class TeamRepository extends ServiceEntityRepository
     // -> Le nombre des fois un post copée + nb des hours
     public function getPostInterruptionInfo($dateStart, $dateEnd, $poste)
     {
-        // stored posts of mission
         $qb = $this->em->createQueryBuilder()
-            ->from('App\Entity\MissionPoste', 'mp')
-            ->select(
-                // Le nombre des fois un post copée
-                'SUM(mp.poste) AS TIMES',
-                // nb des hours
-                'SUM(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd)) as Duration',
-            )
-
-            ->join('mp.mission', 'm')
-            ->andWhere('mp.poste = :poste')
-            ->setParameter('poste', $poste);
-
+            ->from('App\Entity\Mission', 'm')
+            ->join('m.postes', 'p')
+            ->where('p.id = :posteId')
+            ->setParameter('posteId', $poste);
         $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateStart");
-        $qb = $qb->getQuery()->getResult();
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateEnd");
 
-        return $qb;
+        // Le nombre des fois un post copée
+        //      all missions that related to a given poste as number of time a poste interrupted
+        $posteInterruptionCount = clone $qb;
+        $posteInterruptionCount = $posteInterruptionCount
+            ->select('COUNT(m.id)')
+            ->andWhere('m.parent is null')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // nb des hours
+        //      get total hours of this missions as the total intrupption
+        $postInterruptionDuration = $qb
+            ->select('SUM(TIMESTAMPDIFF(SECOND, m.dateStart, m.dateEnd))')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            "Duration" => $postInterruptionDuration,
+            "TIMES" => $posteInterruptionCount,
+        ];
     }
 
     // get team's postes

@@ -97,7 +97,7 @@
                         <div class="col-6">
                             <div class="border p-3 rounded-3 h-100">
                                 <p class="fw-medium mb-3">La durée de coupure</p>
-                                <strong class="h2">{{data.Duration ? data.Duration : 0}}</strong>
+                                <strong class="h2">{{(data.Duration=="0" ? 0 : data.Duration/3600) | decimalHourToTime:'long'}}</strong>
                             </div>
                         </div>
                         <div class="col-6">

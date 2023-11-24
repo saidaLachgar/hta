@@ -27,6 +27,7 @@ export class StatistiquesComponent {
   IFSType: boolean = true;
   ENDType: boolean = true;
   postesStatsSubmitted: boolean = false;
+  formData;
   selectedPoste;
   RelatedPostes$;
   TotalActivity$;
@@ -56,24 +57,24 @@ export class StatistiquesComponent {
     if (form.invalid) return;
     this.submitted = true;
     let fields = form.value;
-    let args = {
+    this.formData = {
       dateStart: fields.dateStart ? DateToString(fields.dateStart) : null,
       dateEnd: fields.dateEnd ? DateToString(fields.dateEnd) : null,
       team: fields.team,
     }
     // console.log(form.value);
-    // console.log(args);
+    // console.log(this.formData);
 
     // Total des interruptions -  Total des Vistes -  Total des anomalies
     this.TotalActivity$ = this.http.post<[]>(this.url, {
       "stats": "TotalActivity",
-      ...(args)
+      ...(this.formData)
     }).pipe();
 
     // Causes And Types
     this.CausesAndType$ = this.http.post<[]>(this.url, {
       "stats": "CausesAndType",
-      ...(args)
+      ...(this.formData)
     }).pipe(map(data => {
       let causes = Object.values(data)
         .filter((v, i) => Object.keys(data)[i].includes("Cause_"))
@@ -155,7 +156,7 @@ export class StatistiquesComponent {
     // DMS - IFS - END
     this.InterruptionsPerformance$ = this.http.post<any>(this.url, {
       "stats": "InterruptionsPerformance",
-      ...(args)
+      ...(this.formData)
     }).pipe(map(data => {
       const decimalHourToTimePipe = new DecimalHourToTimePipe();
       const statTypes = ['DMS_TOTAL', 'END_TOTAL', 'IFS_TOTAL'];
@@ -232,7 +233,7 @@ export class StatistiquesComponent {
     // Taux de correction des anomalies
     this.AnomalyCorrection$ = this.http.post<any>(this.url, {
       "stats": "AnomalyCorrection",
-      ...(args)
+      ...(this.formData)
     }).pipe(map(data => {
       return {
         series: [
@@ -294,7 +295,7 @@ export class StatistiquesComponent {
     // Nombre de kilomètres visités par commune
     this.KMVisitedPerCommune$ = this.http.post<any>(this.url, {
       "stats": "KMVisitedPerCommune",
-      ...(args)
+      ...(this.formData)
     }).pipe(map(data => {
       // console.log(data.map(item => item.DISTANCE));
       // console.log(data.map(item => item.COMMUNE));
@@ -349,7 +350,7 @@ export class StatistiquesComponent {
     // Le nombre de clients coupés par commune
     this.ClientCutsByCommune$ = this.http.post<any>(this.url, {
       "stats": "ClientCutsByCommune",
-      ...(args)
+      ...(this.formData)
     }).pipe(map(data => {
       // console.log(data.map(item => item.CLIENTS));
       // console.log(data.map(item => item.COMMUNE));
@@ -405,20 +406,20 @@ export class StatistiquesComponent {
     // list of team's related poste
     this.RelatedPostes$ = this.http.post<any>(this.url, {
       "stats": "RelatedPostes",
-      ...(args)
+      ...(this.formData)
     }).pipe();
 
   }
 
   postesStats(): void {
-    let args = this.form.value;
+    let args = this.formData;
     this.postesStatsSubmitted = true;
     args.team = this.selectedPoste;
-    console.log(args);
-
+    
+    // console.log(args);
     this.PostInterruptionInfo$ = this.http.post<any>(this.url, {
       "stats": "PostInterruptionInfo",
-      ...(this.form.value)
+      ...(args)
     }).pipe();
   }
 

@@ -43,11 +43,8 @@ class CommuneRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCommunesByRange($depar, $node_a, $node_b = null)
+    public function getCommunesByRange($nodesInRange)
     {
-        $nodesInRange = $this->GraphSearch->bfsNodesInRange($depar, $node_a, $node_b);
-        // dd($nodesInRange);
-
         $results = $this->createQueryBuilder('c')
             ->select('c')
             ->join('c.edges', 'e')
