@@ -100,16 +100,14 @@ class VisiteRepository extends ServiceEntityRepository
     {
         $currentDate = new \DateTime();
         $year = $currentDate->format('Y');
-        return $this->createQueryBuilder('v')
-            ->select('c.titre AS COMMUNE, COUNT(v.id) as VISTES')
 
-            ->join('v.node_a', 'n')
-            ->join('n.commune', 'c')
-
+        return $this->em->createQueryBuilder()
+            ->select('c.titre as COMMUNE, COUNT(v) as VISTES')
+            ->from('App\Entity\Commune', 'c')
+            ->leftJoin('c.visites', 'v')
             ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year)
-
-            ->groupBy("c.titre")
+            ->groupBy('c.titre')
             ->getQuery()
             ->getResult();
     }
@@ -123,7 +121,7 @@ class VisiteRepository extends ServiceEntityRepository
             // Longueur visitée (year + month)
             $visitedLgthQuery = $this->em->createQueryBuilder()
                 ->from('App\Entity\Visite', 'v')
-                ->select('SUM(v.edge_set_length) as visitedLgth')
+                ->select('SUM(v.edge_set_length) / 1000 as visitedLgth')
                 ->andWhere('YEAR(v.date) = :year')
                 ->setParameter('year', $year);
             $visitedLgthYear = clone $visitedLgthQuery;

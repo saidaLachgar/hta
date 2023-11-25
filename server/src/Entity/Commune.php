@@ -66,9 +66,15 @@ class Commune
      */
     private $missionCommunes;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Visite::class, mappedBy="communes")
+     */
+    private $visites;
+
     public function __construct()
     {
         $this->missionCommunes = new ArrayCollection();
+        $this->visites = new ArrayCollection();
     }
 
     public function __toString()
@@ -148,6 +154,33 @@ class Commune
             if ($missionCommune->getCommune() === $this) {
                 $missionCommune->setCommune(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Visite>
+     */
+    public function getVisites(): Collection
+    {
+        return $this->visites;
+    }
+
+    public function addVisite(Visite $visite): self
+    {
+        if (!$this->visites->contains($visite)) {
+            $this->visites[] = $visite;
+            $visite->addCommune($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVisite(Visite $visite): self
+    {
+        if ($this->visites->removeElement($visite)) {
+            $visite->removeCommune($this);
         }
 
         return $this;

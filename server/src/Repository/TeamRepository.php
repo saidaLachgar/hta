@@ -586,49 +586,20 @@ class TeamRepository extends ServiceEntityRepository
     //  -> Nombre de kilomètres visités par commune
     public function getKMVisitedPerCommune($dateStart, $dateEnd, $team)
     {
-        $Communes = $this->em->createQueryBuilder()
-            ->select(
-                'c.id as ID, c.titre as TITLE'
-            )
+        $result = $this->em->createQueryBuilder()
+            ->select('c.titre as COMMUNE, SUM(v.edge_set_length) / 1000 as DISTANCE')
             ->from('App\Entity\Commune', 'c')
+
+            ->leftJoin('c.visites', 'v')
             ->join('c.edges', 'e')
-            // ->join('e.node_a', 'n')
             ->join('e.department', 'd')
+
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team)
-            ->groupBy('c.id')
-            ->getQuery()
-            ->getResult();
-        $communesIds = array_map(function ($item) {
-            return isset($item["ID"]) ? $item["ID"] : null;
-        }, $Communes);
+            ->groupBy('c.titre');
 
-        $nbSupport = $this->em->createQueryBuilder()
-            ->from('App\Entity\Visite', 'v')
-            ->select('c.id AS COMMUNE, SUM(v.nbSupport) as SUPPORTS')
-
-            ->join('v.node_a', 'n')
-            ->join('n.commune', 'c')
-
-            ->andWhere('c.id IN (:communesIds)')
-            ->setParameter('communesIds', $communesIds);
-
-        $nbSupport = $this->filterDate($nbSupport, $dateStart, $dateEnd, "v.date");
-        $nbSupport = $nbSupport->getQuery()->getResult();
-
-        $result = [];
-        foreach ($Communes as $Commune) {
-            $CommuneId = $Commune["ID"];
-
-            $data = current(array_filter($nbSupport, function ($item) use ($CommuneId) {
-                return $item['COMMUNE'] === $CommuneId;
-            }));
-
-            $result[] = [
-                "COMMUNE" => $Commune["TITLE"],
-                "DISTANCE" => !empty($data) ? floatval($data["SUPPORTS"]) * 100 : 0,
-            ];
-        }
+            $result = $this->filterDate($result, $dateStart, $dateEnd, "v.date");
+        $result = $result->getQuery()->getResult();
         return $result;
     }
     //  -> Le nombre de clients coupés par communauté

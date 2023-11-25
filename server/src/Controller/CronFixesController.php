@@ -6,6 +6,7 @@ use App\Entity\Commune;
 use App\Entity\MissionCommune;
 use App\Entity\Poste;
 use App\Entity\Mission;
+use App\Entity\Visite;
 use App\Service\GraphSearch;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,9 +27,9 @@ class CronFixesController extends AbstractController
   }
 
   /**
-   * @Route("/api/fix-mission-data", name="FixMissionData", options={"expose"=true})
+   * @Route("/api/fix-journey-data", name="FixJourneyData", options={"expose"=true})
    */
-  public function getFixMissionData()
+  public function getFixJourneyData()
   {
     // this code was added cuz the concept of storing related Communes and postes wasn't before, 
     // so it's lik a fix for data that hasn't these values
@@ -36,24 +37,23 @@ class CronFixesController extends AbstractController
     $MissionRepo = $this->em->getRepository(Mission::class);
     $CommuneRepo = $this->em->getRepository(Commune::class);
     $PosteRepo = $this->em->getRepository(Poste::class);
+    $VisiteRepo = $this->em->getRepository(Visite::class);
 
+
+    // > Missions Fix
     $Missions = $MissionRepo->findAll();
-    // $batchSize = 20;
-
     foreach ($Missions as $Mission) {
       $NodeB = $Mission->getNodeB();
       $NodeA = $Mission->getNodeA();
       $Depar = $NodeA->getDepartment();
 
       if ((is_null($NodeA) and $NodeB->isEmpty()) || is_null($Depar)) {
-        // dump("???????????");
         continue;
       }
 
       // get related nodes
       $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(fn($obj) => (string) $obj->getId())->getValues();
       $nodesInRange = $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
-
 
       // add related communes
       $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
@@ -82,10 +82,30 @@ class CronFixesController extends AbstractController
       $Mission->setPrevNodes($Destinations);
 
       $this->em->persist($Mission);
-      // if (($i + 1) % $batchSize === 0) {
-        // $this->em->flush();
-        // $this->em->clear(); // Clear the entity manager to free memory
-      // }
+    }
+    
+    // > Missions Fix
+    $Visites = $VisiteRepo->findAll();
+    foreach ($Visites as $Visite) {
+      $NodeB = $Visite->getNodeB();
+      $NodeA = $Visite->getNodeA();
+      $Depar = $NodeA->getDepartment();
+
+      if ((is_null($NodeA) and $NodeB->isEmpty()) || is_null($Depar)) {
+        continue;
+      }
+      // get related nodes
+      $Destinations = $NodeB->isEmpty() ? [] : $NodeB->map(fn($obj) => (string) $obj->getId())->getValues();
+      $nodesInRange = $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
+
+      // add related communes
+      $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
+      $Visite->getCommunes()->clear();
+      foreach ($Communes as $Commune) {
+        $Visite->addCommune($Commune);
+      }
+
+      $this->em->persist($Visite);
     }
     // exit;
     $this->em->flush();

@@ -18,12 +18,12 @@
               <!-- Année courante -->
               <div class="col-7" *ngIf="totalCoveredDistance$ | async as data;">
                 <small class="text-muted">Année courante</small>
-                <strong class="h2 d-block">{{data.visitedLgthYear/1000}} <small class="text-muted">/{{data.annualVisitLgth}} km</small></strong>
+                <strong class="h2 d-block">{{data.visitedLgthYear}} <small class="text-muted">/{{data.annualVisitLgth}} km</small></strong>
               </div>
               <!-- Selected month -->
               <div class="col-5" *ngIf="statsPerMonth$ | async as data;">
                 <small class="text-muted">Pendant le mois {{ selectedMonth | lowercase }}.</small>
-                <strong class="h2 d-block">{{data.visitedLgthMonth/1000}} km</strong>
+                <strong class="h2 d-block">{{data.visitedLgthMonth}} km</strong>
               </div>
             </div>
           </div>

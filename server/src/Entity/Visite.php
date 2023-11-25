@@ -88,9 +88,15 @@ class Visite
      */
     private $edge_set_length;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Commune::class, inversedBy="visites")
+     */
+    private $communes;
+
     public function __construct()
     {
         $this->node_b = new ArrayCollection();
+        $this->communes = new ArrayCollection();
     }
     
     public function __toString()
@@ -175,5 +181,28 @@ class Visite
         return $this;
     }
 
+    /**
+     * @return Collection<int, Commune>
+     */
+    public function getCommunes(): Collection
+    {
+        return $this->communes;
+    }
+
+    public function addCommune(Commune $commune): self
+    {
+        // if (!$this->communes->contains($commune)) {
+            $this->communes[] = $commune;
+        // }
+
+        return $this;
+    }
+
+    public function removeCommune(Commune $commune): self
+    {
+        $this->communes->removeElement($commune);
+
+        return $this;
+    }
    
 }
