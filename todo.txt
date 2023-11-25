@@ -36,14 +36,18 @@ x fix bug postes copé
 x supp parent/children mission
 x are all values stored ? postes?
 x in dashboard table each team has nbPostes that has been intrupted, u have to remove that properity from the entity and get it from the many to many relationship of mission/poste
+x anomalies count is broken
+x visits commune wrong data
 
--> anomalies count is broken
-- visits commune wrong data
-- check each statiqtic 
+- mise en ligne ⛔
+    - db backup
+    - merge branch
+    - scheme update
+    - remove mission parents
+    - set mission parents
+    - lunch crone
+
+- fix children mission order
+- ask jawad for anomalies (what to show?)
 - new chart
 - goals
-
-
-⛔ PROD
-remove value of parent from all entries 
-add real parents
