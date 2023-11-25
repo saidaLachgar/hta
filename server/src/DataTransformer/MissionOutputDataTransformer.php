@@ -24,7 +24,11 @@ class MissionOutputDataTransformer implements DataTransformerInterface
     {
         $output = new MissionOutput();
         $this->journeyAnomalyService->setTotalAnomalies($mission, $output);
-
+        
+        $output->setNbPostes(
+            $mission->getPostes()->count()
+        );
+        
         // handle the parent property separately here
         // if ($mission->getParent() !== null) {
         //     $parent = new MissionOutput();

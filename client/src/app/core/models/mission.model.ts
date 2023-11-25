@@ -8,6 +8,7 @@ export interface Mission {
     type?: boolean;
     causes?: number;
     nbClients?: string;
+    nbPostes?: number;
     DMS?: number;
     IFS?: number;
     END?: number;

@@ -59,6 +59,11 @@ class MissionOutput
     /**
      * @Groups({"missions", "missions_colec"})
      */
+    private $nbPostes;
+
+    /**
+     * @Groups({"missions", "missions_colec"})
+     */
     private $node_a;
 
     /**
@@ -310,16 +315,6 @@ class MissionOutput
         return $this->total_anomalies;
     }
 
-    public function getUndoneAnomalies()
-    {
-        return $this->undone_anomalies;
-    }
-
-    /**
-     * Set the value of total_anomalies
-     *
-     * @return  self
-     */
     public function setTotalAnomalies($total_anomalies)
     {
         $this->total_anomalies = $total_anomalies;
@@ -327,14 +322,26 @@ class MissionOutput
         return $this;
     }
 
-    /**
-     * Set the value of undone_anomalies
-     *
-     * @return  self
-     */
+    public function getUndoneAnomalies()
+    {
+        return $this->undone_anomalies;
+    }
+    
     public function setUndoneAnomalies($undone_anomalies)
     {
         $this->undone_anomalies = $undone_anomalies;
+
+        return $this;
+    }
+    
+    public function getNbPostes()
+    {
+        return $this->nbPostes;
+    }
+    
+    public function setNbPostes($nbPostes)
+    {
+        $this->nbPostes = $nbPostes;
 
         return $this;
     }

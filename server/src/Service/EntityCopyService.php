@@ -58,6 +58,9 @@ class EntityCopyService
 
                             $clonedMission->setTotalAnomalies($anomalies ? $anomalies["total"] : null);
                             $clonedMission->setUndoneAnomalies($anomalies ? $anomalies["undone"] : null);
+                            $clonedMission->setNbPostes(
+                                $item->getPostes()->count()
+                            );
 
                             $clonedCollection->add($clonedMission);
                         } else {

@@ -65,7 +65,7 @@
       <div class="card card-body pb-0 h-100 mb-0">
         
         <ng-container *ngIf="visitsParCommunes$ | async as data; else visitsParCommunesLoading">
-          <p class="fw-medium mb-0">Visites par communes <small class="text-muted">(année courante)</small></p>
+          <p class="fw-medium mb-0">Nombre de visites par commune <small class="text-muted">(année courante)</small></p>
           <ng-container *ngIf="!data.empty; else VistesByCommuneEmpty">
               <apx-chart
                 [series]="data.series"
