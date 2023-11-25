@@ -211,7 +211,17 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
           this.toast.observe({
             loading: "Suppression...",
             success: () => {
-              target ? target.closest("tr").remove() : this.router.navigate(['/mission']);
+              let tr = target ? target.closest("tr") : false;
+              let reload = !tr || tr.classList.contains("is-parent") || tr.classList.contains("is-child");
+              if (reload) {
+                setTimeout(() => {
+                  this.router.navigateByUrl('/', { skipLocationChange: true }).then(() =>
+                    this.router.navigate([`/mission`]));
+                }, 1000);
+              } else {
+                (tr as HTMLTableRowElement).remove();
+              }
+
               return "Supprimé avec succès";
             },
             error: "un problème est survenu, veuillez réessayer",

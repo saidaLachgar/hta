@@ -4,6 +4,7 @@ import { ActivatedRoute } from "@angular/router";
 import { AuthenticationService } from "src/app/core/services/auth.service";
 import { missionService } from "../mission.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Mission } from "src/app/core/models";
 
 const parseDate = d => new Date(Date.parse(d))
 const timeObject = d => { return { hour: d.getHours(), minute: d.getMinutes(), second: d.getSeconds() } };
@@ -125,6 +126,11 @@ export class missionPersistComponent {
     this.modalService.open(this.associations_content, { size: 'xl',centered: true });
     // get data
     this.service.getRelatedMissions();
+  }
+
+  // used to prevent show current mission as related mission
+  isCurrentMission(item: Mission): boolean {
+    return item.id == parseInt(this.id) || item.id == (this.service.existingMission as Mission)?.id;
   }
 
 

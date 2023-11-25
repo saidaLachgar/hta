@@ -304,7 +304,7 @@
             </tr>
             <!-- has data : other options -->
             <ng-container *ngFor="let item of data; let i = index">
-              <tr *ngIf="item.id != id" valign="middle">
+              <tr *ngIf="!isCurrentMission(item)" valign="middle">
                 <td>
                   <div class="form-check">
                     <input type="radio" value="{{item['@id']}}" formControlName="parent" class="form-check-input">

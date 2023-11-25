@@ -107,8 +107,8 @@ export class missionListComponent {
             type: "bar",
           },
           colors: [
-            "#FF4560",
             "#008FFB",
+            "#FF4560",
           ],
           plotOptions: {
             bar: {
@@ -132,8 +132,8 @@ export class missionListComponent {
           },
           xaxis: {
             categories: [
-              'Incident',
               'Coupeur',
+              'Incident',
             ],
             labels: {
               style: {

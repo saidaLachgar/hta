@@ -345,6 +345,7 @@
                   <tr class="app-mission-row"
                     valign="middle"
                     [item]="item"
+                    [class.is-parent]="item.children.length"
                     [searchDateStart]="searchDateStart"
                     [searchDateEnd]="searchDateEnd"
                     [searchCauses]="searchCauses"
@@ -355,7 +356,7 @@
                   <!-- get children missions if it's not search -->
                   <ng-container *ngIf="!service.hasSearch">
                     <ng-container *ngFor="let child of item.children">
-                      <tr class="app-mission-row"
+                      <tr class="app-mission-row is-child"
                         valign="middle"
                         [item]="child"
                         [child]="true"
