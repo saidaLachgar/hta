@@ -105,23 +105,10 @@
     <a
     href="javascript: void(0);"
     fragment="anomalies-list"
-    [routerLink]="authService.isAuthorized('visites_details') ? ['details', item.id] : []"
+    [queryParams]="{active: 'accordion-'+item.id}"
+    [routerLink]="authService.isAuthorized('missions_details') ? ['details', child ? parentId : item.id] : []"
     >
-    <ng-container *ngIf="item.total_anomalies != 0 && item.undone_anomalies != 0">
-        <div  class="badge badge-soft-danger c-pointer rounded-pill border-danger border px-3 py-2 font-size-13 w-100">
-        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.undone_anomalies}}/{{item.total_anomalies}} Anomalies</span>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="item.total_anomalies == 0;">
-        <div class="badge badge-soft-info c-pointer rounded-pill border-info border px-3 py-2 font-size-13 w-100">
-        <i class="fas fa-info-circle me-2"></i> <span class="text-body">Pas d'anomalies</span>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="item.total_anomalies!= 0 && item.undone_anomalies == 0">
-        <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-        <i class="fas fa-check-circle me-2"></i> <span class="text-body">Toutes résolues</span>
-        </div>
-    </ng-container>
+    <anomalies-badge [total]="item.total_anomalies"  [undone]="item.undone_anomalies"></anomalies-badge>
     </a>
 </td>
 
@@ -150,10 +137,12 @@
         >
         <i class="fas fa-play me-2 text-success"></i> Continuer
         </a> -->
-        <a class="dropdown-item"
-        [routerLink]="['details', item.id]"
-        href="javascript: void(0);"
-        *ngIf="authService.isAuthorized('missions_details')"
+        <a 
+            class="dropdown-item"
+            [routerLink]="['details', child ? parentId : item.id]"
+            [queryParams]="{active: 'accordion-'+item.id}"
+            href="javascript: void(0);"
+            *ngIf="authService.isAuthorized('missions_details')"
         >
         <i class="fas fa-eye me-2"></i> Voir
         </a>

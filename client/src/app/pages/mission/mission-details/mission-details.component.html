@@ -69,8 +69,8 @@ width: 99%;
     <div class="col-12 col-xl-9 pt-4">
 
       <div class="card card-body mx-n3 mx-xl-0 mb-0 h-100">
-        <ngb-accordion #acc="ngbAccordion" activeIds="static-1" [closeOthers]="true" [destroyOnHide]="false">
-          <ngb-panel id="static-1">
+        <ngb-accordion #acc="ngbAccordion" [activeIds]="activeAccordion" [closeOthers]="true" [destroyOnHide]="true">
+          <ngb-panel id="accordion-{{mission.id}}">
             <ng-template ngbPanelHeader let-opened="opened">
               <div class="d-flex">
                 <button class="btn" ngbPanelToggle><i class="mdi accor-plus-icon mdi-chevron-{{opened ? 'up' : 'down'}} fs-3 c-pointer"></i></button>
@@ -83,7 +83,7 @@ width: 99%;
           </ngb-panel>
 
           <ng-container *ngFor="let child of mission.children">
-            <ngb-panel id="child-{{child.id}}">
+            <ngb-panel id="accordion-{{child.id}}">
               <ng-template ngbPanelHeader let-opened="opened">
                 <div class="d-flex">
                   <button class="btn" ngbPanelToggle><i class="mdi accor-plus-icon mdi-chevron-{{opened ? 'up' : 'down'}} fs-3 c-pointer"></i></button>

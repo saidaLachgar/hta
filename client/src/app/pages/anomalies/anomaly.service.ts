@@ -110,10 +110,10 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     obj["properties[node_a][]"] = "titre";
     obj["properties[node_b][]"] = "titre";
     obj["pagination"] = "false";
-    delete obj.node_a;delete obj.page;
+    delete obj.node_a; delete obj.page;
     obj.node_b && delete obj.node_b;
     // console.log("dz",obj);
-    
+
     this.edgeService.getWithQuery(obj).subscribe(edges => {
       this.edgesInRange$.next(edges);
     });
@@ -240,14 +240,14 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
       "status[]": [false, null],
       ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
       ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
-    });
+    }, true);
   }
 
   /**
    * find By Criteria
    * @param obj query parameters
    */
-  async findByCriteria(obj): Promise<void> {
+  async findByCriteria(obj, related = false): Promise<void> {
     this.anomalies$ = of([]); // clear table
 
     if (Object.keys(obj).length > 1) {
@@ -268,7 +268,15 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
         obj.node_b && delete obj.node_b;
       }
     }
-
+    
+    if(related) {
+      // if no Related Edges return empty table
+      let noRelatedEdges = !obj["edge.id[]"]?.length ?? true;
+      if (noRelatedEdges) {
+        // fake id to get an empty table
+        obj["edge.id[]"] = 1000000000;
+      }
+    }
 
     // remove empty values
     let queryParams = Object.keys(obj)

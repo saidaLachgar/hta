@@ -26,7 +26,7 @@ export class visiteDetailsComponent {
       // anomalies
       this.currentEdge = {
         ANode: obj.node_a["@id"],
-        BNode: obj.node_b["@id"],
+        BNode: obj.node_b.map((e) => e["@id"]),
         department: obj.node_a.department["@id"],
         type: 'false'
       }

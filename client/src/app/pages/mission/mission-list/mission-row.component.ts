@@ -10,6 +10,7 @@ import { AuthenticationService } from 'src/app/core/services/auth.service';
 export class missionRowComponent {
     @Input() child:boolean = false;
     @Input() item: Mission;
+    @Input() parentId: Mission["id"];
     @Input() searchDateStart;
     @Input() searchDateEnd;
     @Input() searchCauses;

@@ -10,7 +10,6 @@ import { AuthenticationService } from 'src/app/core/services/auth.service';
 export class accordionPanelComponent {
     @Input() child: boolean = false;
     @Input() mission: Mission;
-    @Input() currentEdge: any;
 
     constructor(
         public service: missionService,
@@ -18,9 +17,9 @@ export class accordionPanelComponent {
     ) { }
 
     getCurrentEdge(item) {
-        return this.currentEdge = {
+        return {
             ANode: item.node_a["@id"],
-            BNode: item.node_b["@id"],
+            BNode: item.node_b.map((e) => e["@id"]),
             department: item.node_a.department["@id"],
             type: 'false'
         }

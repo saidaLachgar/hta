@@ -7,11 +7,13 @@ import { ConfirmDialogModule } from './components/confirm-dialog/confirm-dialog.
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DecimalHourToTimePipe } from '../core/pipes';
 import { monthsSelectorComponent } from './components/months-selector/months-selector.component';
+import { anomaliesBadgeComponent } from './components/anomaly-badge/anomalies-badge.component';
 @NgModule({
   declarations: [
     // pipes and directives
     DecimalHourToTimePipe,
     monthsSelectorComponent, 
+    anomaliesBadgeComponent, 
   ],
   imports: [
     // components
@@ -32,6 +34,7 @@ import { monthsSelectorComponent } from './components/months-selector/months-sel
     NgbDropdownModule,
     NgbNavModule,
     monthsSelectorComponent, 
+    anomaliesBadgeComponent, 
     DecimalHourToTimePipe
   ]
 })

@@ -24,9 +24,8 @@
       </ng-container>{{mission.node_b.length == 0 ? " - " : ""}}
     </p>
   </div>
-  <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 d-xl-block d-none">
-    <i class="fas fa-check-circle me-2"></i>
-    <span class="text-body">Toutes résolues</span>
+  <div class="d-xl-block d-none">
+    <anomalies-badge [total]="mission.total_anomalies" [undone]="mission.undone_anomalies" [isLink]="false"></anomalies-badge>
   </div>
   <div ngbDropdown 
     placement="bottom-left"

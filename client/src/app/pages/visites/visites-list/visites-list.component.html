@@ -318,23 +318,7 @@
                       fragment="anomalies-list"
                       [routerLink]="authService.isAuthorized('visites_details') ? ['details', item.id] : []"
                     >
-                    <ng-container *ngIf="item.undone_anomalies > 0 && item.undone_anomalies != item.total_anomalies; else NoAnomalies">
-                      <div  class="badge badge-soft-danger c-pointer rounded-pill border-danger border px-3 py-2 font-size-13 w-100">
-                        <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-body">{{item.undone_anomalies}}/{{item.total_anomalies}} Anomalies</span>
-                      </div>
-                    </ng-container>
-                    <ng-template #NoAnomalies>
-                      <ng-container *ngIf="item.total_anomalies == 0; else AllResolved">
-                        <div class="badge badge-soft-info c-pointer rounded-pill border-info border px-3 py-2 font-size-13 w-100">
-                          <i class="fas fa-info-circle me-2"></i> <span class="text-body">Pas d'anomalies</span>
-                        </div>
-                      </ng-container>
-                      <ng-template #AllResolved>
-                        <div class="badge badge-soft-success c-pointer rounded-pill border-success border px-3 py-2 font-size-13 w-100">
-                          <i class="fas fa-check-circle me-2"></i> <span class="text-body">Toutes résolues</span>
-                        </div>
-                      </ng-template>
-                    </ng-template>
+                      <anomalies-badge [total]="item.total_anomalies"  [undone]="item.undone_anomalies"></anomalies-badge>
                     </a>
                   </td>
 
