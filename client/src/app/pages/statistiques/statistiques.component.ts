@@ -37,6 +37,7 @@ export class StatistiquesComponent {
   PostInterruptionInfo$;
   KMVisitedPerCommune$;
   ClientCutsByCommune$;
+  PostesCutsByDepar$;
 
   constructor(
     private fb: FormBuilder,
@@ -101,7 +102,7 @@ export class StatistiquesComponent {
       data["types"] = {
         series: [
           {
-            name: "distibuted",
+            name: "Total des interruptions",
             data: [parseInt(data["Incident"]), parseInt(data["Coupeur"])]
           }
         ],
@@ -171,11 +172,11 @@ export class StatistiquesComponent {
           coupeur_total: data.reduce((accumulator, item) =>
             accumulator + parseFloat(item[`${statType}_COUPEUR`]), 0),
           incident_series: [{
-            name: "distibuted",
+            name: "Total",
             data: data.map(item => item[`${statType}_INCIDENT`])
           }],
           coupeur_series: [{
-            name: "distibuted",
+            name: "Total",
             data: data.map(item => item[`${statType}_COUPEUR`])
           }],
 
@@ -302,7 +303,7 @@ export class StatistiquesComponent {
       return {
         series: [
           {
-            name: "distibuted",
+            name: "Nombre de kilomètres visités",
             data: data.map(item => item.DISTANCE)
           }
         ],
@@ -358,7 +359,7 @@ export class StatistiquesComponent {
       return {
         series: [
           {
-            name: "distibuted",
+            name: "Nombre de clients coupés",
             data: data.map(item => item.CLIENTS)
           }
         ],
@@ -394,6 +395,59 @@ export class StatistiquesComponent {
         },
         xaxis: {
           categories: data.map(item => item.COMMUNE),
+        },
+        yaxis: {
+          labels: {
+            formatter: value => Math.round(value)
+          },
+        },
+      };
+    }));
+    
+    // Le nombre de postes coupés par depart
+    this.PostesCutsByDepar$ = this.http.post<any>(this.url, {
+      "stats": "PostesCutsByDepar",
+      ...(this.formData)
+    }).pipe(map(data => {
+      return {
+        series: [
+          {
+            name: "Nombre de postes coupés",
+            data: data.map(item => item.POSTES)
+          }
+        ],
+
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                height: "auto"
+              },
+            }
+          }
+        ],
+        chart: {
+          height: 300,
+          type: "bar",
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: "45%",
+            distributed: true
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        legend: {
+          show: false
+        },
+        grid: {
+          show: false
+        },
+        xaxis: {
+          categories: data.map(item => item.DEPARTMENT),
         },
         yaxis: {
           labels: {

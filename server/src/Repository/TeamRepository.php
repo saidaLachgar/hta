@@ -618,7 +618,7 @@ class TeamRepository extends ServiceEntityRepository
             ->setParameter('teamId', $team)
             ->groupBy('c.titre');
 
-            $result = $this->filterDate($result, $dateStart, $dateEnd, "v.date");
+        $result = $this->filterDate($result, $dateStart, $dateEnd, "v.date");
         $result = $result->getQuery()->getResult();
         return $result;
     }
@@ -703,6 +703,49 @@ class TeamRepository extends ServiceEntityRepository
             "Duration" => $postInterruptionDuration,
             "TIMES" => $posteInterruptionCount,
         ];
+    }
+
+    // Le nombre de postes coupés par depart
+    function getPostesCutsByDepar($dateStart, $dateEnd, $team)
+    {
+        $departments = $this->em->createQueryBuilder()
+            ->select('d.id, d.titre as TITLE')
+            ->from('App\Entity\Department', 'd')
+            ->where('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->getQuery()
+            ->getResult();
+
+        $qb = $this->em->createQueryBuilder();
+        $qb = $qb->select(
+            'IDENTITY(n.department) as DEPARTMENT',
+            'COUNT(p.id) as POSTES_TOTAL'
+        )
+            ->from('App\Entity\Mission', 'm')
+            ->leftJoin('m.postes', 'p')
+            ->innerJoin('m.node_a', 'n')
+            ->innerJoin('n.department', 'd')
+            ->andWhere('d.team = :teamId')
+            ->setParameter('teamId', $team)
+            ->groupBy('n.department');
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateStart");
+        $qb = $this->filterDate($qb, $dateStart, $dateEnd, "m.dateEnd");
+        $qb = $qb->getQuery()->getResult();
+
+        $result = [];
+
+        foreach ($departments as $department) {
+            $data = current(array_filter($qb, function ($item) use ($department) {
+                return $item['DEPARTMENT'] === (string) $department['id'];
+            }));
+
+            $result[] = [
+                "DEPARTMENT" => $department['TITLE'],
+                "POSTES" => $data["POSTES_TOTAL"] ?? 0,
+            ];
+        }
+
+        return $result;
     }
 
     // get team's postes

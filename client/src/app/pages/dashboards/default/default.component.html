@@ -20,7 +20,7 @@
                 <h4 class="card-title mb-4">Analyses mensuelles</h4>
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="min-width: 1480px;">
                     <thead>
                         <tr>
                           <th>Équipe</th>
@@ -68,7 +68,6 @@
         <div class="col-lg-6">
             <div class="card card-body">
                 <div class="fw-bold mb-4">
-                    DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
                     <div class="float-end">
                         <ul class="nav nav-pills">
                         <li class="nav-item">
@@ -81,6 +80,7 @@
                         </li>
                         </ul>
                     </div>
+                    DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions de l'année en cours)</small>
                 </div>
                 <ng-container *ngIf="teamsDMSCharts$ | async as chart;else teamsDMSChartsLoading">
                     <apx-chart
@@ -112,7 +112,6 @@
         <div class="col-lg-6">
             <div class="card card-body">
                 <div class="fw-bold mb-4">
-                    IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
                     <div class="float-end">
                         <ul class="nav nav-pills">
                         <li class="nav-item">
@@ -125,6 +124,7 @@
                         </li>
                         </ul>
                     </div>
+                    IFS <small class="text-muted font-size-12">(Fréquence des interruptions de l'année en cours)</small>
                 </div>
                 <ng-container *ngIf="teamsIFSCharts$ | async as chart;else teamsIFSChartsLoading">
                     <apx-chart
@@ -156,7 +156,6 @@
         <div class="col-lg-6">
             <div class="card card-body">
                 <div class="fw-bold mb-4">
-                    END <small class="text-muted font-size-12">(année en cours)</small>
                     <div class="float-end">
                         <ul class="nav nav-pills">
                         <li class="nav-item">
@@ -169,6 +168,7 @@
                         </li>
                         </ul>
                     </div>
+                    END <small class="text-muted font-size-12">(année en cours)</small>
                 </div>
                 <ng-container *ngIf="teamsENDCharts$ | async as chart;else teamsENDChartsLoading">
                     <apx-chart

@@ -86,7 +86,6 @@
       <div class="card card-body">
         
         <div class="fw-bold">
-          DMS <small class="text-muted font-size-12">(Moyenne des interruptions {{DMSMonthly ? "des 30 derniers":"de l'année en cours"}})</small>
           <div class="float-end">
             <ul class="nav nav-pills">
               <li class="nav-item">
@@ -99,6 +98,7 @@
               </li>
             </ul>
           </div>
+          DMS <small class="text-muted font-size-12">(Moyenne des interruptions {{DMSMonthly ? "des 30 derniers":"de l'année en cours"}})</small>
         </div>
         
         <ng-container *ngIf="DMSChart$ | async as DMSChart; else DMSloading">

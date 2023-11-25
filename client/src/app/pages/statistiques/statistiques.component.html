@@ -97,7 +97,7 @@
                         <div class="col-6">
                             <div class="border p-3 rounded-3 h-100">
                                 <p class="fw-medium mb-3">La durée de coupure</p>
-                                <strong class="h2">{{(data.Duration=="0" ? 0 : data.Duration/3600) | decimalHourToTime:'long'}}</strong>
+                                <strong class="h2">{{data.Duration ? ((data.Duration/3600) | decimalHourToTime:'long') : 0}}</strong>
                             </div>
                         </div>
                         <div class="col-6">
@@ -206,19 +206,6 @@
             <div class="col-12" *ngFor="let chart of data;">
                 <div class="card card-body">
                     <div class="fw-bold mb-4">
-                        <div *ngIf="chart.type == 'DMS_TOTAL'">
-                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions)</small>
-                          <br>Total : {{ (DMSType ? chart.incident_total : chart.coupeur_total) | decimalHourToTime }}
-                        </div>
-                        <div *ngIf="chart.type == 'IFS_TOTAL'">
-                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions)</small>
-                          <br>Total : {{ (IFSType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
-                        </div>
-                        <div *ngIf="chart.type == 'END_TOTAL'">
-                          END
-                          <br>Total : {{ (ENDType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
-                        </div>
-
                         <div class="float-end">
                             <ul class="nav nav-pills">
                             <li class="nav-item">
@@ -231,7 +218,18 @@
                             </li>
                             </ul>
                         </div>
-
+                        <div *ngIf="chart.type == 'DMS_TOTAL'">
+                          DMS <small class="text-muted font-size-12">(Durée moyenne des interruptions)</small>
+                          <br>Total : {{ (DMSType ? chart.incident_total : chart.coupeur_total) | decimalHourToTime }}
+                        </div>
+                        <div *ngIf="chart.type == 'IFS_TOTAL'">
+                          IFS <small class="text-muted font-size-12">(Fréquence des interruptions)</small>
+                          <br>Total : {{ (IFSType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
+                        </div>
+                        <div *ngIf="chart.type == 'END_TOTAL'">
+                          END
+                          <br>Total : {{ (ENDType ? chart.incident_total : chart.coupeur_total) | number:'1.1-3' }}
+                        </div>
                     </div>
                     <apx-chart
                         [series]="getType(chart.type) ? chart.incident_series : chart.coupeur_series"
@@ -395,6 +393,40 @@
                 </ng-template>
 
                 <ng-container *ngIf="ClientCutsByCommune$ | async as data; else ClientCutsByCommuneLoading">
+                    <apx-chart
+                        [series]="data.series"
+                        [chart]="data.chart"
+                        [dataLabels]="data.dataLabels"
+                        [plotOptions]="data.plotOptions"
+                        [yaxis]="data.yaxis"
+                        [xaxis]="data.xaxis"
+                        [legend]="data.legend"
+                        [grid]="data.grid"
+                    ></apx-chart>
+                </ng-container>
+            </div>
+        </div>
+        <!-- Le nombre de postes coupés par depart -->
+        <div class="col-12">
+            <div class="card card-body">
+                <div class="fw-bold mb-4">
+                    Le nombre de postes coupés par depart
+                </div>
+                <ng-template #PostesCutsByDeparLoading>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; opacity: 0.2; display: block;" width="200px" height="310px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                        <g transform="rotate(180 50 50)"><rect x="15" y="15" width="10" height="40" fill="#e8e8e8">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.1052631578947367s"></animate>
+                        </rect><rect x="35" y="15" width="10" height="40" fill="#dce4eb">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.0526315789473684s"></animate>
+                        </rect><rect x="55" y="15" width="10" height="40" fill="#bbcedd">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-3.1578947368421053s"></animate>
+                        </rect><rect x="75" y="15" width="10" height="40" fill="#85a2b6">
+                        <animate attributeName="height" values="50;70;30;50" keyTimes="0;0.33;0.66;1" dur="5.2631578947368425s" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.2631578947368425s"></animate>
+                        </rect></g>
+                    </svg>
+                </ng-template>
+
+                <ng-container *ngIf="PostesCutsByDepar$ | async as data; else PostesCutsByDeparLoading">
                     <apx-chart
                         [series]="data.series"
                         [chart]="data.chart"

@@ -80,7 +80,7 @@ export class visitesListComponent {
           empty: data.length == 0,
           series: [
           {
-            name: "distibuted",
+            name: "Nombre de visites",
             data: data.map(item => item.VISTES)
           }
         ],

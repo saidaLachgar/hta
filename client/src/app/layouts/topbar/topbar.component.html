@@ -15,66 +15,73 @@
 
     <div class="d-flex">
       <!--  -->
-      <div class="dropdown d-none d-lg-block ms-2" ngbDropdown>
-        <button type="button" class="btn header-item text-uppercase font-size-12 px-3" ngbDropdownToggle data-toggle="dropdown" aria-haspopup="false"
-          aria-expanded="false" style="background: #2a3042;color: #e6f0ff;">
-          <i class="mdi mdi-plus"></i>
-          Ajout rapide
+      <div class="btn-group d-none d-lg-block me-2" ngbDropdown>
+        <button 
+          type="button" 
+          class="dropdown-toggle btn btn-primary h-100 border-0 rounded-0 ps-3" 
+          style="background-color: #2a3042;"
+          ngbDropdownToggle>Nouveau 
+          <i class="mdi mdi-chevron-down"></i>
         </button>
-        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu style="width: 205px;">
-          <div class="row">
-            <div class="col-12 ps-4">
-              <ul class="list-unstyled mb-0 megamenu-list">
-                <li *ngIf="authService.isAuthorized('mission_add')">
-                  <a href="javascript:void(0);" routerLink="/mission/persist">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Travaux</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('anomalies_add')">
-                  <a href="javascript:void(0);" routerLink="/anomalies/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Anomalies</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('visites_add')">
-                  <a href="javascript:void(0);" routerLink="/visites/persist">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Visites</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('postes_add')">
-                  <a href="javascript:void(0);" routerLink="/postes/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Postes de distribution</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('teams_add')">
-                  <a href="javascript:void(0);" routerLink="/teams/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Équipes</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('users_add')">
-                  <a href="javascript:void(0);" routerLink="/users/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Members</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('departments_add')">
-                  <a href="javascript:void(0);" routerLink="/departments/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Départ</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('dps_add')">
-                  <a href="javascript:void(0);" routerLink="/dps/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Dps</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('edges_add')">
-                  <a href="javascript:void(0);" routerLink="/edges/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Tronçons</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('nodes_add')">
-                  <a href="javascript:void(0);" routerLink="/nodes/add">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Appareils coupeur</a>
-                </li>
-                <li *ngIf="authService.isAuthorized('communes_add')">
-                  <a href="javascript:void(0);" routerLink="/communes">
-                    <i class="far fa-circle align-middle me-2" style="font-size: 6px;"></i>Commune</a>
-                </li>
-                
-              </ul>
-            </div>
-          </div>
+        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('mission_add')"
+            href="javascript:void(0);" routerLink="/mission/persist"
+          >Travaux</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('anomalies_add')"
+            href="javascript:void(0);" routerLink="/anomalies/add"
+          >Anomalie</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('visites_add')"
+            href="javascript:void(0);" routerLink="/visites/persist"
+          >Visite</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('postes_add')"
+            href="javascript:void(0);" routerLink="/postes/add"
+          >Postes de distribution</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('teams_add')"
+            href="javascript:void(0);" routerLink="/teams/add"
+          >Équipe</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('users_add')"
+            href="javascript:void(0);" routerLink="/users/add"
+          >Member</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('departments_add')"
+            href="javascript:void(0);" routerLink="/departments/add"
+          >Départ</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('dps_add')"
+            href="javascript:void(0);" routerLink="/dps/add"
+          >Dp</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('edges_add')"
+            href="javascript:void(0);" routerLink="/edges/add"
+          >Tronçon</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('nodes_add')"
+            href="javascript:void(0);" routerLink="/nodes/add"
+          >Appareils de coupeur</a>
+          <a 
+            class="dropdown-item"
+            *ngIf="authService.isAuthorized('communes_add')"
+            href="javascript:void(0);" routerLink="/communes"
+          >Commune</a>
         </div>
       </div>
+      
       <!-- fullscreen -->
       <div class="dropdown d-none d-lg-inline-block ms-1">
         <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">

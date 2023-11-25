@@ -86,7 +86,7 @@ export class missionListComponent {
               breakpoint: 480,
               options: {
                 chart: {
-                  width: 200
+                  width: "100%"
                 },
                 legend: {
                   position: "bottom"
@@ -98,7 +98,7 @@ export class missionListComponent {
         data["types"] = {
           series: [
             {
-              name: "distibuted",
+              name: "Total des interruptions",
               data: [parseInt(data["Incident"]), parseInt(data["Coupeur"])]
             }
           ],
