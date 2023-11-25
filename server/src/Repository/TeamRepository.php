@@ -89,20 +89,36 @@ class TeamRepository extends ServiceEntityRepository
             ->select(
                 'IDENTITY(d.team) as TEAM',
                 "SUM(CAST(SUBSTRING_INDEX(m.nbClients, '/', 1) AS UNSIGNED)) AS CLIENTS_COUNT",
-                'COUNT(p.id) as POSTES_TOTAL',
                 'SUM(m.DMS) as DMS_TOTAL',
                 'SUM(m.END) as END_TOTAL',
                 'SUM(m.IFS) as IFS_TOTAL'
             )
             ->from('App\Entity\Mission', 'm')
-            ->leftJoin('m.postes', 'p')
-            ->innerJoin('m.node_a', 'n')
-            ->innerJoin('n.department', 'd')
+            ->leftJoin('m.node_a', 'n')
+            ->leftJoin('n.department', 'd')
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :month')
             ->groupBy('d.team')
             ->setParameter('year', $current_year)
             ->setParameter('month', $month)
+            ->getQuery()
+            ->getResult();
+
+
+        $teamPostesStats = $this->em->createQueryBuilder()
+            ->select(
+                'IDENTITY(d.team) as TEAM',
+                'COUNT(p.id) as POSTES_TOTAL'
+            )
+            ->from('App\Entity\Mission', 'm')
+            ->leftJoin('m.postes', 'p')
+            ->leftJoin('m.node_a', 'n')
+            ->leftJoin('n.department', 'd')
+            ->where('YEAR(m.dateStart) = :year')
+            ->andWhere('MONTH(m.dateStart) = :month')
+            ->setParameter('year', $current_year)
+            ->setParameter('month', $month)
+            ->groupBy('d.team')
             ->getQuery()
             ->getResult();
 
@@ -153,6 +169,10 @@ class TeamRepository extends ServiceEntityRepository
                 return $item['TEAM'] === (string) $teamId;
             }));
 
+            $teamPostesStats = current(array_filter($teamPostesStats, function ($item) use ($teamId) {
+                return $item['TEAM'] === (string) $teamId;
+            }));
+
             $teamMissionStatsParents = current(array_filter($missionStatsParents, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
             }));
@@ -176,7 +196,7 @@ class TeamRepository extends ServiceEntityRepository
                 "IFS_TOTAL" => $teamMissionStatsAll["IFS_TOTAL"] ?? 0,
                 "DMS_TOTAL" => $teamMissionStatsAll["DMS_TOTAL"] ?? 0,
                 "END_TOTAL" => $teamMissionStatsAll["END_TOTAL"] ?? 0,
-                "POSTES_TOTAL" => $teamMissionStatsAll["POSTES_TOTAL"] ?? 0
+                "POSTES_TOTAL" => $teamPostesStats["POSTES_TOTAL"] ?? 0
             ];
         }
         // dd($teamsStats);
