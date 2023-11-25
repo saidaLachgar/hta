@@ -133,10 +133,10 @@ class Commune
 
     public function addMissionCommune(MissionCommune $missionCommune): self
     {
-        if (!$this->missionCommunes->contains($missionCommune)) {
+        // if (!$this->missionCommunes->contains($missionCommune)) {
             $this->missionCommunes[] = $missionCommune;
             $missionCommune->setCommune($this);
-        }
+        // }
 
         return $this;
     }

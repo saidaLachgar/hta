@@ -48,7 +48,7 @@ class CommuneRepository extends ServiceEntityRepository
         $results = $this->createQueryBuilder('c')
             ->select('c')
             ->join('c.edges', 'e')
-            ->andWhere('e.node_a IN (:nodes)')
+            ->andWhere('e.node_a IN (:nodes) or e.node_b IN (:nodes)')
             ->setParameter('nodes', $nodesInRange)
             ->getQuery()
             ->getResult();
