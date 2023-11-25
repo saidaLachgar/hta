@@ -190,7 +190,7 @@ class TeamRepository extends ServiceEntityRepository
         $teams = $this->getTeams();
         $currentDate = new \DateTime();
         $startDate = clone $currentDate;
-        $startDate->sub(new \DateInterval('P12M'));
+        $startDate->sub(new \DateInterval('P11M'));
         $monthlyStats = [];
         while ($startDate <= $currentDate) {
             $month = $startDate->format('m');
@@ -241,11 +241,12 @@ class TeamRepository extends ServiceEntityRepository
 
         if ($timeframe === "year") {
             $startDate = clone $currentDate;
-            $startDate->sub(new \DateInterval('P12M'));
+            $startDate->sub(new \DateInterval('P11M'));
 
             while ($startDate <= $currentDate) {
                 $month = $startDate->format('m');
                 $year = $startDate->format('Y');
+                // dump($year."-".$month);
 
                 $missionStats = $this->em->createQueryBuilder()
                     ->select(
@@ -259,9 +260,10 @@ class TeamRepository extends ServiceEntityRepository
                     ->andWhere('MONTH(m.dateStart) = :month')
                     ->setParameter('year', $year)
                     ->setParameter('month', $month)
+                    ->groupBy('d.team')
                     ->getQuery()
                     ->getResult();
-
+                // dd($missionStats);
                 foreach ($teams as $team) {
                     $teamId = $team->getId();
 
@@ -300,6 +302,7 @@ class TeamRepository extends ServiceEntityRepository
                     ->setParameter('year', $year)
                     ->setParameter('month', $month)
                     ->setParameter('day', $day)
+                    ->groupBy('d.team')
                     ->getQuery()
                     ->getResult();
 
@@ -319,7 +322,7 @@ class TeamRepository extends ServiceEntityRepository
                 $startDate->add(new \DateInterval('P1D'));
             }
         }
-
+        // dd($result);
         return $result;
     }
 
@@ -437,6 +440,7 @@ class TeamRepository extends ServiceEntityRepository
             ->innerJoin('m.node_a', 'n')
             ->leftJoin('n.department', 'd')
             ->andWhere('d.team = :teamId')
+            ->andWhere('m.parent is null')
             ->setParameter('teamId', $team);
         $missionTotal = $this->filterDate($missionTotal, $dateStart, $dateEnd, "m.dateStart");
         $missionTotal = $missionTotal->getQuery()->getSingleScalarResult();
@@ -459,6 +463,7 @@ class TeamRepository extends ServiceEntityRepository
             ->from('App\Entity\Mission', 'm')
             ->innerJoin('m.node_a', 'n')
             ->leftJoin('n.department', 'd')
+            ->andWhere('m.parent is null')
             ->andWhere('d.team = :teamId')
             ->setParameter('teamId', $team);
 
