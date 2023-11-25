@@ -21,10 +21,8 @@ setDefaultOptions({ locale: fr });
 
 const parseDate = (date: string) => new Date(Date.parse(date))
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
-const DateObjToDate = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second);
 const DateTimeToString = (date, time) => new Date(date.year, date.month - 1, date.day, time.hour, time.minute, time.second).toISOString();
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
-const DateObjToString = (date) => date.toISOString().split('T')[0];
 
 @Injectable({
   providedIn: "root",
@@ -168,16 +166,25 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
 
   getRelatedMissions(): void {
     let form = this.missionForm.value;
-    if( form.department && form.date ) {
-      let dateEnd = DateObjToDate(form.date, form.dateStart);
-      dateEnd.setDate(dateEnd.getDate() + 1)
-
+    if (form.department && form.date) {
+      const convertDate = (date)=> {
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`
+      }
+      const date = DateToString(form.date)
+      const dateMin = new Date(date);
+      const dateMax = new Date(date);
+      dateMin.setDate(dateMax.getDate() - 1);
+      dateMax.setDate(dateMax.getDate() + 1);
+      
       let criteria = {
         "type": true,
-        "dateStart[after]": DateToString(form.date),
-        "dateStart[before]": DateObjToString(dateEnd),
+        "dateStart[after]": convertDate(dateMin),
+        "dateStart[before]": convertDate(dateMax),
         "node_a.department.id[]": form.department.match(/\d+/)[0],
-        "properties[]":["id","dateStart","dateEnd","node_a","node_b"],
+        "properties[]": ["id", "dateStart", "dateEnd", "node_a", "node_b"],
       }
       this.findByCriteria(criteria, false);
     }

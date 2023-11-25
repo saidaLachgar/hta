@@ -18,6 +18,7 @@
 ## FRONTEND SETUP 
     - npm install (install packages --1st time only)
     - ng build  (run webpack to generate the assets)
+    - ng build --prod
 
 ## SERVE CLIENT SIDE
 > http://localhost:4200
