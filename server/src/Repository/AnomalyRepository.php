@@ -59,11 +59,11 @@ class AnomalyRepository extends ServiceEntityRepository
                 ->andWhere('a.edge IN (:edges)')
                 ->setParameter('edges', $edgesIds);
 
-            if ($journey instanceof Visite) {
-                $date = $journey->getDate();
-                $qb->andWhere('DATE(a.createdAt) = :date')
-                    ->setParameter('date', $date->format('Y-m-d'));
-            }
+            // if ($journey instanceof Visite) {
+            //     $date = $journey->getDate();
+            //     $qb->andWhere('DATE(a.createdAt) = :date')
+            //         ->setParameter('date', $date->format('Y-m-d'));
+            // }
 
             $total = $qb->getQuery()->getArrayResult();
             $undone = array_filter($total, function ($item) {

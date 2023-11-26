@@ -273,11 +273,11 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
 
-    if (date) {
-      let anomaliesDate = typeof date === 'string' || date instanceof String ? date : formatDate(date)
-      queryParams["createdAt[after]"] = anomaliesDate.split("T")[0] + "T00:00:00";
-      queryParams["createdAt[before]"] = anomaliesDate.split("T")[0] + "T23:59:59";
-    }
+    // if (date) {
+    //   let anomaliesDate = typeof date === 'string' || date instanceof String ? date : formatDate(date)
+    //   queryParams["createdAt[after]"] = anomaliesDate.split("T")[0] + "T00:00:00";
+    //   queryParams["createdAt[before]"] = anomaliesDate.split("T")[0] + "T23:59:59";
+    // }
 
     if (onlyUndone) {
       queryParams["status"] = false;
