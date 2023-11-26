@@ -105,15 +105,15 @@ class TeamRepository extends ServiceEntityRepository
             ->getResult();
 
 
-        $teamPostesStats = $this->em->createQueryBuilder()
+        $postesStats = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(d.team) as TEAM',
                 'COUNT(p.id) as POSTES_TOTAL'
             )
             ->from('App\Entity\Mission', 'm')
-            ->leftJoin('m.postes', 'p')
-            ->leftJoin('m.node_a', 'n')
-            ->leftJoin('n.department', 'd')
+            ->join('m.postes', 'p')
+            ->join('m.node_a', 'n')
+            ->join('n.department', 'd')
             ->where('YEAR(m.dateStart) = :year')
             ->andWhere('MONTH(m.dateStart) = :month')
             ->setParameter('year', $current_year)
@@ -121,6 +121,7 @@ class TeamRepository extends ServiceEntityRepository
             ->groupBy('d.team')
             ->getQuery()
             ->getResult();
+        // dd($teamPostesStats);
 
         // data of parent missions only
         $missionStatsParents = $this->em->createQueryBuilder()
@@ -169,7 +170,7 @@ class TeamRepository extends ServiceEntityRepository
                 return $item['TEAM'] === (string) $teamId;
             }));
 
-            $teamPostesStats = current(array_filter($teamPostesStats, function ($item) use ($teamId) {
+            $teamPostesStats = current(array_filter($postesStats, function ($item) use ($teamId) {
                 return $item['TEAM'] === (string) $teamId;
             }));
 
