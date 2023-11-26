@@ -274,8 +274,8 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
 
     if (date) {
-      queryParams["createdAt[after]"] = date.split("T")[0] + "T00:00:00";
-      queryParams["createdAt[before]"] = date.split("T")[0] + "T23:59:59";
+      queryParams["createdAt[after]"] = formatDate(date).split("T")[0] + "T00:00:00";
+      queryParams["createdAt[before]"] = formatDate(date).split("T")[0] + "T23:59:59";
     }
 
     if (onlyUndone) {
