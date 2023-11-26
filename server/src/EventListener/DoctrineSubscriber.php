@@ -57,8 +57,8 @@ class DoctrineSubscriber implements EventSubscriber
     public function log($args, $eventType)
     {
         $object = $args->getObject();
-        if (false) {
-        // if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject || $object instanceof MissionCommune)) {
+        // if (false) {
+        if (!($object instanceof Log || $object instanceof RefreshToken || $object instanceof MediaObject || $object instanceof MissionCommune)) {
             $objectString = (string)$object; // ex : fullName
             $className = get_class($object); // returns fully-qualified class name
             $class = strtolower(basename(str_replace('\\', '/', $className))); // Get the class "basename" of the given object / class
