@@ -304,4 +304,7 @@ export class visiteService extends EntityCollectionServiceBase<Visite> {
   get ANode() {
     return this.visiteForm.get("nodeA");
   }
+  get date() {
+    return this.visiteForm.get("date");
+  }
 }

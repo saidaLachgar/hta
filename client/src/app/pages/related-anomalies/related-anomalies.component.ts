@@ -16,7 +16,8 @@ export class relatedAnomaliesComponent implements OnChanges {
   @Input() anomalies: FormArray;
   @Input() parentFormGroup: FormGroup;
   @Input() showErrors: boolean;
-  @Input() currentEdge: any = { ANode: null, BNode: null, department: null, type: null };
+  @Input() onlyUndone: boolean;
+  @Input() currentEdge: any = { ANode: null, BNode: null, department: null, type: null, date: null };
   @Output() addAlert: EventEmitter<{ message: string, type: string }> = new EventEmitter<{ message: string, type: string }>();
 
   constructor(
@@ -34,7 +35,7 @@ export class relatedAnomaliesComponent implements OnChanges {
     if (change && change.currentValue) {
 
 
-      const { ANode, BNode, department, type } = change.currentValue;
+      const { ANode, BNode, department, type, date } = change.currentValue;
 
       // Check if the objects are equal (excluding the 'type' property)
       const OnlyTypeChanged = change.previousValue && JSON.stringify(
@@ -46,7 +47,7 @@ export class relatedAnomaliesComponent implements OnChanges {
 
       if (ANode && ANode.trim() !== '' && !OnlyTypeChanged) {
 
-        this.anomalyService.getRelatedAnomalies(ANode, BNode, department);
+        this.anomalyService.getRelatedAnomalies(ANode, BNode, department, this.onlyUndone, date);
 
         // scroll to anomalies
         this.anomalyService.loading$.pipe().subscribe(loading => {

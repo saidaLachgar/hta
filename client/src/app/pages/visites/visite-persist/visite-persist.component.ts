@@ -76,7 +76,9 @@ export class visitePersistComponent {
           ANode: this.service.ANode.value,
           BNode: this.service.BNode.value,
           department: obj.node_a.department["@id"],
-          type: true
+          type: true,
+          date: obj.date
+
         }
 
         this.formListeners();
@@ -101,7 +103,7 @@ export class visitePersistComponent {
   AlertANodeChange() {
     this.addAlert("En changeant le PS, les champs tronçons d'anomalies seront réinitialisés.", "warning")
   }
- 
+
   AlertDeparChange() {
     let anode = this.service.ANode.value;
     let bnode = this.service.BNode.value;
@@ -129,11 +131,12 @@ export class visitePersistComponent {
       setTimeout(() => this.removeAlert(alert), 15000);
     }
   }
- 
+
   formListeners() {
     let na = this.service.ANode;
     let nb = this.service.BNode;
     let dp = this.service.department;
+    let date = this.service.date;
 
     // on change ANode -> reset && reload edges and anomalies
     na.valueChanges.subscribe(() => {
@@ -143,13 +146,14 @@ export class visitePersistComponent {
       });
     });
 
-    [nb,na].forEach(input => {
+    [nb, na, date].forEach(input => {
       input.valueChanges.subscribe(() => {
-       this.currentEdge = {
+        this.currentEdge = {
           ANode: na.value,
           BNode: nb.value,
           department: dp.value,
-          type: true
+          type: true,
+          date: date.value
         };
       });
     });

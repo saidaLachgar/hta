@@ -89,9 +89,13 @@ class TeamRepository extends ServiceEntityRepository
             ->select(
                 'IDENTITY(d.team) as TEAM',
                 "SUM(CAST(SUBSTRING_INDEX(m.nbClients, '/', 1) AS UNSIGNED)) AS CLIENTS_COUNT",
-                'SUM(m.DMS) as DMS_TOTAL',
-                'SUM(m.END) as END_TOTAL',
-                'SUM(m.IFS) as IFS_TOTAL'
+                // 'SUM(m.DMS) as DMS_TOTAL',
+                // 'SUM(m.END) as END_TOTAL',
+                // 'SUM(m.IFS) as IFS_TOTAL'
+                // for in incident only
+                'SUM(CASE WHEN m.type = true THEN m.DMS ELSE 0 END) as DMS_TOTAL',
+                'SUM(CASE WHEN m.type = true THEN m.END ELSE 0 END) as END_TOTAL',
+                'SUM(CASE WHEN m.type = true THEN m.IFS ELSE 0 END) as IFS_TOTAL',
             )
             ->from('App\Entity\Mission', 'm')
             ->leftJoin('m.node_a', 'n')

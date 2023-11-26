@@ -54,19 +54,21 @@ class AnomalyRepository extends ServiceEntityRepository
             $journey->getNodeB()->isEmpty() ? null : implode(',', $journey->getNodeB()->map(fn($node) => $node->getId())->toArray())
         );
         if ($edgesIds) {
-
-            $total = $this->createQueryBuilder('a')
+            $qb = $this->createQueryBuilder('a')
                 ->select('a.status')
                 ->andWhere('a.edge IN (:edges)')
-                ->setParameter('edges', $edgesIds)
-                // ->andWhere('DATE(a.createdAt) = :date')
-                // ->setParameter('date', $date->format('Y-m-d'))
-                ->getQuery()->getArrayResult();
+                ->setParameter('edges', $edgesIds);
 
+            if ($journey instanceof Visite) {
+                $date = $journey->getDate();
+                $qb->andWhere('DATE(a.createdAt) = :date')
+                    ->setParameter('date', $date->format('Y-m-d'));
+            }
+
+            $total = $qb->getQuery()->getArrayResult();
             $undone = array_filter($total, function ($item) {
                 return $item["status"] !== true;
             });
-
 
             return [
                 "total" => count($total),

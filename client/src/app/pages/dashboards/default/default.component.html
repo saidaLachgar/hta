@@ -23,16 +23,19 @@
                 <table class="table table-bordered" style="min-width: 1480px;">
                     <thead>
                         <tr>
-                          <th>Équipe</th>
-                          <th>Visite au sol <span class="text-muted ms-1 align-middle" ngbTooltip="Année en cours"><i class="bx bx-info-circle"></i></span></th>
-                          <th>Anomalies réalisées <span class="text-muted ms-1 align-middle" ngbTooltip="Les données sont depuis toujours (pas d'intervalle de temps)"><i class="bx bx-info-circle"></i></span></th>
-                          <th>Nombre d'incidents</th>
-                          <th>Nombre de coupures</th>
-                          <th>Nombre de clients coupés</th>
-                          <th>Nombre de postes coupés</th>
-                          <th>DMS</th>
-                          <th>IFS</th>
-                          <th>END</th>
+                          <th valign="middle" rowspan="2">Équipe</th>
+                          <th valign="middle" rowspan="2">Visite au sol <span class="text-muted ms-1 align-middle" ngbTooltip="Année en cours"><i class="bx bx-info-circle"></i></span></th>
+                          <th valign="middle" rowspan="2">Anomalies réalisées <span class="text-muted ms-1 align-middle" ngbTooltip="Les données sont depuis toujours (pas d'intervalle de temps)"><i class="bx bx-info-circle"></i></span></th>
+                          <th valign="middle" rowspan="2">Nombre d'incidents</th>
+                          <th valign="middle" rowspan="2">Nombre de coupures</th>
+                          <th valign="middle" rowspan="2">Nombre de clients coupés</th>
+                          <th valign="middle" rowspan="2">Nombre de postes coupés</th>
+                          <th class="text-center py-2" colspan="3">IQS mensuels incidents</th>
+                        </tr>
+                        <tr>
+                            <th class="py-1">DMS</th>
+                            <th class="py-1">IFS</th>
+                            <th class="py-1">END</th>
                         </tr>
                       </thead>
                     <tbody *ngIf="teamsStats$ | async as teamsStats; else loading">

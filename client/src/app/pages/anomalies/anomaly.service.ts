@@ -234,20 +234,19 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
 
 
   // get edges and anomalies of current mission range
-  getRelatedAnomalies(anode, bnode, depar) {
+  getRelatedAnomalies(anode, bnode, depar, onlyUndone = false, date = null) {
     anode && anode.trim() !== '' && this.findByCriteria({
       page: 1,
-      "status[]": [false, null],
       ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
       ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
-    }, true);
+    }, true, onlyUndone, date);
   }
 
   /**
    * find By Criteria
    * @param obj query parameters
    */
-  async findByCriteria(obj, related = false): Promise<void> {
+  async findByCriteria(obj, related = false, onlyUndone = false, date = null): Promise<void> {
     this.anomalies$ = of([]); // clear table
 
     if (Object.keys(obj).length > 1) {
@@ -268,20 +267,30 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
         obj.node_b && delete obj.node_b;
       }
     }
-    
-    if(related) {
-      // if no Related Edges return empty table
-      let noRelatedEdges = !obj["edge.id[]"]?.length ?? true;
-      if (noRelatedEdges) {
-        // fake id to get an empty table
-        obj["edge.id[]"] = 1000000000;
-      }
-    }
 
     // remove empty values
     let queryParams = Object.keys(obj)
       .filter((k) => obj[k] != "" && obj[k] != null)
       .reduce((a, k) => ({ ...a, [k]: obj[k] }), {});
+
+    if (date) {
+      queryParams["createdAt[after]"] = date.split("T")[0] + "T00:00:00";
+      queryParams["createdAt[before]"] = date.split("T")[0] + "T23:59:59";
+    }
+
+    if (onlyUndone) {
+      queryParams["status"] = false;
+    }
+
+    if (related) {
+      // if no Related Edges were found return empty table
+      let noRelatedEdges = !queryParams["edge.id[]"]?.length ?? true;
+      if (noRelatedEdges) {
+        // fake id to get an empty table
+        queryParams["edge.id[]"] = 1000000000;
+      }
+    }
+
     this.anomalies$ = this.getWithQuery(queryParams);
     this.getPagination();
   }

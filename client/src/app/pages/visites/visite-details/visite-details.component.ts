@@ -28,7 +28,8 @@ export class visiteDetailsComponent {
         ANode: obj.node_a["@id"],
         BNode: obj.node_b.map((e) => e["@id"]),
         department: obj.node_a.department["@id"],
-        type: 'false'
+        type: 'false',
+        date: obj.date
       }
     });
     

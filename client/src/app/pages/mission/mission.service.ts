@@ -319,7 +319,7 @@ export class missionService extends EntityCollectionServiceBase<Mission> {
 
     let anomalyFormArray = this.missionForm.get("anomalies") as FormArray;
     while (anomalyFormArray.length !== 0) anomalyFormArray.removeAt(0);
-    this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department);
+    this.anomalyService.getRelatedAnomalies(form.node_a,form.node_b,form.department,true);
   }
   
   getById(id:Number){

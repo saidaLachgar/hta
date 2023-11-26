@@ -38,6 +38,11 @@ class CronFixesController extends AbstractController
     $CommuneRepo = $this->em->getRepository(Commune::class);
     $PosteRepo = $this->em->getRepository(Poste::class);
     $VisiteRepo = $this->em->getRepository(Visite::class);
+    $relatedMissionCommunes = true;
+    $relatedMissionPostes = true;
+    $missionPrevNodes = true;
+    $relatedVisiteCommune = true;
+    $visitePrevNodes = true;
 
 
     // > Missions Fix
@@ -56,35 +61,38 @@ class CronFixesController extends AbstractController
       $nodesInRange = $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
 
       // add related communes
-      $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
-      $Mission->getMissionCommunes()->clear();
-      foreach ($Communes as $Commune) {
-        $clientCount = $PosteRepo->ClientTotalByCommune($Commune->getId());
-        $obj = new MissionCommune();
-        $obj->setCommune($Commune);
-        $obj->setClientCount($clientCount);
-        $Mission->addMissionCommune($obj);
+      if($relatedMissionCommunes){
+        $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
+        $Mission->getMissionCommunes()->clear();
+        foreach ($Communes as $Commune) {
+          $clientCount = $PosteRepo->ClientTotalByCommune($Commune->getId());
+          $obj = new MissionCommune();
+          $obj->setCommune($Commune);
+          $obj->setClientCount($clientCount);
+          $Mission->addMissionCommune($obj);
+        }
       }
 
-      // if($Depar->getTeam()->getTitre()=="DEMO équipe") {
-      //   dump($Communes);
-      // }
 
       // add all related postes
-      $Postes = $PosteRepo->getPostesByRange($nodesInRange);
-      $Mission->getPostes()->clear();
-      foreach ($Postes as $Poste) {
-        $Mission->addPoste($Poste);
+      if($relatedMissionPostes) {
+        $Postes = $PosteRepo->getPostesByRange($nodesInRange);
+        $Mission->getPostes()->clear();
+        foreach ($Postes as $Poste) {
+          $Mission->addPoste($Poste);
+        }
       }
 
 
       // set prev value of b nodes (used becouse previous_data doesn't work on collection)
-      $Mission->setPrevNodes($Destinations);
+      if($missionPrevNodes) {
+        $Mission->setPrevNodes($Destinations);
+      }
 
       $this->em->persist($Mission);
     }
     
-    // > Missions Fix
+    // > visit Fix
     $Visites = $VisiteRepo->findAll();
     foreach ($Visites as $Visite) {
       $NodeB = $Visite->getNodeB();
@@ -99,10 +107,17 @@ class CronFixesController extends AbstractController
       $nodesInRange = $this->GraphSearch->bfsNodesInRange($Depar->getId(), $NodeA->getId(), $Destinations);
 
       // add related communes
-      $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
-      $Visite->getCommunes()->clear();
-      foreach ($Communes as $Commune) {
-        $Visite->addCommune($Commune);
+      if($relatedVisiteCommune) {
+        $Communes = $CommuneRepo->getCommunesByRange($nodesInRange);
+        $Visite->getCommunes()->clear();
+        foreach ($Communes as $Commune) {
+          $Visite->addCommune($Commune);
+        }
+      }
+
+      // set prev value of b nodes (used becouse previous_data doesn't work on collection)
+      if($visitePrevNodes) {
+        $Visite->setPrevNodes($Destinations);
       }
 
       $this->em->persist($Visite);

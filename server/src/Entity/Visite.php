@@ -93,6 +93,11 @@ class Visite
      */
     private $communes;
 
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $prevNodes = [];
+
     public function __construct()
     {
         $this->node_b = new ArrayCollection();
@@ -201,6 +206,18 @@ class Visite
     public function removeCommune(Commune $commune): self
     {
         $this->communes->removeElement($commune);
+
+        return $this;
+    }
+
+    public function getPrevNodes(): ?array
+    {
+        return $this->prevNodes;
+    }
+
+    public function setPrevNodes(?array $prevNodes): self
+    {
+        $this->prevNodes = $prevNodes;
 
         return $this;
     }
