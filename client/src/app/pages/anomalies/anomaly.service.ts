@@ -234,19 +234,19 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
 
 
   // get edges and anomalies of current mission range
-  getRelatedAnomalies(anode, bnode, depar, onlyUndone = false, date = null) {
+  getRelatedAnomalies(anode, bnode, depar, date = null, status = "all") {
     anode && anode.trim() !== '' && this.findByCriteria({
       page: 1,
       ...{ node_a: anode.match(/\d+/)[0], depar: depar.match(/\d+/)[0] },
       ...(bnode && bnode.length !== 0 && { node_b: bnode.map((node) => node.match(/\d+/)[0]) })
-    }, true, onlyUndone, date);
+    }, true, date, status);
   }
 
   /**
    * find By Criteria
    * @param obj query parameters
    */
-  async findByCriteria(obj, related = false, onlyUndone = false, date = null): Promise<void> {
+  async findByCriteria(obj, related = false, date = null, status = "all"): Promise<void> {
     this.anomalies$ = of([]); // clear table
 
     if (Object.keys(obj).length > 1) {
@@ -279,8 +279,8 @@ export class anomalyService extends EntityCollectionServiceBase<Anomaly> {
     //   queryParams["createdAt[before]"] = anomaliesDate.split("T")[0] + "T23:59:59";
     // }
 
-    if (onlyUndone) {
-      queryParams["status"] = false;
+    if (status != "all") {
+      queryParams["status"] = status;
     }
 
     if (related) {

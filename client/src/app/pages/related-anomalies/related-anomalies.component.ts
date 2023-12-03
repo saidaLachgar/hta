@@ -16,7 +16,6 @@ export class relatedAnomaliesComponent implements OnChanges {
   @Input() anomalies: FormArray;
   @Input() parentFormGroup: FormGroup;
   @Input() showErrors: boolean;
-  @Input() onlyUndone: boolean;
   @Input() currentEdge: any = { ANode: null, BNode: null, department: null, type: null, date: null };
   @Output() addAlert: EventEmitter<{ message: string, type: string }> = new EventEmitter<{ message: string, type: string }>();
 
@@ -32,6 +31,7 @@ export class relatedAnomaliesComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     let change = changes.currentEdge;
+    
     if (change && change.currentValue) {
 
 
@@ -46,8 +46,7 @@ export class relatedAnomaliesComponent implements OnChanges {
 
 
       if (ANode && ANode.trim() !== '' && !OnlyTypeChanged) {
-
-        this.anomalyService.getRelatedAnomalies(ANode, BNode, department, this.onlyUndone, date);
+        this.anomalyService.getRelatedAnomalies(ANode, BNode, department, date);
 
         // scroll to anomalies
         this.anomalyService.loading$.pipe().subscribe(loading => {
@@ -68,6 +67,12 @@ export class relatedAnomaliesComponent implements OnChanges {
         }
       }
     }
+  }
+
+  // Anomalies status change
+  changeStatus( status ) {
+    const { ANode, BNode, department, date } = this.currentEdge;
+    this.anomalyService.getRelatedAnomalies(ANode, BNode, department, date, status);
   }
 
   // Anomalies CRUD

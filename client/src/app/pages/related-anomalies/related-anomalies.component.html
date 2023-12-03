@@ -1,7 +1,14 @@
  <!-- list des anomalies -->
  <div class="col-12" id="anomalies-list">
   <div class="card card-body">
-    <p class="card-title mb-3">Anomalies liées</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <p class="card-title mb-0">Anomalies liées</p>
+      <select class="form-select" style="width: max-content;" (change)="changeStatus($event.target.value)">
+        <option selected value="all">Toutes</option>
+        <option [value]="true">Terminé</option>
+        <option [value]="false">En attente</option>
+      </select>
+    </div>
     <div class="table-responsive">
       <table class="table table-bordered table-striped">
         <thead>
