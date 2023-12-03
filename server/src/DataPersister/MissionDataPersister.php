@@ -165,7 +165,7 @@ class MissionDataPersister implements DataPersisterInterface
             $clientCount = $PosteRepo->ClientTotalByCommune($Commune->getId());
             $obj = new MissionCommune();
             $obj->setCommune($Commune);
-            $obj->setClientCount($clientCount);
+            $obj->setClientCount($clientCount ? (int)$clientCount :  0);
             $Mission->addMissionCommune($obj);
         }
     }
