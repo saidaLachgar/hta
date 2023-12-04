@@ -90,7 +90,7 @@ export class StatistiquesComponent {
         labels: this.causesList.slice(this.causesList.length / 2),
         responsive: [
           {
-            breakpoint: 480,
+            breakpoint: 1450,
             options: {
               legend: {
                 position: "bottom"

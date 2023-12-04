@@ -28,7 +28,7 @@
     <anomalies-badge [total]="mission.total_anomalies" [undone]="mission.undone_anomalies" [isLink]="false"></anomalies-badge>
   </div>
   <div ngbDropdown 
-    placement="bottom-left"
+    container="body" placement="bottom-right"
     *ngIf="authService.isAuthorized('missions_update') || authService.isAuthorized('missions_delete')"
     >
     <i

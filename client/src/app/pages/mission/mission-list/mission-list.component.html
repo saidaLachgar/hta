@@ -22,7 +22,7 @@
 
         <ng-container *ngIf="missionsStats$ | async as missionsStats; else statsLoading">
           <div class="row justify-content-between">
-            <div class="col-xl-3">
+            <div class="col-xl-4">
               <div class="border p-3 rounded-3 mb-2">
                 <p class="fw-medium mb-3">Total des interruptions</p>
                 <strong class="h2">{{missionsStats["Total"]}}</strong>
@@ -44,7 +44,7 @@
                 <strong class="h2 mb-0">{{ duration | decimalHourToTime:'long' }}</strong>
               </div>
             </div>
-            <div class="col-xl-6 pt-4 pt-xl-0">
+            <div class="col-xl-5 pt-4 pt-xl-0">
               <p class="fw-bold mb-3">Causes des interruptions</p>
               <ng-container *ngIf="missionsStats['causes'] as causes; else noCauses">
                 <apx-chart
@@ -98,7 +98,7 @@
               </li>
             </ul>
           </div>
-          DMS <small class="text-muted font-size-12">(Moyenne des interruptions {{DMSMonthly ? "des 30 derniers":"de l'année en cours"}})</small>
+          DMS <small class="text-muted font-size-10">({{DMSMonthly ? "derniers 30j":"l'année en cours"}})</small>
         </div>
         
         <ng-container *ngIf="DMSChart$ | async as DMSChart; else DMSloading">
@@ -303,7 +303,7 @@
           <!-- Table -->
           <!-- {{service.groupData(service.mission$ | async).length}} -->
           <div class="table-responsive">
-            <table class="table table-bordered border-deem table-hover">
+            <table class="table table-bordered border-deem table-hover sticky-column">
               <thead>
                 <tr>
                   <th width="20px"></th>

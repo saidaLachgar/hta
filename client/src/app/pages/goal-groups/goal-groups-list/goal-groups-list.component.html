@@ -54,7 +54,7 @@
                   
                   <td align="center">
                     <div ngbDropdown 
-                      placement="bottom-left"
+                      container="body" placement="bottom-right"
                       *ngIf="authService.isAuthorized('goal_groups_details') || authService.isAuthorized('goal_groups_update') || authService.isAuthorized('goal_groups_delete')"
                       >
                       <i

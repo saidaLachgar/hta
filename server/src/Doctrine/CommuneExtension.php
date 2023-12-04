@@ -46,8 +46,22 @@ class CommuneExtension implements QueryCollectionExtensionInterface
         $queryBuilder->join($rootAlias.'.edges', 'e')
             ->join('e.node_a', 'n')
             ->join('n.department', 'd')
-            ->join('d.team', 't')
-            ->andWhere('t = :userTeam')
-            ->setParameter('userTeam', $userTeam);
+            ->join('d.team', 't');
+
+        if (
+            in_array('ROLE_ADMIN', $user->getRoles())
+        ) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+            // admin can see only data of his Dp
+            $queryBuilder
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp);
+        } else {
+            // user can see only data of his team
+            $queryBuilder
+                ->andWhere('t = :userTeam')
+                ->setParameter('userTeam', $userTeam);
+        }
     }
 }

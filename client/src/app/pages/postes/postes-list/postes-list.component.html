@@ -30,10 +30,10 @@
           
           <!-- Table -->
           <form [formGroup]="service.posteForm" (ngSubmit)="service.onSearch()" class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered sticky-column">
               <thead>
                 <tr>
-                  <th>Designation</th>
+                  <th style="min-width: 200px">Designation</th>
                   <th style="min-width: 200px">Départ</th>
                   <th>MLE</th>
                   <th>P KVA</th>
@@ -45,7 +45,7 @@
                   <th>Poste</th>
                   <th>N° serie</th>
                   <th>Puis-appelée</th>
-                  <th width="123px"></th>
+                  <th style="width:123px"></th>
                 </tr>
               </thead>
               <tbody>
@@ -106,10 +106,10 @@
 
                   <td>
                     <button type="submit" class="btn btn-sm btn-primary d-flex align-items-center">
-                      <i class="bx bx-search me-1"></i>Rechercher
+                      <i class="bx bx-search me-1"></i><span class="d-none d-md-inline">Rechercher</span>
                     </button>
                     <button type="reset" class="btn btn-sm text-primary flex align-items-center" (click)="service.findAll()">
-                      <i class="bx bx-x me-1"></i>Réinitialiser
+                      <i class="bx bx-undo me-md-1"></i><span class="d-none d-md-inline">Réinitialiser</span>
                     </button>
                   </td>
                 </tr>
@@ -210,7 +210,8 @@
                   
                   <td align="center">
                     <div ngbDropdown 
-                      placement="bottom-left"
+                      container="body"
+                      placement="bottom-right"
                       *ngIf="authService.isAuthorized('postes_details') || authService.isAuthorized('postes_update') || authService.isAuthorized('postes_delete')"
                       >
                       <i

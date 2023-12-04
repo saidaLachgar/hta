@@ -3,10 +3,8 @@
 }
 
 // dropdown
-.dropdown-toggle {
-  &:after {
+.dropdown-toggle:after {
     display: none;
-  }
 }
 
 .c-pointer {
@@ -19,24 +17,6 @@
 
 .line-through {
   text-decoration: line-through;
-}
-
-@media (max-width: 767px) {
-  .table-responsive .dropdown-menu {
-    position: static !important;
-  }
-}
-
-// @media (min-width: 768px) {
-//     .table-responsive {
-//         overflow: inherit;
-//     }
-// }
-
-.table-responsive tbody tr:nth-last-child(-n + 3) .dropdown-menu-end {
-  top: unset !important;
-  right: 100% !important;
-  bottom: 0 !important;
 }
 
 .ng-select.disabled {
@@ -63,12 +43,23 @@
   box-shadow: 0 -0.125rem 1.25rem rgba(0, 0, 0, 0.025) !important;
   @media (max-width: 800px) {
     display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  row-gap: 10px;
-  column-gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 10px;
+    column-gap: 10px;
   }
+}
+
+.sticky-column tr > td:last-child,
+.sticky-column tr > th:last-child {
+  right: 0;
+  position: sticky;
+  background-color: white;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  width: 57px;
+  min-width: unset;
+  z-index: 2;
 }
 
 .collapse-cta {
@@ -135,28 +126,27 @@ fieldset:disabled {
   }
 }
 
-// .pagination li {
-//   /* Hide all pagination links first */
-//   display: none;
-//   /* Display active page and previous 4 links */
-//   &.active,
-//   &:nth-child(-n + 2),
-//   &:nth-last-child(-n + 2) ,
-//   &.active ~ li:nth-child(-n + 2),
-//   & ~ li:nth-last-child(-n + 2),
-//   &.active ~ li:nth-child(-n + 5) {
-//     display: block;
-//   }
- 
-//   &:nth-last-child(5) {
-//     margin-left: 20px;
-//     position: relative;
-//     &::before {
-//       content: "...";
-//       position: absolute;
-//       top: 8px;
-//       line-height: 1;
-//       left: -16px;
-//     }
-//   }
-// }
+// smaller sizes in small screen
+@media (max-width: 1450px) {
+  #sidebar-menu ul li a {
+    padding: 0.625rem 0.9rem;
+  }
+
+  #sidebar-menu ul li a i {
+    min-width: 1.5rem;
+    font-size: 16px;
+  }
+
+  .logo {
+    font-size: 22px !important;
+  }
+
+  .vertical-menu,
+  .navbar-brand-box {
+    width: 210px;
+  }
+
+  .main-content {
+    margin-left: 210px;
+  }
+}

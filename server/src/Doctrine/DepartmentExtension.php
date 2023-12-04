@@ -43,8 +43,22 @@ class DepartmentExtension implements QueryCollectionExtensionInterface
 
         // Apply a filter to fetch data related to the user's department/team
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        $queryBuilder->join($rootAlias .'.team', 't')
-            ->andWhere('t = :userTeam')
-            ->setParameter('userTeam', $userTeam);
+        $queryBuilder->join($rootAlias .'.team', 't');
+
+        if (
+            in_array('ROLE_ADMIN', $user->getRoles())
+        ) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+            // admin can see only data of his Dp
+            $queryBuilder
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp);
+        } else {
+            // user can see only data of his team
+            $queryBuilder
+                ->andWhere('t = :userTeam')
+                ->setParameter('userTeam', $userTeam);
+        }
     }
 }

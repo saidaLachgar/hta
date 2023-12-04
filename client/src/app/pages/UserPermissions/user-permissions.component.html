@@ -5,7 +5,7 @@
         <h6 class="alert-heading">La durée de la session</h6>
         Pour que les changements soient immédiatement pris en compte, l'utilisateur doit se déconnecter et s'authentifier à nouveau.<br>
         Sinon les changements seront effectués lorsque la session expire ou l'utilisateur n'est pas autorisé à une interface.<br>
-        <small>La session de l'utilisateur est mise à jour <b>chaque 5 min</b></small>
+        La session de l'utilisateur s'actualise chaque 5 minutes.
     </div>
     <!-- end page title -->
     <form class="row mt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -24,46 +24,59 @@
                                     <span>{{r.label}}</span>
                                 </a>
                                 <ng-template ngbNavContent>
-                                    <div class="table-responsive mt-4">
-                                        <table class="table table-striped table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th></th>
-                                                    <th *ngFor="let permission of PermissionsIndex; let i=index">{{permission.name}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="let access of EntitiesAccess; let i=index">
-                                                    <th>{{access.name}}</th>
-        
-                                                    <!-- full access -->
-                                                    <td *ngFor="let permission of PermissionsIndex; let i=index">
-                                                        <ng-container 
-                                                            *ngIf="
-                                                                access.permissions === -1 || 
-                                                                ((access.permissions | typeof) === 'number' && i == access.permissions) ||
-                                                                ((access.permissions | typeof) === 'object' && access.permissions.indexOf(i) > -1);
-                                                                else disabled
-                                                            ">
-                                                            <label title="{{permission.name}}">
-                                                                <input type="checkbox" 
-                                                                    [formArrayName]="r.role"
-                                                                    (change)="onChange($event, r.role)"
-                                                                    [value]="access.value+'_'+permission.value"
-                                                                    [checked]="isChecked(access.value+'_'+permission.value, r.role)"
+                                    <div class="border-top-0 pt-1 mb-3" style="margin: 0 -12px;border: 1px solid #ced4da;">
+                                        <div 
+                                        *ngIf="r.role != 'ROLE_SUPER_ADMIN'"
+                                            class="my-3 ps-3"
+                                        >
+                                            <span class="me-3"><i class="text-info fas fa-circle"></i> Toutes les données</span>
+                                            <span><i class="text-warning fas fa-circle"></i> Données relatives à {{r.role == 'ROLE_ADMIN' ? "la DP" : "l'équipe"}}</span>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th *ngFor="let permission of PermissionsIndex; let i=index" width="95px">{{permission.name}}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let access of EntitiesAccess; let i=index">
+                                                        <th>{{access.name}}</th>
+            
+                                                        <!-- full access -->
+                                                        <td *ngFor="let permission of PermissionsIndex; let i=index" align="center">
+                                                            <ng-container 
+                                                                *ngIf="
+                                                                    access.permissions === -1 || 
+                                                                    ((access.permissions | typeof) === 'number' && i == access.permissions) ||
+                                                                    ((access.permissions | typeof) === 'object' && access.permissions.indexOf(i) > -1);
+                                                                    else disabled
+                                                                ">
+                                                                <div 
+                                                                    title="{{permission.name}}"
+                                                                    [ngClass]="r.role != 'ROLE_SUPER_ADMIN' && permission.value == 'show' && access.related ? 'form-check-warning' : 'form-check-info'"
                                                                 >
-                                                                <small class="text-muted" *ngIf="r.role != 'ROLE_SUPER_ADMIN' && permission.value == 'show' && access.related"> (Seul concerné)</small>
-                                                            </label>
-                                                        </ng-container>
-                                                        <ng-template #disabled>
-                                                            <label>
-                                                                <input style="opacity: 0.3;" type="checkbox" disabled>
-                                                            </label>
-                                                        </ng-template>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                                    <input type="checkbox" 
+                                                                        class="form-check-input"
+                                                                        [formArrayName]="r.role"
+                                                                        (change)="onChange($event, r.role)"
+                                                                        [value]="access.value+'_'+permission.value"
+                                                                        [checked]="isChecked(access.value+'_'+permission.value, r.role)"
+                                                                        
+                                                                    >
+                                                                </div>
+                                                            </ng-container>
+                                                            <ng-template #disabled>
+                                                                <label>
+                                                                    <input style="opacity: 0.3;" type="checkbox" disabled>
+                                                                </label>
+                                                            </ng-template>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </ng-template>
                             </li>

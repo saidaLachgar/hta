@@ -83,7 +83,7 @@ export class missionListComponent {
           labels: this.service.causesList.slice(this.service.causesList.length / 2),
           responsive: [
             {
-              breakpoint: 480,
+              breakpoint: 1450,
               options: {
                 chart: {
                   width: "100%"

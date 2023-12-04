@@ -117,7 +117,7 @@
 <td align="center">
     <!-- {{item.id}} -->
     <div ngbDropdown 
-    placement="bottom-left"
+    container="body" placement="bottom-right"
     *ngIf="authService.isAuthorized('missions_details') || authService.isAuthorized('missions_update') || authService.isAuthorized('missions_delete')"
     >
     <i

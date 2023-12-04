@@ -193,7 +193,7 @@
                   
                   <td align="center">
                     <div ngbDropdown 
-                      placement="bottom-left"
+                      container="body" placement="bottom-right"
                       *ngIf="authService.isAuthorized('edges_details') || authService.isAuthorized('edges_update') || authService.isAuthorized('edges_delete')"
                       >
                       <i

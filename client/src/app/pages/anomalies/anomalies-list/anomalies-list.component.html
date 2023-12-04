@@ -194,7 +194,7 @@
                   <!-- actions -->
                   <td align="center">
                     <div ngbDropdown 
-                      placement="bottom-left"
+                      container="body" placement="bottom-right"
                       *ngIf="authService.isAuthorized('anomalies_details') || authService.isAuthorized('anomalies_update') || authService.isAuthorized('anomalies_delete')"
                       >
                       <i
