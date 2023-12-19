@@ -26,7 +26,7 @@ export class dpsUpdateComponent  {
       service.dpsForm.setValue({
         titre: obj.titre,
         team : obj.team.length ? obj.team.map((e)=>e["@id"]) : [],
-        nbClients: [obj.nbClients],
+        nbClients: obj.nbClients,
       });
     });
   }
