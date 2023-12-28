@@ -22,32 +22,6 @@ class AnalyticsController extends AbstractController
   }
 
   /**
-   * @Route("/api/analytics/dms-total", name="getTotalDMS", options={"expose"=true})
-   */
-  public function getTotalDMS(Request $request)
-  {
-    /** @var \App\Repository\MissionRepository $MissionRepo */
-    $MissionRepo = $this->em->getRepository(Mission::class);
-
-    $data = $MissionRepo->getTotalDMS();
-
-    return new JsonResponse($data);
-  }
-
-  /**
-   * @Route("/api/analytics/interruptions-par-type", name="getInterruptionsParType", options={"expose"=true})
-   */
-  public function getInterruptionsParType(Request $request)
-  {
-    /** @var \App\Repository\MissionRepository $MissionRepo */
-    $MissionRepo = $this->em->getRepository(Mission::class);
-
-    $data = $MissionRepo->getInterruptionsParType();
-
-    return new JsonResponse($data);
-  }
-
-  /**
    * @Route("/api/analytics/teams-data/{month}", name="getTeamsData", options={"expose"=true})
    */
   public function getTeamsData($month)

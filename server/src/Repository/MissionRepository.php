@@ -45,79 +45,14 @@ class MissionRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    public function getTotalDMS(): array
-    {
-        $user = $this->security->getUser();
-        // users
-        if ($this->security->isGranted('ROLE_USER')) {
-            $query = $this->createQueryBuilder('t')
-                // ->select('e.titre, d.titre, t.DMS')
-                ->select('SUM(t.DMS) as total, MONTH(t.dateStart) AS period')
-                ->andWhere('t.dateStart IS NOT NULL')
-                ->andWhere('t.DMS IS NOT NULL')
-                ->andWhere('t.type = true')
-                ->join('t.department', 'd')
-                ->join('d.team', 'team')
-                ->andWhere('team.id = :id')
-                ->setParameter('id', $user->getTeam())
-                ->andWhere("t.dateStart <= CURRENT_TIMESTAMP() and t.dateStart >= DATE_SUB(CURRENT_TIMESTAMP(),12,'MONTH')");
-
-            $result = [
-                "team" => $user->getTeam()->getTitre(),
-                "data" => $query->groupBy('period')->getQuery()->getResult()
-            ];
-            // Admin
-        } else {
-            $teams = $this->em->getRepository(Team::class)->findAll();
-            $dms_year = $this->createQueryBuilder('t')
-                ->select('SUM(t.DMS)')
-                ->andWhere('t.dateStart IS NOT NULL')
-                ->andWhere('t.DMS IS NOT NULL')
-                ->andWhere('t.type = true')
-                ->andWhere("t.dateStart <= CURRENT_TIMESTAMP() and t.dateStart >= DATE_SUB(CURRENT_TIMESTAMP(),12,'MONTH')")
-                ->getQuery()
-                ->getSingleScalarResult()
-            ;
-            $result["year"] = $dms_year;
-            foreach ($teams as $team) {
-                $query = $this->createQueryBuilder('t')
-                    ->select('SUM(t.DMS) as total, MONTH(t.dateStart) AS period')
-                    ->andWhere('t.dateStart IS NOT NULL')
-                    ->andWhere('t.DMS IS NOT NULL')
-                    ->andWhere('t.type = true')
-                    ->join('t.department', 'd')
-                    ->join('d.team', 'team')
-                    ->andWhere('team.id = :id')
-                    ->setParameter('id', $team->getId())
-                    ->andWhere("t.dateStart <= CURRENT_TIMESTAMP() and t.dateStart >= DATE_SUB(CURRENT_TIMESTAMP(),12,'MONTH')");
-
-                $result["month"][] = [
-                    "team" => $team->getTitre(),
-                    "data" => $query->groupBy('period')->getQuery()->getResult()
-                ];
-            }
-        }
-        return $result;
-
-    }
-    public function getInterruptionsParType(): array
-    {
-        return $this->createQueryBuilder('t')
-            ->select('t.type as type, COUNT(t.id)')
-            ->groupBy('type')
-            ->getQuery()
-            ->getResult()
-        ;
-
-    }
-
+   
     public function getMissionsStats(int $month): array
     {
         $currentYear = date('Y');
         $date = new \DateTime();
 
         // Check if the given month has occurred in the current year
-        $current_month = (int)$date->format('m');
+        $current_month = (int) $date->format('m');
         if ($month > $current_month) {
             // If the month hasn't occurred yet, adjust the year to the previous one
             $currentYear--;
@@ -158,7 +93,7 @@ class MissionRepository extends ServiceEntityRepository
             ->andWhere('MONTH(m.dateStart) = :month')
             ->setParameter('year', $currentYear)
             ->setParameter('month', $month);
-            
+
 
         // Total count of missions for each cause
         // List of causes to consider
@@ -167,7 +102,7 @@ class MissionRepository extends ServiceEntityRepository
             $queryBuilderAll->addSelect(
                 "SUM(CASE WHEN m.causes = :val_parm_{$key} THEN 1 ELSE 0 END) as Cause_{$key}"
             )
-            ->setParameter("val_parm_".$key, $key + 1);
+                ->setParameter("val_parm_" . $key, $key + 1);
         }
 
         // Average duration of prev month 
@@ -181,36 +116,46 @@ class MissionRepository extends ServiceEntityRepository
             ->setParameter('prevMonth', $prevMonth);
 
         // merge results
-        $r1 = $queryBuilderParents->getQuery()->getResult()[0];
-        $r2 = $queryBuilderAll->getQuery()->getResult()[0];
-        $r3 = $prevDuration->getQuery()->getResult()[0];
+        $r1 = $this->checkAccess($queryBuilderParents)
+            ->getQuery()->getResult()[0];
+        $r2 = $this->checkAccess($queryBuilderAll)
+            ->getQuery()->getResult()[0];
+        $r3 = $this->checkAccess($prevDuration)
+            ->getQuery()->getResult()[0];
 
-        return array_merge( $r1, $r2, $r3 );
+        return array_merge($r1, $r2, $r3);
     }
 
+    public function checkAccess($queryBuilder)
+    {
+        $user = $this->security->getUser();
+        $roles = $user->getRoles();
 
-    //    /**
-//     * @return Mission[] Returns an array of Mission objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            return $queryBuilder;
+        }
 
-    //    public function findOneBySomeField($value): ?Mission
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $queryBuilder->join('m.node_a', 'n')
+            ->join('n.department', 'd')
+            ->join('d.team', 't');
+
+        if (
+            in_array('ROLE_ADMIN', $roles)
+        ) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+            // admin can see only data of his Dp
+            $queryBuilder
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp);
+        } else {
+            // user can see only data of his team
+            $userTeam = $user->getTeam();
+            $queryBuilder
+                ->andWhere('t = :userTeam')
+                ->setParameter('userTeam', $userTeam);
+        }
+        return $queryBuilder;
+    }
+
 }

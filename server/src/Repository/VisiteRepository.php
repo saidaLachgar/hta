@@ -9,6 +9,7 @@ use App\Entity\Visite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @extends ServiceEntityRepository<Visite>
@@ -20,11 +21,13 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class VisiteRepository extends ServiceEntityRepository
 {
+    private $security;
     private $em;
 
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $registry, Security $security, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Visite::class);
+        $this->security = $security;
         $this->em = $entityManager;
     }
 
@@ -100,16 +103,40 @@ class VisiteRepository extends ServiceEntityRepository
     {
         $currentDate = new \DateTime();
         $year = $currentDate->format('Y');
+        $user = $this->security->getUser();
 
-        return $this->em->createQueryBuilder()
+        $queryBuilder = $this->em->createQueryBuilder()
             ->select('c.titre as COMMUNE, COUNT(v) as VISTES')
             ->from('App\Entity\Commune', 'c')
             ->leftJoin('c.visites', 'v')
             ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year)
-            ->groupBy('c.titre')
-            ->getQuery()
-            ->getResult();
+
+            ->join('c.edges', 'e')
+            ->join('e.node_a', 'n')
+            ->join('n.department', 'd')
+            ->join('d.team', 't')
+            ->groupBy('c.titre');
+
+
+        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            return $queryBuilder->getQuery()->getResult();
+        } else if (
+            in_array('ROLE_ADMIN', $user->getRoles())
+        ) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+            // admin can see only data of his Dp
+            $queryBuilder
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp);
+        } else {
+            // user can see only data of his team
+            $queryBuilder
+                ->andWhere('t = :userTeam')
+                ->setParameter('userTeam', $user->getTeam());
+        }
+        return $queryBuilder->getQuery()->getResult();
     }
 
     function getVisitsStats(string $type, int $month = null)
@@ -122,8 +149,13 @@ class VisiteRepository extends ServiceEntityRepository
             $visitedLgthQuery = $this->em->createQueryBuilder()
                 ->from('App\Entity\Visite', 'v')
                 ->select('SUM(v.edge_set_length) / 1000 as visitedLgth')
+                ->join('v.node_a', 'n')
+                ->join('n.department', 'd')
+                ->join('d.team', 't')
                 ->andWhere('YEAR(v.date) = :year')
                 ->setParameter('year', $year);
+
+            $visitedLgthQuery = $this->checkAccess($visitedLgthQuery);
             $visitedLgthYear = clone $visitedLgthQuery;
         }
 
@@ -141,8 +173,13 @@ class VisiteRepository extends ServiceEntityRepository
                     'COUNT(a.id) as TOTAL_ANOMALIES'
                 )
                 ->from('App\Entity\Anomaly', 'a')
+                ->join('a.edge', 'e')
+                ->join('e.department', 'd')
+                ->join('d.team', 't')
                 ->andWhere('YEAR(a.createdAt) = :year')
                 ->andWhere('MONTH(a.createdAt) = :month');
+
+            $anomalyQuery = $this->checkAccess($anomalyQuery);
             $anomaliesPrev = clone $anomalyQuery;
 
             $anomaliesCurrent = $anomalyQuery
@@ -177,7 +214,7 @@ class VisiteRepository extends ServiceEntityRepository
             ];
         } elseif ($type === "team-covered-distance") {
             // la longueur visitée de chaque équipe pendant l'année en cours, où elle est comparée à la longueur totale des départements de l'équipe * 2 ( autrement dit, chaque équipe devrait passer dans chaque département deux fois par an).
-            $teams = $this->em->getRepository(Team::class)->getTeams();
+            $teams = $this->em->getRepository(Team::class)->getUserTeams();
 
             $teamCoveredDistance = $this->em->createQueryBuilder()
                 ->select(
@@ -226,6 +263,33 @@ class VisiteRepository extends ServiceEntityRepository
             return $this->VistesByCommune();
         }
 
+    }
+    public function checkAccess($queryBuilder)
+    {
+        $user = $this->security->getUser();
+        $roles = $user->getRoles();
+
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            return $queryBuilder;
+        }
+
+        if (
+            in_array('ROLE_ADMIN', $roles)
+        ) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+            // admin can see only data of his Dp
+            $queryBuilder
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp);
+        } else {
+            // user can see only data of his team
+            $userTeam = $user->getTeam();
+            $queryBuilder
+                ->andWhere('t = :userTeam')
+                ->setParameter('userTeam', $userTeam);
+        }
+        return $queryBuilder;
     }
 
 }

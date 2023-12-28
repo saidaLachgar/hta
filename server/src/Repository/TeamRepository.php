@@ -48,20 +48,79 @@ class TeamRepository extends ServiceEntityRepository
         }
     }
 
-    function getTeams()
+    function getUserTeams()
     {
-        $roles = $this->security->getUser()->getRoles();
+        $user = $this->security->getUser();
+        $roles = $user->getRoles();
         if (in_array("ROLE_SUPER_ADMIN", $roles)) {
             return $this->findAll();
+        } elseif (in_array('ROLE_ADMIN', $roles)) {
+            // Retrieve the user's dp
+            $dp = $user->getTeam()->getDps();
+
+            // admin can see only data of his Dp
+            return $this->createQueryBuilder('t')
+                ->andWhere('t.dps = :dp')
+                ->setParameter('dp', $dp)
+                ->getQuery()
+                ->getResult();
+
         } else {
             return [$this->security->getUser()->getTeam()];
         }
+        
     }
 
-    // if not super  admin get only their team
+    function filterDate($query, $dateStart, $dateEnd, $attr)
+    {
+        $dates = $this->getDates($dateStart, $dateEnd, true);
+        $dateStart = $dates[0];
+        $dateEnd = $dates[1];
+        if ($dateStart) {
+            $query
+                ->andWhere($attr . ' >= :dateStart')
+                ->setParameter('dateStart', $dateStart);
+        }
+        if ($dateEnd) {
+            $query
+                ->andWhere($attr . ' <= :dateEnd')
+                ->setParameter('dateEnd', $dateEnd);
+        }
+        return $query;
+    }
+    function getDates($dateStart, $dateEnd, $includeStart = false)
+    {
+        // if only end date or start date get data of that date month only
+        // if none given get this year data
+        if ($dateStart && $dateEnd) {
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+        } elseif ($dateStart) {
+            //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
+            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
+            $dateEnd = clone $dateStart;
+            // last day of the original month
+            $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
+        } elseif ($dateEnd) {
+            // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
+            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
+            $dateStart = clone $dateEnd;
+            // 1st day of the same month
+            $dateStart->setDate($dateStart->format('Y'), $dateStart->format('m'), 1);
+        } else {
+            // if none was given, $dateStart is the 1st day of the current year and $dateEnd is the last day of current year
+            $dateStart = new \DateTime('first day of January this year');
+            $dateEnd = new \DateTime('last day of December this year');
+        }
+        if ($includeStart)
+            $dateStart->modify("-1 day");
+        return [$dateStart, $dateEnd];
+    }
+
+    // [ROLE BASED]
     public function getTeamsData(int $month): array
     {
-        $teams = $this->getTeams();
+        $teams = $this->getUserTeams();
         $date = new \DateTime();
         $current_year = $date->format('Y');
 
@@ -209,10 +268,10 @@ class TeamRepository extends ServiceEntityRepository
         return $teamsStats;
     }
 
-    // if not super  admin get only their teams
+    // [ROLE BASED]
     public function getTeamsMonthlyData($property, $type): array
     {
-        $teams = $this->getTeams();
+        $teams = $this->getUserTeams();
         $currentDate = new \DateTime();
         $startDate = clone $currentDate;
         $startDate->sub(new \DateInterval('P11M'));
@@ -258,9 +317,10 @@ class TeamRepository extends ServiceEntityRepository
         return $monthlyStats;
     }
 
+    // [ROLE BASED]
     public function getTeamsDMS(string $timeframe): array
     {
-        $teams = $this->findAll();
+        $teams = $this->getUserTeams();
         $currentDate = new \DateTime();
         $result = [];
 
@@ -351,10 +411,10 @@ class TeamRepository extends ServiceEntityRepository
         return $result;
     }
 
-    // if not super  admin get only their teams
+    // [ROLE BASED]
     public function getTeamsAnomalies(): array
     {
-        $teams = $this->getTeams();
+        $teams = $this->getUserTeams();
 
         $anomalyStats = $this->em->createQueryBuilder()
             ->select(
@@ -387,52 +447,6 @@ class TeamRepository extends ServiceEntityRepository
         }
 
         return $teamsAnomalyStats;
-    }
-
-    public function filterDate($query, $dateStart, $dateEnd, $attr)
-    {
-        $dates = $this->getDates($dateStart, $dateEnd, true);
-        $dateStart = $dates[0];
-        $dateEnd = $dates[1];
-        if ($dateStart) {
-            $query
-                ->andWhere($attr . ' >= :dateStart')
-                ->setParameter('dateStart', $dateStart);
-        }
-        if ($dateEnd) {
-            $query
-                ->andWhere($attr . ' <= :dateEnd')
-                ->setParameter('dateEnd', $dateEnd);
-        }
-        return $query;
-    }
-    function getDates($dateStart, $dateEnd, $includeStart = false)
-    {
-        // if only end date or start date get data of that date month only
-        // if none given get this year data
-        if ($dateStart && $dateEnd) {
-            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
-            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
-        } elseif ($dateStart) {
-            //  if only $dateStart was supplied create a date object and $dateEnd should be the same date as $dateStart but with last day of the month of $dateStart.
-            $dateStart = \DateTime::createFromFormat('Y-m-d', $dateStart);
-            $dateEnd = clone $dateStart;
-            // last day of the original month
-            $dateEnd = $dateEnd->sub(new \DateInterval('P1D'));
-        } elseif ($dateEnd) {
-            // if only $dateEnd was supplied create a date object and $dateStart should be the same date as $dateEnd but with 1st day of the month of $dateEnd.
-            $dateEnd = \DateTime::createFromFormat('Y-m-d', $dateEnd);
-            $dateStart = clone $dateEnd;
-            // 1st day of the same month
-            $dateStart->setDate($dateStart->format('Y'), $dateStart->format('m'), 1);
-        } else {
-            // if none was given, $dateStart is the 1st day of the current year and $dateEnd is the last day of current year
-            $dateStart = new \DateTime('first day of January this year');
-            $dateEnd = new \DateTime('last day of December this year');
-        }
-        if ($includeStart)
-            $dateStart->modify("-1 day");
-        return [$dateStart, $dateEnd];
     }
 
     //  -> Total des interruptions -  Total des Vistes -  Total des anomalies
