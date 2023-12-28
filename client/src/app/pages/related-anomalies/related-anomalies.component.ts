@@ -55,7 +55,7 @@ export class relatedAnomaliesComponent implements OnChanges {
         });
       }
 
-      // disable validation if is Coupeur / Ouverture
+      // disable validation if is Coupure / Ouverture
       if (!change.previousValue || change.previousValue.type != type) {
         let anomalyFormArray = this.anomalies as FormArray;
         // let anomalyFormArray =  this.parentFormGroup.get("anomalies") as FormArray;

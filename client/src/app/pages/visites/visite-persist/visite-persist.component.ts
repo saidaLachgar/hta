@@ -110,7 +110,7 @@ export class visitePersistComponent {
 
     let hasNonEmptyNodes = (anode && anode.trim() !== '') || (bnode && bnode.length !== 0);
     let hasNonEmptyEdges = this.hasNonEmptyEdges;
-    (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
+    (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupure" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
   }
   removeAlert(alert: Alert) {
     const index = this.alerts.indexOf(alert);

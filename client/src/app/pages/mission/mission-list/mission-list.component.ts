@@ -132,7 +132,7 @@ export class missionListComponent {
           },
           xaxis: {
             categories: [
-              'Coupeur',
+              'Coupure',
               'Incident',
             ],
             labels: {

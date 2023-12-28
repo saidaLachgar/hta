@@ -50,7 +50,7 @@ export const EntitiesAccess:EntityAccess[] = [
         permissions: -1
     },
     {
-        name: 'Appareils coupeur',
+        name: 'Appareils coupure',
         value: 'nodes',
         related : true,
         permissions: [0, 1, 2, 3, 4]

@@ -35,7 +35,7 @@ width: 99%;
 <div class="container-fluid">
   <!-- start page title -->
   <app-page-title
-    title="Fiche d'incident / coupeur"
+    title="Fiche d'incident / coupure"
     [Loading]="service.loading$ | async"
     [breadcrumbItems]="breadCrumbItems"
   ></app-page-title>
@@ -50,7 +50,7 @@ width: 99%;
           *ngIf="mission.type != null"
           [ngClass]="mission.type ? 'badge-soft-danger' : 'badge-soft-info'"
           class="badge rounded-pill fs-5">
-          {{mission.type ? "Incident" : "Coupeur" }}
+          {{mission.type ? "Incident" : "coupure" }}
         </div> -->
         <p class="text-muted mb-1 mt-5">Date</p>
         <p class="font-size-20 fw-medium mb-5">{{mission.dateStart | date:'d MMMM yyyy':'Africa/Casablanca'}}</p>

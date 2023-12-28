@@ -133,7 +133,7 @@ export const MENU: MenuItem[] = [
             },
             {
                 id:17,
-                label: 'Appareils coupeur',
+                label: 'Appareils coupure',
                 link: '/nodes',
                 checkPermissions: 'nodes',
                 parentId: 15

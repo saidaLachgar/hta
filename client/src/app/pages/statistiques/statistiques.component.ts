@@ -137,7 +137,7 @@ export class StatistiquesComponent {
         xaxis: {
           categories: [
             'Incident',
-            'Coupeur',
+            'Coupure',
           ],
           labels: {
             style: {

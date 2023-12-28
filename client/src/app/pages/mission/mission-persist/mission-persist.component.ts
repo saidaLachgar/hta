@@ -33,7 +33,7 @@ export class missionPersistComponent {
     public service: missionService,
     private modalService: NgbModal,
     public authService: AuthenticationService) {
-    this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupeur', active: true }];
+    this.breadCrumbItems = [{ label: 'Travaux' }, { label: 'Fiche d\'incident / coupure', active: true }];
     this.service.EditeMode = false;
     service.loadDepartments(false);
     service.loadActions();
@@ -162,7 +162,7 @@ export class missionPersistComponent {
     let bnode = this.service.BNode.value;
     let hasNonEmptyNodes = (anode && anode.trim() !== '') || (bnode && bnode.length !== 0);
     let hasNonEmptyEdges = this.hasNonEmptyEdges;
-    (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupeur" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
+    (hasNonEmptyNodes || hasNonEmptyNodes) && this.addAlert(`En changeant le département, les champs ${hasNonEmptyNodes ? "appareils de coupure" : ""}${hasNonEmptyNodes && hasNonEmptyEdges ? " et " : ""}${hasNonEmptyEdges ? "tronçons d'anomalies" : ""} seront réinitialisés.`, "warning")
   }
 
   formListeners() {
