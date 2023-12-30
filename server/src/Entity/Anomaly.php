@@ -17,18 +17,21 @@ use App\Dto\AnomalyMultipleRequest;
 use App\Dto\AnomalyMultipleResponse;
 use App\Action\AnomalyAction;
 // https://github.com/api-platform/api-platform/issues/294
+// *      "put"= {"access_control"="is_granted('hasPermission', 'anomalies_update')"},
+// *      "post"= {"access_control"="is_granted('hasPermission', 'anomalies_add')"},
+
 /**
  * @ApiResource(
  *   order= {"createdAt" = "DESC"},
  *   normalizationContext={"groups"={"anomalies"}},
  *  itemOperations={
- *      "put"= {"access_control"="is_granted('hasPermission', 'anomalies_update')"},
+ *      "put",
  *      "get"= {"access_control"="is_granted('hasPermission', 'anomalies_details')"},
  *      "delete"= {"access_control"="is_granted('hasPermission', 'anomalies_delete')"},
  *   },
  *   collectionOperations={
- *      "post"= {"access_control"="is_granted('hasPermission', 'anomalies_add')"},
- *      "get"= {},
+ *      "post",
+ *      "get",
  *      "bulk"= {
  *          "method"="POST",
  *          "path"="/anomalies/bulk",

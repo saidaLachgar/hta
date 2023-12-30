@@ -48,7 +48,7 @@
               <td>
                 <ui-switch 
                     [checked]="item.status ? item.status : false" 
-                    [disabled]="!authService.isAuthorized('anomalies_update')" 
+                    [disabled]="!authService.isAuthorized('missions_update')" 
                     (changeEvent)="anomalyService.updateStatus($event, item.id)"
                     [loading]="anomalyService.statusLoading === item.id"
                     uncheckedLabel="En attente"
