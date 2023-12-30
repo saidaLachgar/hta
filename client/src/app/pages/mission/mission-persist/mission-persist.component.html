@@ -131,7 +131,7 @@
               </div>
             </div>
           <ng-container *ngIf="(service.actions$ | async) as data;">
-            <div class="col-md-4 d-flex flex-column" *ngFor="let action of (data | keyvalue).reverse()">
+            <div class="col-md-4 d-flex" *ngFor="let action of (data | keyvalue).reverse()">
               <div class="card flex-fill">
                 <div class="card-header">{{action.key}}</div>
                   <ul class="list-group list-group-flush">
