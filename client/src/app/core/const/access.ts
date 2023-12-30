@@ -74,12 +74,14 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Équipes',
         value: 'teams',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     
     {
         name: 'Members',
         value: 'users',
+        related : true,
         permissions: [0, 1, 2, 3, 4]
     },
     {
@@ -90,6 +92,7 @@ export const EntitiesAccess:EntityAccess[] = [
     {
         name: 'Statistiques',
         value: 'statistiques',
+        related : true,
         permissions: 4
     },
     {
