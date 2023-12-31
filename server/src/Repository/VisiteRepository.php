@@ -106,22 +106,23 @@ class VisiteRepository extends ServiceEntityRepository
         $user = $this->security->getUser();
 
         $queryBuilder = $this->em->createQueryBuilder()
-            ->select('c.titre as COMMUNE, COUNT(v) as VISTES')
+            ->select('c.titre as COMMUNE, COUNT(v.id) as VISTES')
             ->from('App\Entity\Commune', 'c')
             ->leftJoin('c.visites', 'v')
             ->andWhere('YEAR(v.date) = :year')
             ->setParameter('year', $year)
-
-            ->join('c.edges', 'e')
-            ->join('e.node_a', 'n')
-            ->join('n.department', 'd')
-            ->join('d.team', 't')
             ->groupBy('c.titre');
-
 
         if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             return $queryBuilder->getQuery()->getResult();
-        } else if (
+        }
+
+        $queryBuilder
+            ->join('v.node_a', 'n')
+            ->join('n.department', 'd')
+            ->join('d.team', 't');
+
+        if (
             in_array('ROLE_ADMIN', $user->getRoles())
         ) {
             // Retrieve the user's dp
