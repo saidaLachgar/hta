@@ -25,8 +25,8 @@
     ng serve --open
 
 ## SERVE SERVER SIDE
->http://127.0.0.1:8000
-    symfony serve
+>http://127.0.0.1:8089
+    symfony serve --port=8089
 ## DATABASE SCHEMA
 >https://dbdiagram.io/d/63b9376d7d39e42284e977af
 
@@ -59,7 +59,6 @@ Obtain a token for API access:
       d:s:u --force   ( doctrine:database:update )
 
 
-
 ## Angular CLI
     - Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
     - Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
@@ -76,7 +75,6 @@ Obtain a token for API access:
     source-map-explorer dist/skote/main.3d439155b7914070.js
 
 
-
 ## COMMON ERRORS
     Error : Object of class App\\Entity\\MediaObject could not be converted to string
     Fix : add string or remove from logs
@@ -89,14 +87,16 @@ Obtain a token for API access:
         each entity should able to access it own attrs to do that, u add the it group to the field
 
 
-<BR>
+<br>
 
-## 🧶 Checklist
-  Dev. Backend
+## 🧶 New interface checklist
+    Dev. Backend
       - Create entity + repo
       - __string + constant vars
       - grant access of REST methods + api filter
-  Inté Frontend
+      - grant access of query builder per role (custom extension)
+
+    Inté. Frontend
       - HTML, component, service, routing 
       - model models\index.ts
       - menu.ts (menu label)
@@ -107,88 +107,56 @@ Obtain a token for API access:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## QUERIES
 
+    SELECT 
+    t.id, t.departement_id,	t.appareil_id, t.ps_id, t.date_start,t.type,t.causes,
+    -- get Duration
+    timediff(date_end,date_start) as `DIFF`,
+    time_format((select DIFF),'%H:%i:%s') as `Duration`,
+    -- time_format((select DIFF),'%H') * 1 as "Hours",
+    TIME_TO_SEC((select DIFF)) as "Seconds",
+    (SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as "CC",
 
+    CASE
+        -- depar & endTime are null
+        WHEN date_end IS Null or t.departement_id IS Null THEN NULL
+        -- source IS NULL & ps IS NULL
+        WHEN t.appareil_id IS Null and t.ps_id IS Null THEN (SELECT CC)
+        -- source NOT NULL & ps IS NULL
+        WHEN t.appareil_id IS NOT Null and t.ps_id IS Null THEN 
+            (SELECT sum(nb_clients) FROM poste as p2 
+            LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+            WHERE p2.departement_id = d.id 
+            AND ap.appareil_coupeur_id = t.appareil_id )
+            -- source IS NULL & ps NOT NULL
+        WHEN t.appareil_id IS Null and t.ps_id IS NOT Null THEN 
+            (SELECT sum(nb_clients) FROM poste as p2 
+            WHERE p2.departement_id = d.id 
+            AND p2.id NOT IN (
+                SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+            ))
+        -- source NOT NULL & ps NOT NULL
+        ELSE 
+            (SELECT sum(nb_clients) FROM poste as p2 
+            LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+            WHERE p2.departement_id = d.id 
+            AND ap.appareil_coupeur_id = t.appareil_id 
+            AND p2.id NOT IN (
+                SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+            ))
+        END as "CI",
+    -- CALC
+    ((SELECT Seconds) * (SELECT CI) / (SELECT CC * 3600)) as `DMS`
 
-SELECT 
-t.id, t.departement_id,	t.appareil_id, t.ps_id, t.date_start,t.type,t.causes,
--- get Duration
-timediff(date_end,date_start) as `DIFF`,
-time_format((select DIFF),'%H:%i:%s') as `Duration`,
--- time_format((select DIFF),'%H') * 1 as "Hours",
-TIME_TO_SEC((select DIFF)) as "Seconds",
-(SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as "CC",
+    -- Anomalies
+    -- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
+    -- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
 
-CASE
-    -- depar & endTime are null
-    WHEN date_end IS Null or t.departement_id IS Null THEN NULL
-    -- source IS NULL & ps IS NULL
-    WHEN t.appareil_id IS Null and t.ps_id IS Null THEN (SELECT CC)
-    -- source NOT NULL & ps IS NULL
-    WHEN t.appareil_id IS NOT Null and t.ps_id IS Null THEN 
-        (SELECT sum(nb_clients) FROM poste as p2 
-        LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-        WHERE p2.departement_id = d.id 
-        AND ap.appareil_coupeur_id = t.appareil_id )
-        -- source IS NULL & ps NOT NULL
-    WHEN t.appareil_id IS Null and t.ps_id IS NOT Null THEN 
-        (SELECT sum(nb_clients) FROM poste as p2 
-        WHERE p2.departement_id = d.id 
-        AND p2.id NOT IN (
-            SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
-        ))
-    -- source NOT NULL & ps NOT NULL
-    ELSE 
-        (SELECT sum(nb_clients) FROM poste as p2 
-        LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-        WHERE p2.departement_id = d.id 
-        AND ap.appareil_coupeur_id = t.appareil_id 
-        AND p2.id NOT IN (
-            SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
-        ))
-    END as "CI",
--- CALC
-((SELECT Seconds) * (SELECT CI) / (SELECT CC * 3600)) as `DMS`
-
--- Anomalies
--- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
--- sum(case CATEGORY when 'Shirt' then STOCK else 0 end) as `Anomalies`
-
-FROM `travaux` as t
-LEFT JOIN  departement d ON t.departement_id = d.id 
--- LEFT JOIN  appareil_coupeur ap1 ON appareil_id = d.id AND
--- LEFT JOIN  appareil_coupeur ap2 ON ps_id = d.id
+    FROM `travaux` as t
+    LEFT JOIN  departement d ON t.departement_id = d.id 
+    -- LEFT JOIN  appareil_coupeur ap1 ON appareil_id = d.id AND
+    -- LEFT JOIN  appareil_coupeur ap2 ON ps_id = d.id
 
 
 
@@ -197,71 +165,71 @@ LEFT JOIN  departement d ON t.departement_id = d.id
 
 
 
-where date_end is not null
+    where date_end is not null
 
 
--- Do not calc when date_end && depart is null
--- if 
+    -- Do not calc when date_end && depart is null
+    -- if 
 
--- on presist
-    -- set the value of depar if depar is null but one of the ps or source(apprai) is set
-
-
-
+    -- on presist
+        -- set the value of depar if depar is null but one of the ps or source(apprai) is set
 
 
 
 
-SELECT sum(nb_clients) FROM poste as p2 
-LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-WHERE p2.departement_id = 26 
-AND ap.appareil_coupeur_id = 4 
-AND ap.appareil_coupeur_id NOT IN (3)
 
 
 
-SELECT sum(nb_clients) FROM poste as p2 
-LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-WHERE p2.departement_id = 26 
-AND ap.appareil_coupeur_id = 4 
-AND p2.id NOT IN (
-    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
-)
+    SELECT sum(nb_clients) FROM poste as p2 
+    LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+    WHERE p2.departement_id = 26 
+    AND ap.appareil_coupeur_id = 4 
+    AND ap.appareil_coupeur_id NOT IN (3)
 
 
 
-SELECT ac.id,ac.titre,p.id, p.designation FROM `appareil_coupeur_poste` as ap
-LEFT JOIN  poste p ON ap.poste_id = p.id 
-LEFT JOIN  appareil_coupeur ac ON ap.appareil_coupeur_id = ac.id
-
-
-SELECT * FROM poste as p2 
-LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-WHERE p2.departement_id = 26 ORDER BY ap.appareil_coupeur_id
--- AND ap.appareil_coupeur_id NOT IN (3)
-
-SELECT * FROM poste as p2 
-WHERE p2.departement_id = 26 
-AND p2.id NOT IN (
-    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
-)
+    SELECT sum(nb_clients) FROM poste as p2 
+    LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+    WHERE p2.departement_id = 26 
+    AND ap.appareil_coupeur_id = 4 
+    AND p2.id NOT IN (
+        SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
+    )
 
 
 
+    SELECT ac.id,ac.titre,p.id, p.designation FROM `appareil_coupeur_poste` as ap
+    LEFT JOIN  poste p ON ap.poste_id = p.id 
+    LEFT JOIN  appareil_coupeur ac ON ap.appareil_coupeur_id = ac.id
 
--- get CI
-(SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as `CC`,
--- if ps and ap has not set and 
--- (CASE WHEN ps_id is null then CC else   
-(
-SELECT sum(nb_clients) FROM poste as p2 
-LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
-WHERE p2.departement_id = d.id 
-AND ap.appareil_coupeur_id = t.appareil_id 
-AND p2.id NOT IN (
-    SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
-)) as `CI`,
--- END) as `CI`,
+
+    SELECT * FROM poste as p2 
+    LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+    WHERE p2.departement_id = 26 ORDER BY ap.appareil_coupeur_id
+    -- AND ap.appareil_coupeur_id NOT IN (3)
+
+    SELECT * FROM poste as p2 
+    WHERE p2.departement_id = 26 
+    AND p2.id NOT IN (
+        SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = 3
+    )
+
+
+
+
+    -- get CI
+    (SELECT sum(nb_clients) FROM poste as p1 WHERE p1.departement_id= d.id) as `CC`,
+    -- if ps and ap has not set and 
+    -- (CASE WHEN ps_id is null then CC else   
+    (
+    SELECT sum(nb_clients) FROM poste as p2 
+    LEFT JOIN  appareil_coupeur_poste ap ON p2.id = ap.poste_id 
+    WHERE p2.departement_id = d.id 
+    AND ap.appareil_coupeur_id = t.appareil_id 
+    AND p2.id NOT IN (
+        SELECT poste_id from appareil_coupeur_poste where appareil_coupeur_id = t.ps_id
+    )) as `CI`,
+    -- END) as `CI`,
 
 
 
@@ -282,31 +250,31 @@ AND p2.id NOT IN (
 ## ROLES management
 https://dev.to/sebastiandg7/how-do-you-handle-role-permissions-updates-with-jwt-3778
 
-How to grant access in front?
-    on login get user role from token which can be only (super_admin,admin,user)
-    send a new request to get the user's groupe ( using find by name )
-    store groupe in local storage
-        use ng guard to tell if a route can be accessed or not
-        you should add a validation foreach item in the menu if it can be accessed or not
-How to grant api by role dynamically?
-    in the api u can do something like (user.groupe.roles as json) contains current entity also current method (add,delete....)
-How to update stored roles for each user :
-    set authz for each REST api in backend
-    if gets an authz error (in front interceptor) 
-        -> refresh the user's token (which will get a new roles to the front)
-        -> refresh page
-        -> show a toast of something went wrong
+- **How to grant access in front?**
+    - on login get user role from token which can be only (super_admin,admin,user)
+    - send a new request to get the user's groupe ( using find by name )
+    - store groupe in local storage
+        - use ng guard to tell if a route can be accessed or not
+        - you should add a validation foreach item in the menu if it can be accessed or not
+- **How to grant api by role dynamically?**
+    - in the api u can do something like (user.groupe.roles as json) contains current entity also current method (add,delete....)
+- **How to update stored roles for each user :**
+    - set authz for each REST api in backend
+    - if gets an authz error (in front interceptor) 
+        - refresh the user's token (which will get a new roles to the front)
+        - refresh page
+        - show a toast of something went wrong
 
-The changes may tak a while to be effected
+The changes may tak a while to be effected<br>
 For having the permission changes immediately reflected, the user should logout and re-authenticate, otherwise the changes will be effected when the user is Unauthorized or denied from accessing an interface or when it session end which will take approximately one hour
-
+<br><br>
 https://nehalist.io/logging-events-to-database-in-symfony/
-07:58 x download monolog bundel
-09:10 x create monolog.yml file config > package
-12:52 x create Monolog handler php src > utlity
-15:26 x create new entity log
-15:45 : update services.yaml > config
-01:40 : create dbprocessor > utillity
+- 07:58 x download monolog bundel
+- 09:10 x create monolog.yml file config > package
+- 12:52 x create Monolog handler php src > utlity
+- 15:26 x create new entity log
+- 15:45 : update services.yaml > config
+- 01:40 : create dbprocessor > utillity
 
 
 
@@ -384,8 +352,9 @@ I will provide you with an example of how you might implement webhooks in your S
     After extracting the updated role information, update the user's role in local storage using Angular's local storage.
     Once the user's role is updated in local storage, you can update the UI accordingly to reflect the new role.
 
-It's important to note that you should use secure communication channels such as HTTPS to prevent unauthorized access to your webhook endpoint, validate the request origin and make sure that the webhook request comes from a trusted source.
-Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.
+It's important to note that you should use secure communication channels such as HTTPS to prevent unauthorized access to your webhook endpoint, validate the request origin and make sure that the webhook request comes from a trusted source.<br>
+
+Also, you can use Symfony's security component to secure your webhook endpoint and make sure that only authenticated and authorized admin users can access it.<br>
 
 Please note that this is just an example, you should adjust it to fit your specific use case, and it might not be complete and may require additional steps.
 
