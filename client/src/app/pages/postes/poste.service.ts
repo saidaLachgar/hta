@@ -14,7 +14,7 @@ import { environment } from "src/environments/environment";
 import { communeService } from "../communes/commune.service";
 import { departmentService } from "../departments/department.service";
 
-const formatDate = (date) => new Date(date.year,date.month,date.day).toISOString();
+const formatDate = (date) => date !== "" ? date.year + "-" + date.month + "-" + ("0" + date.day).slice(-2) : "";
 const zeroPad = (num, places = 2) => String(num).padStart(places, '0');
 const DateToString = (date) => `${date.year}-${zeroPad(date.month)}-${zeroPad(date.day)}`;
 
@@ -25,7 +25,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   readonly pageSize = environment.pageSize;
   private server = environment.serverURL;
   postes$: Observable<Poste[]>;
-  
+
   communes$: Observable<Commune[]>;
   communeLoading = false;
   communeInput$ = new Subject<string>();
@@ -44,7 +44,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   page:number = 1;
   lastSearchedParams;
   uploadResponse:string[];
-  
+
   public selectedFile:File;
   public posteForm: FormGroup;
   public exportForm: FormGroup;
@@ -67,7 +67,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
   findAll(): void {
     this.findByCriteria({ page: 1 });
   }
-  
+
   loadCommunes(defaultVal = []) : void{
     this.communes$ = concat(
       of(defaultVal), // default items
@@ -110,7 +110,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
           distinctUntilChanged(),
           filter((val) => val != null),
           tap(() => this.nodeLoading = true),
-          switchMap(term => 
+          switchMap(term =>
             this.http.get<Node[]>(`${this.server}/api/nodes?properties[]=id&properties[]=titre&titre=${term}`+
             (this.department ?  "&department.id="+ this.department.value.match(/\d+/)[0] : "")
             )
@@ -179,7 +179,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     const filter = Object.fromEntries(obj.filter(([key, value]) => value !== "" && value !== null ));
     filter["dateMst"] && (filter["dateMst"] = formatDate(filter["dateMst"]));
     // console.log(data);
-    // return; 
+    // return;
     this.http.post(url, {className : "poste", filter }, { responseType: 'blob' } ).subscribe(
       (response) => {
         that.isLoading = false;
@@ -200,11 +200,11 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
    * import spreadsheet to the server
    */
   importSpreadSheet(): void{
-    this.submitted = true;    
+    this.submitted = true;
     this.isLoading = true;
 
     if (this.importForm.invalid) return;
-    
+
     let url = `${this.server}/api/import_spreadsheet`;
     let that = this;
     let toast = this.toast;
@@ -216,7 +216,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
     body.append("uniqueColumns", "Designation,Node");
 
      this.http.post<{messages: string[]}>( url, body, { reportProgress: true, responseType: 'json' }).pipe().subscribe(
-      
+
       (response) => {
         // console.log('Response:', response);
         that.importForm.reset();
@@ -230,7 +230,7 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
       (error) => {
         that.isLoading = false;
         toast.error("un problème est survenu, veuillez réessayer"+error)
-      }  
+      }
     );
   }
 
@@ -240,13 +240,13 @@ export class posteService extends EntityCollectionServiceBase<Poste> {
    */
   onCreate(): void {
     let posteForm = this.posteForm;
-    this.submitted = true;    
+    this.submitted = true;
     if (posteForm.invalid) return;
     let toast = this.toast;
     let obj = Object.entries(posteForm.value as Poste);
     // remove empty values
     const poste = Object.fromEntries(obj.filter(([key, value]) => value !== ""));
-    
+
     poste["dateMst"] && (poste["dateMst"] = formatDate(poste["dateMst"]));
 
     this.add(poste).subscribe({
