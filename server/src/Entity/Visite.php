@@ -18,7 +18,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 /**
  * @ApiResource(
- *  order= {"id" = "DESC"},
+ *  order= {"date" = "DESC"},
  *  output=VisiteOutput::class,
  *  normalizationContext={"groups"={"visite"}},
  *  itemOperations={
@@ -67,7 +67,7 @@ class Visite
      * @ORM\Column(type="float", nullable=true)
      * @Groups({"visite"})
      */
-    private $nbSupport=0;
+    private $nbSupport = 0;
 
     /**
      * @ORM\ManyToOne(targetEntity=Node::class, inversedBy="a_visites")
@@ -103,10 +103,10 @@ class Visite
         $this->node_b = new ArrayCollection();
         $this->communes = new ArrayCollection();
     }
-    
+
     public function __toString()
     {
-        return (string)$this->id;
+        return (string) $this->id;
     }
 
     public function getId(): ?int
@@ -197,7 +197,7 @@ class Visite
     public function addCommune(Commune $commune): self
     {
         // if (!$this->communes->contains($commune)) {
-            $this->communes[] = $commune;
+        $this->communes[] = $commune;
         // }
 
         return $this;
@@ -221,5 +221,5 @@ class Visite
 
         return $this;
     }
-   
+
 }
